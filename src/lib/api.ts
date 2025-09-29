@@ -1,8 +1,6 @@
 // src/lib/api.ts
-export const API =
-  import.meta.env.VITE_API_BASE ||
-  (typeof process !== "undefined" ? (process.env.API_BASE as string) : "") ||
-  "";
+// API base URL - empty for Supabase edge functions
+export const API = "";
 
 export async function getJSON<T = any>(path: string) {
   const r = await fetch(`${API}${path}`, { cache: "no-store" });

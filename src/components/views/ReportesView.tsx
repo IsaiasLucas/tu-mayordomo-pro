@@ -1,24 +1,28 @@
-import React, { useState } from "react";
-import { postJSON, getTel } from "@/lib/api";
+import React from "react";
 import { useReportes } from "@/hooks/useReportes";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ReportesView() {
   const { items, loading } = useReportes();
-  const [busy,setBusy] = useState(false);
+  const { toast } = useToast();
 
-  const generar = async (tipo:"semanal"|"mensual")=>{
-    setBusy(true);
-    await postJSON(`/pdf?tel=${getTel()}&tipo=${tipo}`);
-    window.location.reload();
+  const generar = (tipo:"semanal"|"mensual")=>{
+    toast({
+      title: "Gerando relatório",
+      description: `Relatório ${tipo} será gerado em breve. A funcionalidade de PDF será implementada.`,
+    });
   };
 
   return (
     <main className="p-4 space-y-4">
       <div className="flex gap-3">
-        <button disabled={busy} onClick={()=>generar("semanal")}
-                className="bg-black text-white px-4 py-2 rounded-xl">PDF semanal</button>
-        <button disabled={busy} onClick={()=>generar("mensual")}
-                className="bg-black text-white px-4 py-2 rounded-xl">PDF mensual</button>
+        <Button onClick={()=>generar("semanal")} className="rounded-xl">
+          PDF semanal
+        </Button>
+        <Button onClick={()=>generar("mensual")} className="rounded-xl">
+          PDF mensual
+        </Button>
       </div>
 
       {loading ? "Cargando…" : (
