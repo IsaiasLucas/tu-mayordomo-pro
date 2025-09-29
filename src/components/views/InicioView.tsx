@@ -4,7 +4,7 @@ import { useUser } from "@/hooks/useUser";
 import { useGastos } from "@/hooks/useGastos";
 import { fmtCLP } from "@/lib/api";
 
-const InicioView = ({ isPro }: { isPro: boolean }) => {
+const InicioView = () => {
   const { data: user, loading } = useUser();
   const { items: gastos } = useGastos();
 

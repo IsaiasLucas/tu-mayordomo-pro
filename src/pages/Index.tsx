@@ -17,12 +17,10 @@ const Index = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check both old phone system and new auth system
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      const tel = getTel();
       
-      if (!session && !tel) {
+      if (!session) {
         navigate("/auth");
       }
     };
@@ -57,17 +55,17 @@ const Index = () => {
   const renderCurrentView = () => {
     switch (currentView) {
       case "inicio":
-        return <InicioView isPro={isPro} />;
+        return <InicioView />;
       case "gastos":
         return <GastosView />;
       case "reportes":
         return <ReportesView />;
       case "planes":
-        return <PlanesView isPro={isPro} onPlanChange={handlePlanChange} />;
+        return <PlanesView />;
       case "perfil":
-        return <PerfilView isPro={isPro} />;
+        return <PerfilView />;
       default:
-        return <InicioView isPro={isPro} />;
+        return <InicioView />;
     }
   };
 

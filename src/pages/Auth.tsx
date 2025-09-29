@@ -36,19 +36,12 @@ export default function Auth() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
+    if (!email || !password || (isSignUp && !telefone)) {
       toast({
         title: "Error",
-        description: "Por favor completa todos los campos obligatorios",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (isSignUp && !telefone) {
-      toast({
-        title: "Error", 
-        description: "El número de teléfono es obligatorio para el registro",
+        description: isSignUp 
+          ? "Por favor completa todos los campos obligatorios incluyendo el teléfono"
+          : "Por favor completa email y contraseña",
         variant: "destructive",
       });
       return;
@@ -90,8 +83,8 @@ export default function Auth() {
         }
 
         toast({
-          title: "Registro exitoso",
-          description: "Revisa tu email para confirmar tu cuenta",
+          title: "Registro realizado",
+          description: "Verifique seu email para confirmar a conta",
         });
       } else {
         // Sign in
@@ -103,8 +96,8 @@ export default function Auth() {
         if (error) throw error;
 
         toast({
-          title: "Inicio de sesión exitoso",
-          description: "Bienvenido de vuelta",
+          title: "Login realizado",
+          description: "Bem-vindo de volta",
         });
       }
     } catch (error: any) {
@@ -123,11 +116,11 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>{isSignUp ? "Crear cuenta" : "Iniciar sesión"}</CardTitle>
+          <CardTitle>{isSignUp ? "Criar conta" : "Iniciar sesión"}</CardTitle>
           <CardDescription>
             {isSignUp 
-              ? "Crea tu cuenta para comenzar" 
-              : "Ingresa a tu cuenta"}
+              ? "Crie sua conta para acessar o sistema" 
+              : "Entre com sua conta"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -168,23 +161,26 @@ export default function Auth() {
                     placeholder="56999999999"
                     required
                   />
+                  <p className="text-xs text-gray-500">
+                    Este número será usado para comunicação via WhatsApp
+                  </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="nombre">Nombre (opcional)</Label>
+                  <Label htmlFor="nombre">Nome (opcional)</Label>
                   <Input
                     id="nombre"
                     type="text"
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
-                    placeholder="Tu nombre"
+                    placeholder="Seu nome"
                   />
                 </div>
               </>
             )}
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Procesando..." : (isSignUp ? "Crear cuenta" : "Iniciar sesión")}
+              {loading ? "Processando..." : (isSignUp ? "Criar conta" : "Iniciar sesión")}
             </Button>
 
             <div className="text-center">
@@ -194,8 +190,8 @@ export default function Auth() {
                 className="text-sm text-primary hover:underline"
               >
                 {isSignUp 
-                  ? "¿Ya tienes cuenta? Inicia sesión" 
-                  : "¿No tienes cuenta? Regístrate"}
+                  ? "Já tem conta? Faça login" 
+                  : "Não tem conta? Registre-se"}
               </button>
             </div>
           </form>

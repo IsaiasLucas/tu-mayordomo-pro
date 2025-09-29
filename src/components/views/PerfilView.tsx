@@ -22,11 +22,8 @@ import {
   PiggyBank
 } from "lucide-react";
 
-interface PerfilViewProps {
-  isPro: boolean;
-}
-
-const PerfilView = ({ isPro }: PerfilViewProps) => {
+const PerfilView = () => {
+  const isPro = false; // You can get this from auth context later
   const [showBalance, setShowBalance] = useState(true);
   const [notifications, setNotifications] = useState({
     expenses: true,
