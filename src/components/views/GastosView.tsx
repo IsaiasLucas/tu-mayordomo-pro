@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Download, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface Movement {
   id: string;
@@ -64,8 +66,60 @@ export default function GastosView() {
   }, [phone, selectedMonth]);
 
   const handleDownloadPDF = () => {
-    // Placeholder para descarga de PDF
-    console.log("Descargando PDF del mes:", selectedMonth);
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // Encabezado
+    doc.setFontSize(18);
+    doc.text("Tu Mayordomo", 20, 20);
+    
+    doc.setFontSize(12);
+    doc.text(`Resumen ${selectedMonth} — ${phone}`, 20, 30);
+    
+    // Totales
+    doc.setFontSize(14);
+    doc.text("Totales del mes", 20, 45);
+    
+    doc.setFontSize(10);
+    doc.text(`Ingresos: ${fmtCLP(data.totals.ingresos)}`, 20, 55);
+    doc.text(`Gastos: ${fmtCLP(data.totals.gastos)}`, 20, 62);
+    doc.text(`Saldo: ${fmtCLP(data.totals.saldo)}`, 20, 69);
+    
+    // Tabla de movimientos
+    const tableData = data.movements.map(mov => [
+      format(new Date(mov.fecha), "dd/MM HH:mm"),
+      mov.descripcion,
+      mov.tipo,
+      fmtCLP(mov.monto)
+    ]);
+    
+    autoTable(doc, {
+      startY: 80,
+      head: [["Fecha", "Descripción", "Tipo", "Monto"]],
+      body: tableData,
+      theme: "grid",
+      styles: {
+        fontSize: 9,
+        cellPadding: 3
+      },
+      headStyles: {
+        fillColor: [100, 100, 100],
+        textColor: [255, 255, 255]
+      }
+    });
+    
+    // Pie de página
+    const finalY = (doc as any).lastAutoTable.finalY || 80;
+    doc.setFontSize(8);
+    doc.text(
+      `Generado automáticamente el ${format(new Date(), "dd/MM/yyyy HH:mm")}`,
+      20,
+      finalY + 15
+    );
+    
+    // Guardar
+    const fileName = `resumen-${selectedMonth}-${phone}.pdf`;
+    doc.save(fileName);
   };
 
   if (!phone) {
