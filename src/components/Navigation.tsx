@@ -40,8 +40,45 @@ const Navigation = ({
     label: "Perfil",
     icon: User
   }];
-  return <div className="bg-gradient-header text-primary-foreground shadow-card">
-      
-    </div>;
+  return (
+    <div className="bg-gradient-header text-primary-foreground shadow-card">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between py-4">
+          <h1 className="text-xl font-bold">Tu Mayordomo</h1>
+          
+          <div className="flex items-center gap-2">
+            {navigationItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = currentView === item.id;
+              const isDisabled = item.requiresPro && !isPro;
+              
+              return (
+                <Button
+                  key={item.id}
+                  variant={isActive ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => !isDisabled && onViewChange(item.id)}
+                  disabled={isDisabled}
+                  className={cn(
+                    "flex items-center gap-2",
+                    isActive && "bg-white/20",
+                    isDisabled && "opacity-50"
+                  )}
+                >
+                  <Icon size={16} />
+                  <span className="hidden sm:inline">{item.label}</span>
+                  {item.requiresPro && !isPro && (
+                    <Badge variant="secondary" className="ml-1 text-xs">
+                      Pro
+                    </Badge>
+                  )}
+                </Button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 export default Navigation;
