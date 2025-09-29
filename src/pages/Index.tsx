@@ -7,6 +7,7 @@ import GastosView from "@/components/views/GastosView";
 import ReportesView from "@/components/views/ReportesView";
 import PlanesView from "@/components/views/PlanesView";
 import PerfilView from "@/components/views/PerfilView";
+import CompleteProfileModal from "@/components/CompleteProfileModal";
 import { toast } from "@/hooks/use-toast";
 
 const Index = () => {
@@ -14,6 +15,7 @@ const Index = () => {
   const [currentView, setCurrentView] = useState("inicio");
   const [userPlan, setUserPlan] = useState("free"); // free, pro, premium
   const [phoneFilter, setPhoneFilter] = useState("");
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,6 +23,16 @@ const Index = () => {
       navigate("/auth");
     }
   }, [isAuthenticated, authLoading, navigate]);
+
+  // Check if user needs to complete profile after login
+  useEffect(() => {
+    if (isAuthenticated && !authLoading) {
+      const hasPhone = localStorage.getItem("tm_phone");
+      if (!hasPhone) {
+        setShowProfileModal(true);
+      }
+    }
+  }, [isAuthenticated, authLoading]);
 
   if (authLoading) {
     return (
@@ -87,6 +99,11 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8">
         {renderCurrentView()}
       </main>
+
+      <CompleteProfileModal
+        open={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
     </div>
   );
 };
