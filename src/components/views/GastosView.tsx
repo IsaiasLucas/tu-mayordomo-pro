@@ -1,28 +1,222 @@
-import React from "react";
-import { useGastos } from "@/hooks/useGastos";
+import { useState, useEffect } from "react";
 import { fmtCLP } from "@/lib/api";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Download, AlertCircle } from "lucide-react";
+import { format } from "date-fns";
+
+interface Movement {
+  id: string;
+  fecha: string;
+  descripcion: string;
+  tipo: string;
+  monto: number;
+}
+
+interface MonthData {
+  movements: Movement[];
+  totals: {
+    ingresos: number;
+    gastos: number;
+    saldo: number;
+  };
+}
 
 export default function GastosView() {
-  const { items, loading } = useGastos();
-  if (loading) return <div className="p-4">Cargando…</div>;
+  const [selectedMonth, setSelectedMonth] = useState<string>(
+    format(new Date(), "yyyy-MM")
+  );
+  const [phone, setPhone] = useState<string | null>(null);
+  const [data, setData] = useState<MonthData>({ movements: [], totals: { ingresos: 0, gastos: 0, saldo: 0 } });
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 50;
+
+  useEffect(() => {
+    const storedPhone = localStorage.getItem("tm_phone");
+    setPhone(storedPhone);
+  }, []);
+
+  useEffect(() => {
+    if (!phone) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const url = `https://script.google.com/macros/s/AKfycbxyXBVTvevLlh59jTps_0lH9FCArcKrumWdu3_h0B1P_QNzG-etIan-g-_1SlatTYRaNQ/exec?action=month&phone=${encodeURIComponent(phone)}&ym=${selectedMonth}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        
+        if (result.ok) {
+          setData(result);
+        }
+      } catch (error) {
+        console.error("Error fetching month data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [phone, selectedMonth]);
+
+  const handleDownloadPDF = () => {
+    // Placeholder para descarga de PDF
+    console.log("Descargando PDF del mes:", selectedMonth);
+  };
+
+  if (!phone) {
+    return (
+      <div className="p-6">
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            ⚠️ Falta confirmar tu WhatsApp para vincular tu cuenta.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  const paginatedMovements = data.movements.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalPages = Math.ceil(data.movements.length / itemsPerPage);
 
   return (
-    <main className="p-4 space-y-3">
-      {items.map((g:any)=>(
-        <div key={g.id} className="flex justify-between items-center bg-white rounded-[24px] p-4 shadow">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gray-100" />
-            <div>
-              <div className="font-medium">{g.categoria}</div>
-              <div className="text-xs text-gray-500">
-                {new Date(g.fecha).toLocaleDateString("es-CL")}
-              </div>
-            </div>
-          </div>
-          <div className="font-semibold">{fmtCLP(Number(g.valor||0))}</div>
+    <div className="p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h1 className="text-3xl font-bold">Gastos</h1>
+        <div className="flex gap-3 items-center">
+          <input
+            type="month"
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="px-3 py-2 border rounded-md"
+          />
+          <Button onClick={handleDownloadPDF}>
+            <Download className="w-4 h-4 mr-2" />
+            Descargar PDF
+          </Button>
         </div>
-      ))}
-      {!items.length && <div className="text-gray-500">Sin gastos este mes.</div>}
-    </main>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Ingresos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">
+              {fmtCLP(data.totals.ingresos)}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Gastos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">
+              {fmtCLP(data.totals.gastos)}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Saldo</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className={`text-2xl font-bold ${data.totals.saldo >= 0 ? 'text-primary' : 'text-red-600'}`}>
+              {fmtCLP(data.totals.saldo)}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Movimientos del mes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="text-center py-8">Cargando...</div>
+          ) : (
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead>Descripción</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead className="text-right">Monto</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedMovements.map((mov) => (
+                    <TableRow key={mov.id}>
+                      <TableCell>
+                        {format(new Date(mov.fecha), "dd/MM HH:mm")}
+                      </TableCell>
+                      <TableCell>{mov.descripcion}</TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            mov.tipo.toLowerCase().includes("ingreso") || 
+                            mov.tipo.toLowerCase().includes("receita")
+                              ? "default"
+                              : "destructive"
+                          }
+                        >
+                          {mov.tipo}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        {fmtCLP(mov.monto)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              {paginatedMovements.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  Sin movimientos en este mes.
+                </div>
+              )}
+
+              {totalPages > 1 && (
+                <div className="flex justify-center gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Anterior
+                  </Button>
+                  <span className="px-4 py-2">
+                    Página {currentPage} de {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Siguiente
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
