@@ -52,7 +52,7 @@ const Index = () => {
       case "reportes":
         return <ReportesView />;
       case "planes":
-        return <PlanesView />;
+        return <PlanesView isPro={isPro} onPlanChange={handlePlanChange} />;
       case "perfil":
         return <PerfilView isPro={isPro} />;
       default:
