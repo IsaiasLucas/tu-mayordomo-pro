@@ -163,23 +163,24 @@ const PerfilView = () => {
   const handleDeleteAccount = async () => {
     setLoading(true);
     try {
-      // Delete user profile first
-      if (profile?.id) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .delete()
-          .eq('user_id', user?.id);
-        
-        if (profileError) throw profileError;
-      }
+      // Call edge function to delete user completely
+      const { data, error } = await supabase.functions.invoke('delete-user', {
+        headers: {
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+        }
+      });
 
-      // Sign out
-      await signOut();
-      
+      if (error) throw error;
+
       toast({
         title: "Conta excluída",
         description: "Sua conta foi excluída com sucesso.",
       });
+
+      // Redirect to home after a short delay
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1500);
     } catch (error: any) {
       toast({
         title: "Erro ao excluir conta",

@@ -9,3 +9,6 @@ max_rows = 1000
 
 [functions.add-user-to-sheets]
 verify_jwt = false
+
+[functions.delete-user]
+verify_jwt = true
