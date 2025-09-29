@@ -41,12 +41,20 @@ const Navigation = ({
     icon: User
   }];
   return (
-    <div className="bg-gradient-header text-primary-foreground shadow-card">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between py-4">
-          <h1 className="text-xl font-bold">Tu Mayordomo</h1>
-          
-          <div className="flex items-center gap-2">
+    <>
+      {/* Top header with title */}
+      <div className="bg-gradient-header text-primary-foreground shadow-card">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center py-4">
+            <h1 className="text-xl font-bold">Tu Mayordomo</h1>
+          </div>
+        </div>
+      </div>
+      
+      {/* Bottom floating navigation */}
+      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
+        <div className="bg-background/80 backdrop-blur-lg border rounded-full shadow-lg px-2 py-2">
+          <div className="flex items-center gap-1">
             {navigationItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentView === item.id;
@@ -55,21 +63,22 @@ const Navigation = ({
               return (
                 <Button
                   key={item.id}
-                  variant={isActive ? "secondary" : "ghost"}
+                  variant={isActive ? "default" : "ghost"}
                   size="sm"
                   onClick={() => !isDisabled && onViewChange(item.id)}
                   disabled={isDisabled}
                   className={cn(
-                    "flex items-center gap-2",
-                    isActive && "bg-white/20",
-                    isDisabled && "opacity-50"
+                    "flex flex-col items-center gap-1 h-auto py-2 px-3 rounded-full transition-all",
+                    isActive && "bg-primary text-primary-foreground",
+                    isDisabled && "opacity-50",
+                    "hover:scale-105"
                   )}
                 >
-                  <Icon size={16} />
-                  <span className="hidden sm:inline">{item.label}</span>
+                  <Icon size={18} />
+                  <span className="text-xs">{item.label}</span>
                   {item.requiresPro && !isPro && (
-                    <Badge variant="secondary" className="ml-1 text-xs">
-                      Pro
+                    <Badge variant="secondary" className="absolute -top-1 -right-1 text-xs w-4 h-4 p-0 flex items-center justify-center">
+                      P
                     </Badge>
                   )}
                 </Button>
@@ -78,7 +87,7 @@ const Navigation = ({
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 export default Navigation;
