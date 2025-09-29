@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { getTel } from "@/lib/api";
 import Navigation from "@/components/Navigation";
 import InicioView from "@/components/views/InicioView";
 import GastosView from "@/components/views/GastosView";
@@ -11,6 +13,11 @@ const Index = () => {
   const [currentView, setCurrentView] = useState("inicio");
   const [userPlan, setUserPlan] = useState("free"); // free, pro, premium
   const [phoneFilter, setPhoneFilter] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => { 
+    if (!getTel()) navigate("/ingresar"); 
+  }, [navigate]);
 
   const isPro = userPlan !== "free";
 
