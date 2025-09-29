@@ -1,3 +1,4 @@
+import HeroOverview from "../HeroOverview";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,10 @@ const InicioView = ({ isPro }: InicioViewProps) => {
   ];
 
   return (
+    <main className="p-4 space-y-4">
+    {/* Hero Roxo */}
+    <HeroOverview total={totalBalance} varPct={16} title="Overview" />
+
     <div className="space-y-6">
       {/* Overview Card - Main Balance */}
       <Card className="bg-gradient-header text-white shadow-card-hover rounded-3xl p-8">
