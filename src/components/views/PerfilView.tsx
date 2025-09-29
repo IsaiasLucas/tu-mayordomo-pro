@@ -2,7 +2,20 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { 
   User,
   Crown,
@@ -25,7 +38,12 @@ import {
 
 const PerfilView = () => {
   const { user, profile, signOut } = useAuth();
+  const { toast } = useToast();
   const [showBalance, setShowBalance] = useState(true);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const isPro = profile?.plan === 'pro' || profile?.plan === 'premium';
   
@@ -67,6 +85,111 @@ const PerfilView = () => {
       ...prev,
       [key]: !prev[key as keyof typeof prev]
     }));
+    toast({
+      title: "Preferência salva",
+      description: "Sua configuração de notificação foi atualizada.",
+    });
+  };
+
+  const handleExportData = async () => {
+    try {
+      const dataToExport = {
+        profile: profile,
+        user: {
+          email: user?.email,
+          created_at: user?.created_at,
+        },
+        exported_at: new Date().toISOString(),
+      };
+      
+      const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `meus-dados-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Dados exportados",
+        description: "Seus dados foram exportados com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao exportar",
+        description: "Não foi possível exportar seus dados. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!newPassword || newPassword.length < 6) {
+      toast({
+        title: "Senha inválida",
+        description: "A senha deve ter pelo menos 6 caracteres.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Senha alterada",
+        description: "Sua senha foi atualizada com sucesso.",
+      });
+      setShowPasswordDialog(false);
+      setNewPassword("");
+    } catch (error: any) {
+      toast({
+        title: "Erro ao alterar senha",
+        description: error.message || "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setLoading(true);
+    try {
+      // Delete user profile first
+      if (profile?.id) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .delete()
+          .eq('user_id', user?.id);
+        
+        if (profileError) throw profileError;
+      }
+
+      // Sign out
+      await signOut();
+      
+      toast({
+        title: "Conta excluída",
+        description: "Sua conta foi excluída com sucesso.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao excluir conta",
+        description: error.message || "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+      setShowDeleteDialog(false);
+    }
   };
 
   const stats = [
@@ -256,11 +379,19 @@ const PerfilView = () => {
           <div className="space-y-4">
             <h4 className="font-medium">Gestão de Dados</h4>
             <div className="space-y-3">
-              <Button variant="outline" className="w-full rounded-2xl py-3 justify-start">
+              <Button 
+                variant="outline" 
+                onClick={handleExportData}
+                className="w-full rounded-2xl py-3 justify-start"
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Exportar meus dados
               </Button>
-              <Button variant="outline" className="w-full rounded-2xl py-3 justify-start">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowPasswordDialog(true)}
+                className="w-full rounded-2xl py-3 justify-start"
+              >
                 <Shield className="h-4 w-4 mr-2" />
                 Alterar senha
               </Button>
@@ -270,7 +401,11 @@ const PerfilView = () => {
           <div className="space-y-4">
             <h4 className="font-medium">Ações da Conta</h4>
             <div className="space-y-3">
-              <Button variant="outline" className="w-full rounded-2xl py-3 justify-start text-red-600 border-red-300 hover:bg-red-50">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowDeleteDialog(true)}
+                className="w-full rounded-2xl py-3 justify-start text-red-600 border-red-300 hover:bg-red-50"
+              >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Excluir conta
               </Button>
@@ -313,6 +448,57 @@ const PerfilView = () => {
           </Button>
         </div>
       </Card>
+
+      {/* Password Change Dialog */}
+      <AlertDialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Alterar Senha</AlertDialogTitle>
+            <AlertDialogDescription>
+              Digite sua nova senha. Ela deve ter pelo menos 6 caracteres.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <Input
+            type="password"
+            placeholder="Nova senha"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            className="rounded-xl"
+          />
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleChangePassword}
+              disabled={loading}
+              className="rounded-xl"
+            >
+              {loading ? "Alterando..." : "Alterar Senha"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Account Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir Conta</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza? Esta ação não pode ser desfeita. Todos os seus dados serão permanentemente excluídos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteAccount}
+              disabled={loading}
+              className="rounded-xl bg-red-600 hover:bg-red-700"
+            >
+              {loading ? "Excluindo..." : "Excluir Conta"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
