@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   User,
   Crown,
@@ -23,8 +24,11 @@ import {
 } from "lucide-react";
 
 const PerfilView = () => {
-  const isPro = false; // You can get this from auth context later
+  const { user, profile, signOut } = useAuth();
   const [showBalance, setShowBalance] = useState(true);
+
+  const isPro = profile?.plan === 'pro' || profile?.plan === 'premium';
+  
   const [notifications, setNotifications] = useState({
     expenses: true,
     budgets: true,
@@ -33,15 +37,22 @@ const PerfilView = () => {
   });
 
   const userProfile = {
-    name: "María González",
-    email: "maria.gonzalez@email.com",
-    phone: "+56 9 8765 4321",
-    location: "Santiago, Chile",
-    joinDate: "Marzo 2024",
-    planType: isPro ? "PRO" : "Gratis",
-    totalTransactions: 247,
-    monthsActive: 7
+    name: profile?.display_name || user?.user_metadata?.nombre || user?.email?.split('@')[0] || "Usuario",
+    email: user?.email || "",
+    phone: profile?.phone_personal || user?.user_metadata?.telefone || "No registrado",
+    location: "Chile",
+    joinDate: new Date(user?.created_at || new Date()).toLocaleDateString('es-CL', { 
+      year: 'numeric', 
+      month: 'long' 
+    }),
+    planType: profile?.plan || "free",
+    totalTransactions: 0,
+    monthsActive: Math.ceil((new Date().getTime() - new Date(user?.created_at || new Date()).getTime()) / (1000 * 60 * 60 * 24 * 30))
   };
+
+  if (!user) {
+    return <div className="p-4">Cargando perfil...</div>;
+  }
 
   const formatCLP = (amount: number) => {
     return new Intl.NumberFormat('es-CL', {
@@ -61,13 +72,13 @@ const PerfilView = () => {
   const stats = [
     { label: "Transacciones registradas", value: userProfile.totalTransactions, icon: Receipt },
     { label: "Meses activo", value: userProfile.monthsActive, icon: Calendar },
-    { label: "Ahorro promedio mensual", value: formatCLP(285000), icon: PiggyBank },
+    { label: "Ahorro promedio mensual", value: formatCLP(0), icon: PiggyBank },
   ];
 
   return (
     <div className="space-y-6">
       {/* Profile Header */}
-      <Card className="bg-gradient-header text-white shadow-card-hover rounded-3xl p-8">
+      <Card className="bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-lg rounded-3xl p-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-6">
             <div className="bg-white/20 backdrop-blur-sm p-6 rounded-3xl">
@@ -77,7 +88,7 @@ const PerfilView = () => {
               <div className="flex items-center space-x-3 mb-2">
                 <h1 className="text-3xl font-bold">{userProfile.name}</h1>
                 {isPro && (
-                  <Badge className="bg-accent text-accent-foreground px-3 py-1 rounded-full font-semibold">
+                  <Badge className="bg-yellow-500 text-black px-3 py-1 rounded-full font-semibold">
                     <Crown className="h-3 w-3 mr-1" />
                     PRO
                   </Badge>
@@ -120,17 +131,17 @@ const PerfilView = () => {
 
       {/* Account Settings */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-gradient-card shadow-card rounded-3xl p-6">
+        <Card className="bg-white shadow-sm rounded-3xl p-6">
           <h3 className="text-lg font-semibold mb-6 flex items-center">
             <Settings className="h-5 w-5 mr-2" />
-            Configuración de Cuenta
+            Configuração da Conta
           </h3>
           
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-medium">Mostrar balance en inicio</h4>
-                <p className="text-sm text-muted-foreground">Controla la visibilidad de tu balance principal</p>
+                <h4 className="font-medium">Mostrar saldo no início</h4>
+                <p className="text-sm text-gray-600">Controle a visibilidade do seu saldo principal</p>
               </div>
               <Button
                 variant="ghost"
@@ -143,45 +154,45 @@ const PerfilView = () => {
             </div>
 
             <div className="border-t pt-4">
-              <h4 className="font-medium mb-4">Información Personal</h4>
+              <h4 className="font-medium mb-4">Informações Pessoais</h4>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-xl transition-colors">
+                <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
                   <div className="flex items-center space-x-3">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <Mail className="h-4 w-4 text-gray-500" />
                     <span>Email</span>
                   </div>
-                  <span className="text-muted-foreground">{userProfile.email}</span>
+                  <span className="text-gray-600">{userProfile.email}</span>
                 </div>
-                <div className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-xl transition-colors">
+                <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
                   <div className="flex items-center space-x-3">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
-                    <span>Teléfono</span>
+                    <Phone className="h-4 w-4 text-gray-500" />
+                    <span>Telefone</span>
                   </div>
-                  <span className="text-muted-foreground">{userProfile.phone}</span>
+                  <span className="text-gray-600">{userProfile.phone}</span>
                 </div>
-                <div className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-xl transition-colors">
+                <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
                   <div className="flex items-center space-x-3">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span>Miembro desde</span>
+                    <Calendar className="h-4 w-4 text-gray-500" />
+                    <span>Membro desde</span>
                   </div>
-                  <span className="text-muted-foreground">{userProfile.joinDate}</span>
+                  <span className="text-gray-600">{userProfile.joinDate}</span>
                 </div>
               </div>
             </div>
           </div>
         </Card>
 
-        <Card className="bg-gradient-card shadow-card rounded-3xl p-6">
+        <Card className="bg-white shadow-sm rounded-3xl p-6">
           <h3 className="text-lg font-semibold mb-6 flex items-center">
             <Bell className="h-5 w-5 mr-2" />
-            Notificaciones
+            Notificações
           </h3>
           
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="font-medium">Alertas de gastos</h4>
-                <p className="text-sm text-muted-foreground">Notificaciones cuando registres nuevos gastos</p>
+                <p className="text-sm text-gray-600">Notificações quando registrar novos gastos</p>
               </div>
               <Button
                 variant={notifications.expenses ? "default" : "outline"}
@@ -189,14 +200,14 @@ const PerfilView = () => {
                 onClick={() => handleNotificationChange('expenses')}
                 className="rounded-xl"
               >
-                {notifications.expenses ? "Activado" : "Desactivado"}
+                {notifications.expenses ? "Ativado" : "Desativado"}
               </Button>
             </div>
 
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-medium">Límites de presupuesto</h4>
-                <p className="text-sm text-muted-foreground">Avisos cuando superes tus presupuestos</p>
+                <h4 className="font-medium">Limites de orçamento</h4>
+                <p className="text-sm text-gray-600">Avisos quando superar seus orçamentos</p>
               </div>
               <Button
                 variant={notifications.budgets ? "default" : "outline"}
@@ -204,18 +215,18 @@ const PerfilView = () => {
                 onClick={() => handleNotificationChange('budgets')}
                 className="rounded-xl"
               >
-                {notifications.budgets ? "Activado" : "Desactivado"}
+                {notifications.budgets ? "Ativado" : "Desativado"}
               </Button>
             </div>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <div>
-                  <h4 className="font-medium">Reportes semanales</h4>
-                  <p className="text-sm text-muted-foreground">Resumen semanal de tus finanzas</p>
+                  <h4 className="font-medium">Relatórios semanais</h4>
+                  <p className="text-sm text-gray-600">Resumo semanal das suas finanças</p>
                 </div>
                 {isPro && (
-                  <Badge className="bg-accent text-accent-foreground px-2 py-0 text-xs rounded-full">
+                  <Badge className="bg-yellow-500 text-black px-2 py-0 text-xs rounded-full">
                     PRO
                   </Badge>
                 )}
@@ -227,22 +238,7 @@ const PerfilView = () => {
                 disabled={!isPro}
                 className="rounded-xl"
               >
-                {notifications.reports ? "Activado" : "Desactivado"}
-              </Button>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-medium">Promociones</h4>
-                <p className="text-sm text-muted-foreground">Ofertas especiales y novedades</p>
-              </div>
-              <Button
-                variant={notifications.marketing ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleNotificationChange('marketing')}
-                className="rounded-xl"
-              >
-                {notifications.marketing ? "Activado" : "Desactivado"}
+                {notifications.reports ? "Ativado" : "Desativado"}
               </Button>
             </div>
           </div>
@@ -250,37 +246,41 @@ const PerfilView = () => {
       </div>
 
       {/* Security & Data */}
-      <Card className="bg-gradient-card shadow-card rounded-3xl p-6">
+      <Card className="bg-white shadow-sm rounded-3xl p-6">
         <h3 className="text-lg font-semibold mb-6 flex items-center">
           <Shield className="h-5 w-5 mr-2" />
-          Seguridad y Datos
+          Segurança e Dados
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <h4 className="font-medium">Gestión de Datos</h4>
+            <h4 className="font-medium">Gestão de Dados</h4>
             <div className="space-y-3">
               <Button variant="outline" className="w-full rounded-2xl py-3 justify-start">
                 <Download className="h-4 w-4 mr-2" />
-                Exportar mis datos
+                Exportar meus dados
               </Button>
               <Button variant="outline" className="w-full rounded-2xl py-3 justify-start">
                 <Shield className="h-4 w-4 mr-2" />
-                Cambiar contraseña
+                Alterar senha
               </Button>
             </div>
           </div>
 
           <div className="space-y-4">
-            <h4 className="font-medium">Acciones de Cuenta</h4>
+            <h4 className="font-medium">Ações da Conta</h4>
             <div className="space-y-3">
-              <Button variant="outline" className="w-full rounded-2xl py-3 justify-start text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground">
+              <Button variant="outline" className="w-full rounded-2xl py-3 justify-start text-red-600 border-red-300 hover:bg-red-50">
                 <Trash2 className="h-4 w-4 mr-2" />
-                Eliminar cuenta
+                Excluir conta
               </Button>
-              <Button variant="outline" className="w-full rounded-2xl py-3 justify-start">
+              <Button 
+                variant="outline" 
+                onClick={signOut}
+                className="w-full rounded-2xl py-3 justify-start"
+              >
                 <LogOut className="h-4 w-4 mr-2" />
-                Cerrar sesión
+                Sair
               </Button>
             </div>
           </div>
@@ -288,28 +288,28 @@ const PerfilView = () => {
       </Card>
 
       {/* Plan Information */}
-      <Card className="bg-gradient-card shadow-card rounded-3xl p-6">
+      <Card className="bg-white shadow-sm rounded-3xl p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold mb-2">Tu Plan Actual</h3>
+            <h3 className="text-lg font-semibold mb-2">Seu Plano Atual</h3>
             <div className="flex items-center space-x-3">
               <Badge className={`px-3 py-1 rounded-full font-semibold ${
                 isPro 
-                  ? 'bg-accent text-accent-foreground' 
-                  : 'bg-muted text-muted-foreground'
+                  ? 'bg-yellow-500 text-black' 
+                  : 'bg-gray-100 text-gray-700'
               }`}>
                 {isPro && <Crown className="h-3 w-3 mr-1" />}
-                {userProfile.planType}
+                {userProfile.planType.toUpperCase()}
               </Badge>
               {isPro ? (
-                <p className="text-muted-foreground">Acceso completo a todas las funciones</p>
+                <p className="text-gray-600">Acesso completo a todas as funcionalidades</p>
               ) : (
-                <p className="text-muted-foreground">Funciones básicas disponibles</p>
+                <p className="text-gray-600">Funcionalidades básicas disponíveis</p>
               )}
             </div>
           </div>
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl px-6">
-            {isPro ? "Gestionar Plan" : "Actualizar a PRO"}
+          <Button className="bg-purple-600 text-white hover:bg-purple-700 rounded-2xl px-6">
+            {isPro ? "Gerenciar Plano" : "Atualizar para PRO"}
           </Button>
         </div>
       </Card>

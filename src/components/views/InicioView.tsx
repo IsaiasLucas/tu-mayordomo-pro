@@ -1,11 +1,11 @@
 import React from "react";
 import HeroOverview from "../HeroOverview";
-import { useUser } from "@/hooks/useUser";
+import { useAuth } from "@/hooks/useAuth";
 import { useGastos } from "@/hooks/useGastos";
 import { fmtCLP } from "@/lib/api";
 
 const InicioView = () => {
-  const { data: user, loading } = useUser();
+  const { profile, loading } = useAuth();
   const { items: gastos } = useGastos();
 
   const ingresos = gastos.filter(g=>String(g.tipo).toLowerCase()==="ingreso")
@@ -18,10 +18,10 @@ const InicioView = () => {
     <main className="p-4 space-y-4">
       <HeroOverview total={saldoMes||0} varPct={16} title="Overview" />
 
-      {!loading && user?.plan==="free" && (
+      {!loading && profile?.plan === "free" && (
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-900 rounded-xl p-3">
-          Te quedan <b>{30-(user?.usage_count||0)}</b>/30 interacciones gratis.
-          <a href="/planes" className="underline ml-2">Activar PRO</a>
+          Plano gratuito ativo. 
+          <a href="/planes" className="underline ml-2">Fazer upgrade para PRO</a>
         </div>
       )}
 

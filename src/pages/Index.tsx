@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getTel } from "@/lib/api";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import Navigation from "@/components/Navigation";
 import InicioView from "@/components/views/InicioView";
 import GastosView from "@/components/views/GastosView";
@@ -11,22 +10,28 @@ import PerfilView from "@/components/views/PerfilView";
 import { toast } from "@/hooks/use-toast";
 
 const Index = () => {
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [currentView, setCurrentView] = useState("inicio");
   const [userPlan, setUserPlan] = useState("free"); // free, pro, premium
   const [phoneFilter, setPhoneFilter] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        navigate("/auth");
-      }
-    };
-    
-    checkAuth();
-  }, [navigate]);
+    if (!authLoading && !isAuthenticated) {
+      navigate("/auth");
+    }
+  }, [isAuthenticated, authLoading, navigate]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   const isPro = userPlan !== "free";
 
