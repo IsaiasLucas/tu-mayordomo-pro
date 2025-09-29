@@ -163,31 +163,43 @@ const PerfilView = () => {
   const handleDeleteAccount = async () => {
     setLoading(true);
     try {
+      // Ensure we have a fresh session/token
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+
+      if (!accessToken) {
+        // No valid session: force sign out and redirect
+        await supabase.auth.signOut();
+        window.location.replace('/auth');
+        return;
+      }
+
       // Call edge function to delete user completely
-      const { data, error } = await supabase.functions.invoke('delete-user', {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-        }
+      const { error } = await supabase.functions.invoke('delete-user', {
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
 
       if (error) throw error;
-
-      // Sign out immediately after successful deletion
-      await supabase.auth.signOut();
 
       toast({
         title: "Conta excluída",
         description: "Sua conta foi excluída com sucesso.",
       });
 
-      // Redirect immediately
-      window.location.href = '/';
+      // Always sign out and redirect after deletion
+      await supabase.auth.signOut();
+      window.location.replace('/auth');
     } catch (error: any) {
+      // On any error, ensure user is signed out and moved to login
+      console.error('Delete account error:', error);
       toast({
         title: "Erro ao excluir conta",
-        description: error.message || "Tente novamente mais tarde.",
+        description: error?.message || "Tente novamente mais tarde.",
         variant: "destructive",
       });
+      await supabase.auth.signOut();
+      window.location.replace('/auth');
+    } finally {
       setLoading(false);
       setShowDeleteDialog(false);
     }
