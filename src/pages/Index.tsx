@@ -48,9 +48,9 @@ const Index = () => {
       case "inicio":
         return <InicioView isPro={isPro} />;
       case "gastos":
-        return <GastosView isPro={isPro} />;
+        return <GastosView />;
       case "reportes":
-        return <ReportesView isPro={isPro} />;
+        return <ReportesView />;
       case "planes":
         return <PlanesView isPro={isPro} onPlanChange={handlePlanChange} />;
       case "perfil":
