@@ -68,10 +68,6 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
       return;
     }
 
-    // Normalizar phone para el backend (solo dígitos con 56)
-    const phoneDigits = whatsapp.replace(/\D/g, "");
-    const normalizedPhone = phoneDigits.startsWith("56") ? phoneDigits : `56${phoneDigits}`;
-
     setLoading(true);
 
     try {
@@ -85,27 +81,27 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
           body: JSON.stringify({
             action: "addUser",
             name: nombre,
-            phone: normalizedPhone,
-            kind: tipo === "Personal" ? "pessoal" : "empresa",
+            phone: whatsapp,
+            kind: tipo === "Empresa" ? "empresa" : "pessoal",
           }),
         }
       );
 
       const data = await response.json();
 
-      if (data.ok) {
-        // Guardar phone en localStorage
-        localStorage.setItem("tm_phone", normalizedPhone);
-        
-        toast({
-          title: "✅ Número verificado",
-          description: "Tu cuenta está activa.",
-        });
-
-        onClose();
-      } else {
-        throw new Error("Response not OK");
+      if (!data.ok) {
+        throw new Error(data.error || "Falha ao salvar");
       }
+
+      // Guardar phone formatado en localStorage
+      localStorage.setItem("tm_phone", whatsapp);
+      
+      toast({
+        title: "✅ Número verificado",
+        description: "Tu cuenta está activa.",
+      });
+
+      onClose();
     } catch (error) {
       console.error("Error al guardar datos:", error);
       toast({
