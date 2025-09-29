@@ -56,6 +56,8 @@ export function useAuth() {
   };
 
   const signOut = async () => {
+    // Limpiar tm_phone al hacer logout
+    localStorage.removeItem("tm_phone");
     await supabase.auth.signOut();
   };
 

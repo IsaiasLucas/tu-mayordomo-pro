@@ -9,6 +9,7 @@ import { Download, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import CompleteProfileModal from "@/components/CompleteProfileModal";
 
 interface Movement {
   id: string;
@@ -32,6 +33,7 @@ export default function GastosView() {
     format(new Date(), "yyyy-MM")
   );
   const [phone, setPhone] = useState<string | null>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [data, setData] = useState<MonthData>({ movements: [], totals: { ingresos: 0, gastos: 0, saldo: 0 } });
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,6 +42,11 @@ export default function GastosView() {
   useEffect(() => {
     const storedPhone = localStorage.getItem("tm_phone");
     setPhone(storedPhone);
+    
+    // Si no hay phone, mostrar modal
+    if (!storedPhone) {
+      setShowProfileModal(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -122,16 +129,29 @@ export default function GastosView() {
     doc.save(fileName);
   };
 
+  const handleProfileModalClose = () => {
+    // Verificar si ahora hay phone guardado
+    const storedPhone = localStorage.getItem("tm_phone");
+    setPhone(storedPhone);
+    setShowProfileModal(false);
+  };
+
   if (!phone) {
     return (
-      <div className="p-6">
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            ⚠️ Falta confirmar tu WhatsApp para vincular tu cuenta.
-          </AlertDescription>
-        </Alert>
-      </div>
+      <>
+        <div className="p-6">
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              ⚠️ Falta confirmar tu WhatsApp para vincular tu cuenta.
+            </AlertDescription>
+          </Alert>
+        </div>
+        <CompleteProfileModal 
+          open={showProfileModal}
+          onClose={handleProfileModalClose}
+        />
+      </>
     );
   }
 
