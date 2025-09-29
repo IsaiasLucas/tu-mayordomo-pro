@@ -1,15 +1,49 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { setTel } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Ingresar() {
   const [v, setV] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const go = () => {
+  const go = async () => {
     if (!v.trim()) return;
-    setTel(v);          // normaliza para 56 + dígitos
-    navigate("/inicio");
+    
+    setLoading(true);
+    const telefoneNormalizado = setTel(v);
+    
+    try {
+      const response = await fetch(
+        "https://script.google.com/macros/s/AKfycbxyXBVTvevLlh59jTps_0lH9FCArcKrumWdu3_h0B1P_QNzG-etIan-g-_1SlatTYRaNQ/exec",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            phone: telefoneNormalizado,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao registrar telefone");
+      }
+
+      navigate("/inicio");
+    } catch (error) {
+      console.error("Erro ao enviar telefone:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível registrar o telefone. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -22,8 +56,12 @@ export default function Ingresar() {
         value={v}
         onChange={(e) => setV(e.target.value)}
       />
-      <button onClick={go} className="bg-purple-600 text-white px-4 py-3 rounded-xl w-full">
-        Entrar
+      <button 
+        onClick={go} 
+        disabled={loading}
+        className="bg-purple-600 text-white px-4 py-3 rounded-xl w-full disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {loading ? "Registrando..." : "Entrar"}
       </button>
       
       <div className="pt-4 border-t">
