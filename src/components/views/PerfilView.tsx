@@ -172,22 +172,22 @@ const PerfilView = () => {
 
       if (error) throw error;
 
+      // Sign out immediately after successful deletion
+      await supabase.auth.signOut();
+
       toast({
         title: "Conta excluída",
         description: "Sua conta foi excluída com sucesso.",
       });
 
-      // Redirect to home after a short delay
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 1500);
+      // Redirect immediately
+      window.location.href = '/';
     } catch (error: any) {
       toast({
         title: "Erro ao excluir conta",
         description: error.message || "Tente novamente mais tarde.",
         variant: "destructive",
       });
-    } finally {
       setLoading(false);
       setShowDeleteDialog(false);
     }
