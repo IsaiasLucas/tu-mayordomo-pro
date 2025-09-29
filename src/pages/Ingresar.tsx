@@ -25,6 +25,16 @@ export default function Ingresar() {
       <button onClick={go} className="bg-purple-600 text-white px-4 py-3 rounded-xl w-full">
         Entrar
       </button>
+      
+      <div className="pt-4 border-t">
+        <p className="text-sm text-gray-600 mb-3">¿Prefieres crear una cuenta completa?</p>
+        <button 
+          onClick={() => navigate("/auth")} 
+          className="bg-gray-800 text-white px-4 py-3 rounded-xl w-full"
+        >
+          Crear cuenta con email
+        </button>
+      </div>
     </main>
   );
 }

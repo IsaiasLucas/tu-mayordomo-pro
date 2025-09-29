@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Ingresar from "./pages/Ingresar";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -11,6 +12,7 @@ function App() {
         <Route path="/" element={<Index />} />
         <Route path="/inicio" element={<Index />} />
         <Route path="/ingresar" element={<Ingresar />} />
+        <Route path="/auth" element={<Auth />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />

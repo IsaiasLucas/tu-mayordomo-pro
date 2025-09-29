@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getTel } from "@/lib/api";
+import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import InicioView from "@/components/views/InicioView";
 import GastosView from "@/components/views/GastosView";
@@ -15,8 +16,18 @@ const Index = () => {
   const [phoneFilter, setPhoneFilter] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => { 
-    if (!getTel()) navigate("/ingresar"); 
+  useEffect(() => {
+    // Check both old phone system and new auth system
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const tel = getTel();
+      
+      if (!session && !tel) {
+        navigate("/auth");
+      }
+    };
+    
+    checkAuth();
   }, [navigate]);
 
   const isPro = userPlan !== "free";
