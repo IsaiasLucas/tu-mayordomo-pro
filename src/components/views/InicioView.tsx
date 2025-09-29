@@ -1,7 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import AccountSwitcher from "@/components/AccountSwitcher";
 import { 
   ArrowUpRight, 
   ArrowDownRight, 
@@ -11,9 +10,6 @@ import {
   CreditCard,
   PiggyBank
 } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "@/hooks/use-toast";
 
 interface InicioViewProps {
   isPro: boolean;
@@ -28,45 +24,10 @@ const formatCLP = (amount: number) => {
 };
 
 const InicioView = ({ isPro }: InicioViewProps) => {
-  const navigate = useNavigate();
   const totalBalance = 2547830;
   const monthlyIncome = 1850000;
   const monthlyExpenses = 1245670;
   const savings = 302160;
-
-  // Mock data para contas
-  const [currentAccount] = useState({
-    id: "1",
-    tipo: 'personal' as const,
-    nome: "João Silva",
-    email: "joao@email.com"
-  });
-
-  const [savedAccounts] = useState([
-    {
-      id: "1",
-      tipo: 'personal' as const,
-      nome: "João Silva",
-      email: "joao@email.com"
-    },
-    {
-      id: "2", 
-      tipo: 'empresa' as const,
-      nome: "Empresa Silva Ltda",
-      email: "empresa@silva.com"
-    }
-  ]);
-
-  const handleAccountSwitch = (account: any) => {
-    toast({
-      title: "Trocando conta",
-      description: `Mudando para ${account.nome}`
-    });
-  };
-
-  const handleAddAccount = () => {
-    navigate('/ingresar');
-  };
 
   const recentTransactions = [
     { id: 1, description: "Supermercado Jumbo", amount: -45670, date: "Hoy", category: "Alimentación" },
@@ -78,16 +39,6 @@ const InicioView = ({ isPro }: InicioViewProps) => {
 
   return (
     <main className="p-4 space-y-4">
-      {/* Account Switcher */}
-      <div className="mb-6">
-        <AccountSwitcher
-          currentAccount={currentAccount}
-          savedAccounts={savedAccounts}
-          onAccountSwitch={handleAccountSwitch}
-          onAddAccount={handleAddAccount}
-        />
-      </div>
-
     <div className="space-y-6">
       {/* Overview Card - Main Balance */}
       <Card className="bg-gradient-header text-white shadow-card-hover rounded-3xl p-8">
