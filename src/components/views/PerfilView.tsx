@@ -57,8 +57,10 @@ const PerfilView = () => {
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showCancelPlanDialog, setShowCancelPlanDialog] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [cancellingPlan, setCancellingPlan] = useState(false);
   const [editName, setEditName] = useState("");
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -159,6 +161,32 @@ const PerfilView = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCancelPlan = async () => {
+    setCancellingPlan(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("cancel-subscription");
+      
+      if (error) throw error;
+      
+      if (data?.success) {
+        toast({
+          title: "Plano Cancelado",
+          description: "Seu plano PRO permanecerá ativo até o final do período. Depois, você retornará ao plano Gratuito.",
+        });
+        setShowCancelPlanDialog(false);
+      }
+    } catch (error: any) {
+      console.error("Error cancelling plan:", error);
+      toast({
+        title: "Erro",
+        description: error.message || "Não foi possível cancelar o plano.",
+        variant: "destructive",
+      });
+    } finally {
+      setCancellingPlan(false);
     }
   };
 
@@ -562,15 +590,40 @@ const PerfilView = () => {
               )}
             </div>
           </div>
-          <Button 
-            onClick={() => setShowDeleteDialog(true)}
-            variant="destructive"
-            className="rounded-2xl px-6"
-          >
-            Cancelar Conta
-          </Button>
+          {isPro && (
+            <Button 
+              onClick={() => setShowCancelPlanDialog(true)}
+              variant="destructive"
+              className="rounded-2xl px-6"
+            >
+              Cancelar Plan
+            </Button>
+          )}
         </div>
       </Card>
+
+      {/* Cancel Plan Dialog */}
+      <AlertDialog open={showCancelPlanDialog} onOpenChange={setShowCancelPlanDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Cancelar Plano PRO?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Seu plano PRO permanecerá ativo até o final do período de 30 dias. 
+              Após esse período, você retornará automaticamente ao plano Gratuito.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Não, manter</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleCancelPlan}
+              disabled={cancellingPlan}
+              className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {cancellingPlan ? "Cancelando..." : "Sim, cancelar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Password Change Dialog */}
       <AlertDialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
