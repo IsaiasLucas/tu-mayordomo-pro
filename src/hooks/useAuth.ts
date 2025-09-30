@@ -52,9 +52,10 @@ export function useAuth() {
       } else {
         setProfile(data);
         
-        // Check subscription status after fetching profile
+        // Check subscription status and sync plan from sheets
         setTimeout(() => {
           checkSubscriptionStatus();
+          syncPlanFromSheets();
         }, 0);
       }
     } catch (error) {
@@ -69,6 +70,41 @@ export function useAuth() {
       await supabase.functions.invoke("check-subscription");
     } catch (error) {
       console.error('Error checking subscription:', error);
+    }
+  };
+
+  const syncPlanFromSheets = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const { data, error } = await supabase.functions.invoke('sync-plan-from-sheets', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+      
+      if (error) {
+        console.error('Error syncing plan:', error);
+        return;
+      }
+      
+      console.log('Plan synced from sheets:', data);
+      
+      // Refresh profile if plan was synced
+      if (data?.synced && session.user) {
+        const { data: updatedProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        
+        if (updatedProfile) {
+          setProfile(updatedProfile);
+        }
+      }
+    } catch (error) {
+      console.error('Error syncing plan from sheets:', error);
     }
   };
 
