@@ -36,6 +36,42 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
                          .reduce((s,g)=>s+Number(g.valor||0),0);
   const saldoMes = ingresos - egresos;
 
+  // Calcular variação diária
+  const calcularVariacionDiaria = () => {
+    const hoy = new Date();
+    const ayer = new Date(hoy);
+    ayer.setDate(ayer.getDate() - 1);
+
+    const saldoHoy = movimientos
+      .filter(m => {
+        const fechaMov = new Date(m.fecha);
+        return fechaMov.toDateString() === hoy.toDateString();
+      })
+      .reduce((total, m) => {
+        const valor = m.tipo.toLowerCase() === "ingreso" || m.tipo.toLowerCase() === "receita" 
+          ? m.monto 
+          : -m.monto;
+        return total + valor;
+      }, 0);
+
+    const saldoAyer = movimientos
+      .filter(m => {
+        const fechaMov = new Date(m.fecha);
+        return fechaMov.toDateString() === ayer.toDateString();
+      })
+      .reduce((total, m) => {
+        const valor = m.tipo.toLowerCase() === "ingreso" || m.tipo.toLowerCase() === "receita" 
+          ? m.monto 
+          : -m.monto;
+        return total + valor;
+      }, 0);
+
+    if (saldoAyer === 0) return 0;
+    return Math.round(((saldoHoy - saldoAyer) / Math.abs(saldoAyer)) * 100);
+  };
+
+  const variacionDiaria = calcularVariacionDiaria();
+
   useEffect(() => {
     const storedPhone = localStorage.getItem("tm_phone");
     setPhone(storedPhone);
@@ -91,7 +127,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
 
   return (
     <main className="p-4 space-y-4">
-      <HeroOverview total={saldoMes||0} varPct={16} title="Overview" />
+      <HeroOverview total={saldoMes||0} varPct={variacionDiaria} title="Overview" />
 
       {!loading && profile?.plan === "free" && (
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-900 rounded-xl p-3">
