@@ -3,9 +3,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Check, Sparkles, Zap, GraduationCap, MessageCircle, Loader2, Settings } from "lucide-react";
+import { Check, Sparkles, Zap, GraduationCap, MessageCircle, Loader2, Settings, XCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface PlanFeature {
   text: string;
@@ -31,6 +42,7 @@ export default function PlanesView() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [checkingSubscription, setCheckingSubscription] = useState(false);
   const [loadingPortal, setLoadingPortal] = useState(false);
+  const [cancellingSubscription, setCancellingSubscription] = useState(false);
 
   const plans: Plan[] = [
     {
@@ -150,6 +162,36 @@ export default function PlanesView() {
     }
   };
 
+  const handleCancelSubscription = async () => {
+    setCancellingSubscription(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("cancel-subscription");
+      
+      if (error) throw error;
+      
+      if (data?.success) {
+        toast({
+          title: "Suscripción Cancelada",
+          description: "Tu suscripción será cancelada al final del período actual. El plan cambiará a Gratuito.",
+        });
+        
+        // Refresh page after 2 seconds
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      }
+    } catch (error: any) {
+      console.error("Error cancelling subscription:", error);
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo cancelar la suscripción.",
+        variant: "destructive",
+      });
+    } finally {
+      setCancellingSubscription(false);
+    }
+  };
+
   const handleSelectPlan = async (planId: string, priceId: string) => {
     if (planId === "free") {
       toast({
@@ -195,6 +237,7 @@ export default function PlanesView() {
 
   const currentPlan = profile?.plan || "free";
   const hasActivePlan = currentPlan !== "free";
+  const isProPlan = currentPlan === "mensal" || currentPlan === "anual" || (currentPlan !== "free" && currentPlan !== "");
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50 to-blue-50 p-4 pb-20">
@@ -211,25 +254,68 @@ export default function PlanesView() {
           Empieza gratis. Actualiza cuando quieras.
         </p>
         
-        {hasActivePlan && (
-          <Button
-            variant="outline"
-            onClick={handleManageSubscription}
-            disabled={loadingPortal}
-            className="rounded-xl"
-          >
-            {loadingPortal ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Cargando...
-              </>
-            ) : (
-              <>
-                <Settings className="h-4 w-4 mr-2" />
-                Administrar Suscripción
-              </>
-            )}
-          </Button>
+        {isProPlan && (
+          <div className="flex gap-3 justify-center items-center">
+            <Button
+              variant="outline"
+              onClick={handleManageSubscription}
+              disabled={loadingPortal}
+              className="rounded-xl"
+            >
+              {loadingPortal ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Cargando...
+                </>
+              ) : (
+                <>
+                  <Settings className="h-4 w-4 mr-2" />
+                  Administrar
+                </>
+              )}
+            </Button>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  className="rounded-xl"
+                  disabled={cancellingSubscription}
+                >
+                  {cancellingSubscription ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Cancelando...
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="h-4 w-4 mr-2" />
+                      Cancelar Suscripción
+                    </>
+                  )}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>¿Cancelar Suscripción?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Tu suscripción será cancelada al final del período actual. 
+                    Después, volverás al plan Gratuito con 30 mensajes/mes.
+                    Esta acción también actualizará tu estado en la planilha de Google Sheets.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>No, mantener</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleCancelSubscription}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Sí, cancelar
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         )}
       </div>
 
