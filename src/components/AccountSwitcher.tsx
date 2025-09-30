@@ -98,60 +98,56 @@ export default function AccountSwitcher() {
       localStorage.removeItem('tm_phone');
       localStorage.removeItem('tm_nombre');
 
-      // Use refreshSession to automatically refresh expired tokens
-      const { data, error } = await supabase.auth.refreshSession({
-        refresh_token: account.refresh_token,
-      });
-
-      if (error || !data.session) {
-        console.error('Failed to refresh session:', error);
-        
-        // Remove expired account
-        removeAccount(account.user_id);
-        
-        toast({
-          title: "Sessão expirada",
-          description: `A conta de ${account.display_name} expirou. Faça login novamente.`,
-          variant: "destructive",
+      // 1) Try to set session directly with stored tokens (fast path)
+      let setErr = null as any;
+      try {
+        const { error } = await supabase.auth.setSession({
+          access_token: account.access_token,
+          refresh_token: account.refresh_token,
         });
-        
-        return;
+        setErr = error;
+      } catch (e) {
+        setErr = e;
       }
 
-      // Update stored account with new tokens
-      const updatedAccount: StoredAccount = {
-        ...account,
-        access_token: data.session.access_token,
-        refresh_token: data.session.refresh_token,
-      };
+      if (setErr) {
+        // 2) Fallback: try to refresh using refresh_token only
+        const { data, error } = await supabase.auth.refreshSession({
+          refresh_token: account.refresh_token,
+        });
 
-      const stored = localStorage.getItem("tm_accounts");
-      let existingAccounts: StoredAccount[] = stored ? JSON.parse(stored) : [];
-      const index = existingAccounts.findIndex(acc => acc.user_id === account.user_id);
-      
-      if (index >= 0) {
-        existingAccounts[index] = updatedAccount;
-        localStorage.setItem("tm_accounts", JSON.stringify(existingAccounts));
+        if (error || !data.session) {
+          console.error('Failed to switch/refresh session:', setErr || error);
+          // Keep the account but notify the user – they can re-login later
+          toast({
+            title: "Sessão expirada",
+            description: `Não foi possível alternar para ${account.display_name}. Tente novamente mais tarde.`,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Update stored tokens after successful refresh
+        const updatedAccount: StoredAccount = {
+          ...account,
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+        };
+        const stored = localStorage.getItem("tm_accounts");
+        let existingAccounts: StoredAccount[] = stored ? JSON.parse(stored) : [];
+        const idx = existingAccounts.findIndex(acc => acc.user_id === account.user_id);
+        if (idx >= 0) {
+          existingAccounts[idx] = updatedAccount;
+          localStorage.setItem("tm_accounts", JSON.stringify(existingAccounts));
+        }
       }
 
       console.log(`Switched to account: ${account.display_name} (${account.email})`);
-
-      toast({
-        title: "Conta alternada",
-        description: `Agora você está usando ${account.display_name}`,
-      });
-      
-      // Reload after a small delay to ensure session is properly set
-      setTimeout(() => {
-        window.location.reload();
-      }, 200);
+      toast({ title: "Conta alternada", description: `Agora você está usando ${account.display_name}` });
+      setTimeout(() => window.location.reload(), 150);
     } catch (error) {
       console.error("Error switching account:", error);
-      toast({
-        title: "Erro ao alternar conta",
-        description: "Não foi possível trocar de conta.",
-        variant: "destructive",
-      });
+      toast({ title: "Erro ao alternar conta", description: "Não foi possível trocar de conta.", variant: "destructive" });
     }
   };
 
