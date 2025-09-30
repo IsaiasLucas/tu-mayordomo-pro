@@ -53,7 +53,7 @@ export default function GastosView() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const url = `https://script.google.com/macros/s/AKfycbyF1bpzDkaBqRmk_lshvclbyVcr0GGeQaAwU3KM_3rYLw7csxLO9rNLsl7pACrronj1/exec?action=month&phone=${encodeURIComponent(phone)}&ym=${selectedMonth}`;
+        const url = `https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec?action=month&phone=${encodeURIComponent(phone)}&ym=${selectedMonth}`;
         const response = await fetch(url);
         const result = await response.json();
         

@@ -39,7 +39,7 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
     setWhatsapp(formatted);
   };
 
-  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyCWcSuxX5X3U3NXFj2MKkA9e_Kk4wHtofRw1mKLI_6_HYHN4siyRRKbXAjdkNULkS1rQ/exec";
+  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec";
 
   const handleSave = async () => {
     // Validación
