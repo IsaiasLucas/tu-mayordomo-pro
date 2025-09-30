@@ -182,13 +182,8 @@ export default function PlanesView() {
       if (data?.success) {
         toast({
           title: "Suscripción Cancelada",
-          description: "Tu suscripción será cancelada al final del período actual. El plan cambiará a Gratuito."
+          description: "Tu suscripción Pro permanecerá activa hasta el final del período de 30 días. Después cambiará automáticamente a Gratuito."
         });
-
-        // Refresh page after 2 seconds
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       }
     } catch (error: any) {
       console.error("Error cancelling subscription:", error);

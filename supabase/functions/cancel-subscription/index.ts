@@ -84,85 +84,13 @@ serve(async (req) => {
       logStep("No Stripe customer found");
     }
 
-    // Update Google Sheets
-    const apiKey = Deno.env.get("GOOGLE_SHEETS_API_KEY");
-    if (!apiKey) throw new Error("GOOGLE_SHEETS_API_KEY not set");
-
-    const spreadsheetId = "1WeIPDOTFkm748yEJBkNvWvG2MJHJpdaJAeen1fFzIk";
-    const range = "usuarios!A:G";
-    
-    const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
-    
-    logStep("Fetching from Google Sheets");
-    
-    const sheetsResponse = await fetch(sheetsUrl);
-    if (!sheetsResponse.ok) {
-      throw new Error(`Google Sheets API error: ${sheetsResponse.status}`);
-    }
-
-    const sheetsData = await sheetsResponse.json();
-    const rows = sheetsData.values || [];
-    
-    logStep("Sheets data fetched", { rowCount: rows.length });
-
-    // Normalize phone for comparison
-    const normalizeTelefone = (tel: string) => tel.replace(/\D/g, '');
-    const telefoneNormalizado = normalizeTelefone(telefone);
-    
-    // Find user row
-    let rowIndex = -1;
-    for (let i = 1; i < rows.length; i++) {
-      const row = rows[i];
-      const rowTelefone = row[0] || "";
-      const rowTelefoneNormalizado = normalizeTelefone(rowTelefone);
-
-      if (rowTelefoneNormalizado === telefoneNormalizado) {
-        rowIndex = i + 1; // Google Sheets is 1-indexed
-        break;
-      }
-    }
-
-    if (rowIndex > 0) {
-      // Update the plan column (Column D = index 3) to "free"
-      const updateUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/usuarios!D${rowIndex}?valueInputOption=RAW&key=${apiKey}`;
-      
-      const updateResponse = await fetch(updateUrl, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          values: [["free"]]
-        })
-      });
-
-      if (!updateResponse.ok) {
-        throw new Error(`Failed to update Google Sheets: ${updateResponse.status}`);
-      }
-
-      logStep("Updated plan in Google Sheets to 'free'", { rowIndex });
-    } else {
-      logStep("User not found in Google Sheets");
-    }
-
-    // Update Supabase profile
-    const { error: updateError } = await supabaseClient
-      .from("profiles")
-      .update({ 
-        plan: "free",
-        updated_at: new Date().toISOString()
-      })
-      .eq("user_id", user.id);
-
-    if (updateError) throw updateError;
-
-    logStep("Plan updated in Supabase to 'free'");
+    logStep("Subscription will be cancelled at period end. Plan will remain active until then.");
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: "Subscription cancelled successfully",
-        newPlan: "free"
+        message: "Subscription will be cancelled at the end of the current billing period",
+        cancelAtPeriodEnd: true
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
