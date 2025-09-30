@@ -55,7 +55,7 @@ serve(async (req) => {
     const apiKey = Deno.env.get("GOOGLE_SHEETS_API_KEY");
     if (!apiKey) throw new Error("GOOGLE_SHEETS_API_KEY not set");
 
-    const spreadsheetId = "1WeIPDOTFkm748yEJBkNvWvG2MJHJJJpdaJAeen1fFzIk";
+    const spreadsheetId = "1WeIPDOTFkm748yEJBkNvWvG2MJHJJpdaJAeen1fFzIk";
     const range = "usuarios!A:G"; // telefono, reporte_semanal, reporte_mensual, plan, plan_expires_at, usage_month, usage_count
     
     const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
