@@ -56,7 +56,7 @@ serve(async (req) => {
     if (!apiKey) throw new Error("GOOGLE_SHEETS_API_KEY not set");
 
     const spreadsheetId = "1WeIPDOTFkm748yEJBkNvWvG2MJHJJJpdaJAeen1fFzIk";
-    const range = "usuarios!A:D"; // telefono, plan, created_at, email
+    const range = "usuarios!A:G"; // telefono, reporte_semanal, reporte_mensual, plan, plan_expires_at, usage_month, usage_count
     
     const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
     
@@ -72,20 +72,19 @@ serve(async (req) => {
     
     logStep("Sheets data fetched", { rowCount: rows.length });
 
-    // Buscar linha do usuário (por telefone ou email)
+    // Buscar linha do usuário (por telefone)
     let userRow = null;
     let planFromSheets = "free";
 
     for (let i = 1; i < rows.length; i++) { // Skip header row
       const row = rows[i];
       const rowTelefone = row[0] || "";
-      const rowPlan = row[1] || "free";
-      const rowEmail = row[3] || "";
+      const rowPlan = row[3] || "free"; // Column D (index 3)
 
-      if (rowTelefone === telefone || rowEmail === email) {
+      if (rowTelefone === telefone) {
         userRow = row;
         planFromSheets = rowPlan.toLowerCase();
-        logStep("User found in sheets", { telefone: rowTelefone, email: rowEmail, plan: planFromSheets });
+        logStep("User found in sheets", { telefone: rowTelefone, plan: planFromSheets });
         break;
       }
     }
