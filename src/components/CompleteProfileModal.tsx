@@ -39,6 +39,8 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
     setWhatsapp(formatted);
   };
 
+  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyCWcSuxX5X3U3NXFj2MKkA9e_Kk4wHtofRw1mKLI_6_HYHN4siyRRKbXAjdkNULkS1rQ/exec";
+
   const handleSave = async () => {
     // Validación
     if (!nombre.trim()) {
@@ -71,21 +73,18 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "https://script.google.com/macros/s/AKfycbyCWcSuxX5X3U3NXFj2MKkA9e_Kk4wHtofRw1mKLI_6_HYHN4siyRRKbXAjdkNULkS1rQ/exec",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            action: "addUser",
-            name: nombre,
-            phone: whatsapp,
-            kind: tipo === "Empresa" ? "empresa" : "pessoal",
-          }),
-        }
-      );
+      const response = await fetch(WEBAPP_URL, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "text/plain" // evita preflight
+        },
+        body: JSON.stringify({
+          action: "addUser",
+          name: nombre,
+          phone: whatsapp,
+          kind: tipo === "Empresa" ? "empresa" : "pessoal",
+        }),
+      });
 
       const data = await response.json();
 
