@@ -301,61 +301,60 @@ const PerfilView = () => {
           </div>
         </Card>
 
+        <Card className="bg-white shadow-sm rounded-3xl p-6">
+          <h3 className="text-lg font-semibold mb-6 flex items-center">
+            <Shield className="h-5 w-5 mr-2" />
+            Segurança e Dados
+          </h3>
+          
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <h4 className="font-medium">Gestão de Dados</h4>
+              <div className="space-y-3">
+                <Button 
+                  variant="outline" 
+                  onClick={handleExportData}
+                  className="w-full rounded-2xl py-3 justify-start"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Exportar meus dados
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowPasswordDialog(true)}
+                  className="w-full rounded-2xl py-3 justify-start"
+                >
+                  <Shield className="h-4 w-4 mr-2" />
+                  Alterar senha
+                </Button>
+              </div>
+            </div>
+
+            <div className="border-t pt-4">
+              <h4 className="font-medium mb-4">Ações da Conta</h4>
+              <div className="space-y-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="w-full rounded-2xl py-3 justify-start text-red-600 border-red-300 hover:bg-red-50"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Excluir conta
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={signOut}
+                  className="w-full rounded-2xl py-3 justify-start"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sair
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Card>
       </div>
 
-      {/* Security & Data */}
-      <Card className="bg-white shadow-sm rounded-3xl p-6">
-        <h3 className="text-lg font-semibold mb-6 flex items-center">
-          <Shield className="h-5 w-5 mr-2" />
-          Segurança e Dados
-        </h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <h4 className="font-medium">Gestão de Dados</h4>
-            <div className="space-y-3">
-              <Button 
-                variant="outline" 
-                onClick={handleExportData}
-                className="w-full rounded-2xl py-3 justify-start"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Exportar meus dados
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => setShowPasswordDialog(true)}
-                className="w-full rounded-2xl py-3 justify-start"
-              >
-                <Shield className="h-4 w-4 mr-2" />
-                Alterar senha
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h4 className="font-medium">Ações da Conta</h4>
-            <div className="space-y-3">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowDeleteDialog(true)}
-                className="w-full rounded-2xl py-3 justify-start text-red-600 border-red-300 hover:bg-red-50"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Excluir conta
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={signOut}
-                className="w-full rounded-2xl py-3 justify-start"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sair
-              </Button>
-            </div>
-          </div>
-        </div>
-      </Card>
 
       {/* Plan Information */}
       <Card className="bg-white shadow-sm rounded-3xl p-6">
