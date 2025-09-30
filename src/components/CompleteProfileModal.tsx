@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { Shield } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CompleteProfileModalProps {
   open: boolean;
@@ -73,10 +74,15 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
     setLoading(true);
 
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
+      // Save to Google Sheets
       const response = await fetch(WEBAPP_URL, {
         method: "POST",
         headers: { 
-          "Content-Type": "text/plain" // evita preflight
+          "Content-Type": "text/plain"
         },
         body: JSON.stringify({
           action: "addUser",
@@ -92,7 +98,20 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
         throw new Error(data.error || "Falha ao salvar");
       }
 
-      // Guardar phone formatado en localStorage
+      // Save to Supabase profile
+      const phoneField = tipo === "Empresa" ? "phone_empresa" : "phone_personal";
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          display_name: nombre,
+          [phoneField]: whatsapp,
+          entidad: tipo === "Empresa" ? "empresa" : "personal"
+        })
+        .eq('user_id', user.id);
+
+      if (profileError) throw profileError;
+
+      // Save to localStorage for quick access
       localStorage.setItem("tm_phone", whatsapp);
       
       toast({

@@ -73,16 +73,25 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
   const variacionDiaria = calcularVariacionDiaria();
 
   useEffect(() => {
-    const storedPhone = localStorage.getItem("tm_phone");
-    setPhone(storedPhone);
-
-    if (storedPhone) {
-      fetchMovimientos(storedPhone);
+    // Check phone from profile (Supabase) first
+    const phoneFromProfile = profile?.phone_personal || profile?.phone_empresa;
+    
+    if (phoneFromProfile) {
+      setPhone(phoneFromProfile);
+      localStorage.setItem("tm_phone", phoneFromProfile);
+      fetchMovimientos(phoneFromProfile);
     } else {
-      // Si no hay phone, mostrar modal automáticamente
-      setShowProfileModal(true);
+      // Fallback to localStorage
+      const storedPhone = localStorage.getItem("tm_phone");
+      if (storedPhone) {
+        setPhone(storedPhone);
+        fetchMovimientos(storedPhone);
+      } else {
+        // Si no hay phone, mostrar modal automáticamente
+        setShowProfileModal(true);
+      }
     }
-  }, []);
+  }, [profile]);
 
   const fetchMovimientos = async (phoneNumber: string) => {
     setLoadingMovimientos(true);
