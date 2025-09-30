@@ -220,7 +220,14 @@ const PerfilView = () => {
 
       const file = event.target.files[0];
       const fileExt = file.name.split('.').pop();
-      const filePath = `${user?.id}-${Math.random()}.${fileExt}`;
+      const fileName = `avatar.${fileExt}`;
+      const filePath = `${user?.id}/${fileName}`;
+
+      // Remove avatar antigo se existir
+      if (profile?.avatar_url) {
+        const oldPath = profile.avatar_url.split('/').slice(-2).join('/');
+        await supabase.storage.from('avatars').remove([oldPath]);
+      }
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
