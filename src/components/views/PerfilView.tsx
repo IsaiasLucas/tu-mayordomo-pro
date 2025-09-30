@@ -562,8 +562,12 @@ const PerfilView = () => {
               )}
             </div>
           </div>
-          <Button className="bg-purple-600 text-white hover:bg-purple-700 rounded-2xl px-6">
-            {isPro ? "Gerenciar Plano" : "Atualizar para PRO"}
+          <Button 
+            onClick={() => setShowDeleteDialog(true)}
+            variant="destructive"
+            className="rounded-2xl px-6"
+          >
+            Cancelar Conta
           </Button>
         </div>
       </Card>
