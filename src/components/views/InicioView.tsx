@@ -28,10 +28,15 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
   const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
   const [loadingMovimientos, setLoadingMovimientos] = useState(false);
 
-  const ingresos = gastos.filter(g=>String(g.tipo).toLowerCase()==="ingreso")
-                         .reduce((s,g)=>s+Number(g.valor||0),0);
-  const egresos  = gastos.filter(g=>String(g.tipo).toLowerCase()==="egreso")
-                         .reduce((s,g)=>s+Number(g.valor||0),0);
+  // Calculate from movimientos instead of gastos hook
+  const ingresos = movimientos
+    .filter(m => m.tipo.toLowerCase() === "ingreso" || m.tipo.toLowerCase() === "receita")
+    .reduce((s, m) => s + Number(m.monto || 0), 0);
+  
+  const egresos = movimientos
+    .filter(m => m.tipo.toLowerCase() === "egreso" || m.tipo.toLowerCase() === "despesa")
+    .reduce((s, m) => s + Number(m.monto || 0), 0);
+  
   const saldoMes = ingresos - egresos;
 
   // Calcular variação diária
