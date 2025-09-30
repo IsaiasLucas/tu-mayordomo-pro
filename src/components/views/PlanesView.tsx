@@ -258,34 +258,6 @@ export default function PlanesView() {
           Elige tu Plan
         </h1>
         
-        
-        {isProPlan && <div className="flex gap-3 justify-center items-center">
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" className="rounded-xl" disabled={cancellingSubscription}>
-                  {cancellingSubscription ? <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Cancelando...
-                    </> : <>
-                      <XCircle className="h-4 w-4 mr-2" />
-                      Cancelar Suscripción
-                    </>}
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>¿Cancelar Suscripción?</AlertDialogTitle>
-                  <AlertDialogDescription>Tu suscripción será cancelada al final del período actual. Después, volverás al plan Gratuito con 30 mensajes/mes.</AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>No, mantener</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleCancelSubscription} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                    Sí, cancelar
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>}
       </div>
 
       {/* Plans Grid */}
