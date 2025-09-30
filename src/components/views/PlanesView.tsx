@@ -252,7 +252,7 @@ export default function PlanesView() {
       <div className="text-center mb-10 pt-4 animate-fade-in">
         <div className="inline-flex items-center gap-2 mb-3 bg-white px-4 py-2 rounded-full shadow-sm">
           <Sparkles className="h-5 w-5 text-purple-600 animate-pulse" />
-          <span className="text-sm font-semibold text-gray-700">Planes Simples</span>
+          <span className="text-sm font-semibold text-gray-700">Tu Mayordomo Personal</span>
         </div>
         <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
           Elige tu Plan
