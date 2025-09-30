@@ -39,68 +39,68 @@ export default function PlanesView() {
     {
       id: "free",
       name: "Gratuito",
-      description: "Para começar",
+      description: "Pa' empezar",
       price: 0,
-      period: "sempre",
+      period: "siempre",
       priceId: "",
       iconName: "message",
       gradient: "from-gray-100 to-gray-200",
       features: [
-        { text: "30 mensagens/mês", included: true },
-        { text: "Relatórios básicos", included: true },
-        { text: "Análise de gastos", included: true },
-        { text: "Mensagens ilimitadas", included: false },
-        { text: "Relatórios detalhados", included: false },
+        { text: "30 mensajes/mes", included: true },
+        { text: "Reportes básicos", included: true },
+        { text: "Análisis de gastos", included: true },
+        { text: "Mensajes ilimitados", included: false },
+        { text: "Reportes detallados", included: false },
       ],
     },
     {
       id: "mensal",
-      name: "Pro Mensal",
-      description: "Uso sem limites",
+      name: "Pro Mensual",
+      description: "Uso sin límites",
       price: 3000,
-      period: "mês",
+      period: "mes",
       priceId: "price_1SAb6WCGNOUldBA37lsDjBgB",
       iconName: "zap",
       popular: true,
       gradient: "from-purple-100 to-purple-200",
       features: [
-        { text: "Mensagens ilimitadas", included: true },
-        { text: "Relatórios detalhados", included: true },
-        { text: "Análise avançada", included: true },
-        { text: "Exportar dados", included: true },
-        { text: "Suporte prioritário", included: true },
+        { text: "Mensajes ilimitados", included: true },
+        { text: "Reportes detallados", included: true },
+        { text: "Análisis avanzado", included: true },
+        { text: "Exportar datos", included: true },
+        { text: "Soporte prioritario", included: true },
       ],
     },
     {
       id: "anual",
       name: "Pro Anual",
-      description: "Economize $11.000",
+      description: "Ahorra $11.000",
       price: 25000,
-      period: "ano",
+      period: "año",
       priceId: "price_1SBRZJCGNOUldBA3dPc3DIqU",
       iconName: "sparkles",
       gradient: "from-blue-100 to-blue-200",
       features: [
-        { text: "Tudo do Pro Mensal", included: true },
-        { text: "~$2.083/mês (30% off)", included: true },
+        { text: "Todo del Pro Mensual", included: true },
+        { text: "~$2.083/mes (30% off)", included: true },
         { text: "Backup automático", included: true },
-        { text: "Suporte prioritário", included: true },
+        { text: "Soporte prioritario", included: true },
       ],
     },
     {
       id: "estudante",
-      name: "Estudante",
-      description: "50% de desconto",
+      name: "Estudiante",
+      description: "50% de descuento",
       price: 1500,
-      period: "mês",
+      period: "mes",
       priceId: "price_1SCvQSCGNOUldBA3BNvCtbWE",
       iconName: "graduation",
       gradient: "from-green-100 to-green-200",
       features: [
-        { text: "Mensagens ilimitadas", included: true },
-        { text: "Relatórios detalhados", included: true },
-        { text: "Análise avançada", included: true },
-        { text: "Requer email .edu", included: true },
+        { text: "Mensajes ilimitados", included: true },
+        { text: "Reportes detallados", included: true },
+        { text: "Análisis avanzado", included: true },
+        { text: "Requiere email .edu", included: true },
       ],
     },
   ];
@@ -160,8 +160,8 @@ export default function PlanesView() {
     } catch (error: any) {
       console.error("Error opening customer portal:", error);
       toast({
-        title: "Erro",
-        description: "Não foi possível abrir o portal de gerenciamento.",
+        title: "Error",
+        description: "No se pudo abrir el portal de administración.",
         variant: "destructive",
       });
     } finally {
@@ -172,8 +172,8 @@ export default function PlanesView() {
   const handleSelectPlan = async (planId: string, priceId: string) => {
     if (planId === "free") {
       toast({
-        title: "Plano Gratuito",
-        description: "Você já tem acesso ao plano gratuito!",
+        title: "Plan Gratuito",
+        description: "¡Ya tienes acceso al plan gratuito!",
       });
       return;
     }
@@ -237,13 +237,13 @@ export default function PlanesView() {
       <div className="text-center mb-10 pt-4 animate-fade-in">
         <div className="inline-flex items-center gap-2 mb-3 bg-white px-4 py-2 rounded-full shadow-sm">
           <Sparkles className="h-5 w-5 text-purple-600 animate-pulse" />
-          <span className="text-sm font-semibold text-gray-700">Planos Simples</span>
+          <span className="text-sm font-semibold text-gray-700">Planes Simples</span>
         </div>
         <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Escolha seu Plano
+          Elige tu Plan
         </h1>
         <p className="text-gray-600 mb-4">
-          Comece grátis. Atualize quando precisar.
+          Empieza gratis. Actualiza cuando quieras.
         </p>
         
         {hasActivePlan && (
@@ -256,12 +256,12 @@ export default function PlanesView() {
             {loadingPortal ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Carregando...
+                Cargando...
               </>
             ) : (
               <>
                 <Settings className="h-4 w-4 mr-2" />
-                Gerenciar Assinatura
+                Administrar Suscripción
               </>
             )}
           </Button>
@@ -301,7 +301,7 @@ export default function PlanesView() {
                     </div>
                     {isCurrent && (
                       <Badge className="bg-green-100 text-green-700 font-semibold">
-                        Atual
+                        Actual
                       </Badge>
                     )}
                   </div>
@@ -315,7 +315,7 @@ export default function PlanesView() {
                   <div className="bg-white rounded-xl p-4 shadow-sm">
                     <div className="flex items-baseline gap-1">
                       {plan.price === 0 ? (
-                        <span className="text-3xl font-bold text-gray-900">Grátis</span>
+                        <span className="text-3xl font-bold text-gray-900">Gratis</span>
                       ) : (
                         <>
                           <span className="text-sm text-gray-500">$</span>
@@ -356,14 +356,14 @@ export default function PlanesView() {
                     disabled={isCurrent || isSelecting}
                   >
                     {isCurrent ? (
-                      "Plano Atual"
+                      "Plan Actual"
                     ) : isSelecting ? (
                       <span className="flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Processando...
+                        Procesando...
                       </span>
                     ) : (
-                      `Escolher ${plan.name}`
+                      `Elegir ${plan.name}`
                     )}
                   </Button>
                 </CardFooter>
@@ -379,24 +379,24 @@ export default function PlanesView() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
             <div className="space-y-1">
               <div className="text-2xl">✨</div>
-              <div className="font-semibold text-gray-900">Sem Contratos</div>
-              <div className="text-gray-600">Cancele quando quiser</div>
+              <div className="font-semibold text-gray-900">Sin Contratos</div>
+              <div className="text-gray-600">Cancela cuando quieras</div>
             </div>
             <div className="space-y-1">
               <div className="text-2xl">🔒</div>
-              <div className="font-semibold text-gray-900">Dados Seguros</div>
-              <div className="text-gray-600">Criptografia total</div>
+              <div className="font-semibold text-gray-900">Datos Seguros</div>
+              <div className="text-gray-600">Encriptación total</div>
             </div>
             <div className="space-y-1">
               <div className="text-2xl">💬</div>
-              <div className="font-semibold text-gray-900">Suporte</div>
-              <div className="text-gray-600">Sempre disponível</div>
+              <div className="font-semibold text-gray-900">Soporte</div>
+              <div className="text-gray-600">Siempre disponible</div>
             </div>
           </div>
         </div>
         
         <p className="text-gray-500 text-sm">
-          Pagamentos processados com segurança via Stripe
+          Pagos procesados de forma segura vía Stripe
         </p>
       </div>
 

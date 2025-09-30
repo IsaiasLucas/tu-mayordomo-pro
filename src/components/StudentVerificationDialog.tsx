@@ -33,7 +33,7 @@ export const StudentVerificationDialog = ({
     if (!studentEmail || !studentEmail.includes("@")) {
       toast({
         title: "Email inválido",
-        description: "Por favor, insira um email válido.",
+        description: "Por favor, ingresa un email válido.",
         variant: "destructive",
       });
       return;
@@ -57,16 +57,16 @@ export const StudentVerificationDialog = ({
         onOpenChange(false);
       } else {
         toast({
-          title: "Verificação Falhou",
+          title: "Verificación Falló",
           description: data.message,
           variant: "destructive",
         });
       }
     } catch (error: any) {
-      console.error("Erro ao verificar email:", error);
+      console.error("Error al verificar email:", error);
       toast({
-        title: "Erro na Verificação",
-        description: error.message || "Não foi possível verificar o email. Tente novamente.",
+        title: "Error en la Verificación",
+        description: error.message || "No se pudo verificar el email. Intenta de nuevo.",
         variant: "destructive",
       });
     } finally {
@@ -82,10 +82,10 @@ export const StudentVerificationDialog = ({
             <div className="bg-green-100 p-2 rounded-full">
               <GraduationCap className="h-6 w-6 text-green-600" />
             </div>
-            <DialogTitle>Verificação de Estudante</DialogTitle>
+            <DialogTitle>Verificación de Estudiante</DialogTitle>
           </div>
           <DialogDescription>
-            Para ativar o plano estudante, insira seu email institucional (.edu, .ac.uk, etc.)
+            Pa' activar el plan estudiante, ingresa tu email institucional (.edu, .ac.uk, etc.)
           </DialogDescription>
         </DialogHeader>
 
@@ -95,7 +95,7 @@ export const StudentVerificationDialog = ({
             <Input
               id="student-email"
               type="email"
-              placeholder="seu.nome@universidad.edu"
+              placeholder="tu.nombre@universidad.edu"
               value={studentEmail}
               onChange={(e) => setStudentEmail(e.target.value)}
               disabled={loading}
@@ -106,11 +106,11 @@ export const StudentVerificationDialog = ({
             <div className="flex gap-2">
               <CheckCircle2 className="h-4 w-4 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium mb-1">Emails aceitos:</p>
+                <p className="font-medium mb-1">Emails aceptados:</p>
                 <ul className="space-y-1 text-xs">
-                  <li>• Domínios .edu (exemplo@uni.edu)</li>
-                  <li>• Domínios .ac (exemplo@uni.ac.uk)</li>
-                  <li>• Email estudante/alumnos</li>
+                  <li>• Dominios .edu (ejemplo@uni.edu)</li>
+                  <li>• Dominios .ac (ejemplo@uni.ac.uk)</li>
+                  <li>• Email estudiante/alumnos</li>
                 </ul>
               </div>
             </div>

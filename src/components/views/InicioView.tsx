@@ -161,14 +161,14 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
         <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-semibold text-gray-900">Plano Gratuito Ativo</p>
-              <p className="text-sm text-gray-600">Atualize para desbloquear mensagens ilimitadas</p>
+              <p className="font-semibold text-gray-900">Plan Gratuito Activo</p>
+              <p className="text-sm text-gray-600">Actualiza pa' desbloquear mensajes ilimitados</p>
             </div>
             <a 
               href="/planes" 
               className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-xl font-semibold hover:scale-105 transition-transform"
             >
-              Ver Planos
+              Ver Planes
             </a>
           </div>
         </div>
@@ -180,15 +180,15 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
             <div>
               <p className="font-semibold text-gray-900 flex items-center gap-2">
                 <span className="text-green-600">✓</span>
-                Plano {profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1)} Ativo
+                Plan {profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1)} Activo
               </p>
-              <p className="text-sm text-gray-600">Você tem acesso completo a todos os recursos</p>
+              <p className="text-sm text-gray-600">Tienes acceso completo a todos los recursos</p>
             </div>
             <a 
               href="/planes" 
               className="text-green-700 px-4 py-2 rounded-xl font-semibold hover:bg-green-100 transition-colors"
             >
-              Gerenciar
+              Administrar
             </a>
           </div>
         </div>
