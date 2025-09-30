@@ -20,12 +20,10 @@ interface Movement {
 }
 
 interface MonthData {
-  movements: Movement[];
-  totals: {
-    ingresos: number;
-    gastos: number;
-    saldo: number;
-  };
+  items: Movement[];
+  totalIngresos: number;
+  totalGastos: number;
+  saldo: number;
 }
 
 export default function GastosView() {
@@ -34,7 +32,7 @@ export default function GastosView() {
   );
   const [phone, setPhone] = useState<string | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [data, setData] = useState<MonthData>({ movements: [], totals: { ingresos: 0, gastos: 0, saldo: 0 } });
+  const [data, setData] = useState<MonthData>({ items: [], totalIngresos: 0, totalGastos: 0, saldo: 0 });
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 50;
@@ -88,12 +86,12 @@ export default function GastosView() {
     doc.text("Totales del mes", 20, 45);
     
     doc.setFontSize(10);
-    doc.text(`Ingresos: ${fmtCLP(data.totals.ingresos)}`, 20, 55);
-    doc.text(`Gastos: ${fmtCLP(data.totals.gastos)}`, 20, 62);
-    doc.text(`Saldo: ${fmtCLP(data.totals.saldo)}`, 20, 69);
+    doc.text(`Ingresos: ${fmtCLP(data.totalIngresos)}`, 20, 55);
+    doc.text(`Gastos: ${fmtCLP(data.totalGastos)}`, 20, 62);
+    doc.text(`Saldo: ${fmtCLP(data.saldo)}`, 20, 69);
     
     // Tabla de movimientos
-    const tableData = data.movements.map(mov => [
+    const tableData = (data.items || []).map(mov => [
       format(new Date(mov.fecha), "dd/MM HH:mm"),
       mov.descripcion,
       mov.tipo,
@@ -155,12 +153,12 @@ export default function GastosView() {
     );
   }
 
-  const paginatedMovements = data.movements.slice(
+  const paginatedMovements = (data.items || []).slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  const totalPages = Math.ceil(data.movements.length / itemsPerPage);
+  const totalPages = Math.ceil((data.items || []).length / itemsPerPage);
 
   return (
     <div className="p-6 space-y-6">
@@ -187,7 +185,7 @@ export default function GastosView() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {fmtCLP(data.totals.ingresos)}
+              {fmtCLP(data.totalIngresos)}
             </div>
           </CardContent>
         </Card>
@@ -198,7 +196,7 @@ export default function GastosView() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
-              {fmtCLP(data.totals.gastos)}
+              {fmtCLP(data.totalGastos)}
             </div>
           </CardContent>
         </Card>
@@ -208,8 +206,8 @@ export default function GastosView() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Saldo</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${data.totals.saldo >= 0 ? 'text-primary' : 'text-red-600'}`}>
-              {fmtCLP(data.totals.saldo)}
+            <div className={`text-2xl font-bold ${data.saldo >= 0 ? 'text-primary' : 'text-red-600'}`}>
+              {fmtCLP(data.saldo)}
             </div>
           </CardContent>
         </Card>
