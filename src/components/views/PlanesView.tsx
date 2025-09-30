@@ -59,7 +59,7 @@ export default function PlanesView() {
       description: "Uso sin límites",
       price: 3000,
       period: "mes",
-      priceId: "price_1SCvpYCGNOUldBA3tTrTgEf0",
+      priceId: "price_1SDBEqCGNOUldBA3Fh0quBIN",
       iconName: "zap",
       popular: true,
       gradient: "from-purple-100 to-purple-200",
@@ -77,7 +77,7 @@ export default function PlanesView() {
       description: "Ahorra $11.000",
       price: 25000,
       period: "año",
-      priceId: "price_1SCvpwCGNOUldBA3DLLd625d",
+      priceId: "price_1SDBGGCGNOUldBA3YXBfTYl4",
       iconName: "sparkles",
       gradient: "from-blue-100 to-blue-200",
       features: [
@@ -93,7 +93,7 @@ export default function PlanesView() {
       description: "50% de descuento",
       price: 1500,
       period: "mes",
-      priceId: "price_1SCvqOCGNOUldBA3O8o1G8xA",
+      priceId: "price_1SDBGGCGNOUldBA3fdub9gbE",
       iconName: "graduation",
       gradient: "from-green-100 to-green-200",
       features: [
