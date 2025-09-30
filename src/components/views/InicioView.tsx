@@ -52,13 +52,13 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
     setLoadingMovimientos(true);
     try {
       const response = await fetch(
-        `https://script.google.com/macros/s/AKfycbyF1bpzDkaBqRmk_lshvclbyVcr0GGeQaAwU3KM_3rYLw7csxLO9rNLsl7pACrronj1/exec?action=last5&phone=${encodeURIComponent(phoneNumber)}`
+        `https://script.google.com/macros/s/AKfycbyCWcSuxX5X3U3NXFj2MKkA9e_Kk4wHtofRw1mKLI_6_HYHN4siyRRKbXAjdkNULkS1rQ/exec?action=last5&phone=${encodeURIComponent(phoneNumber)}`
       );
 
       if (response.ok) {
         const data = await response.json();
-        if (data.movimientos && Array.isArray(data.movimientos)) {
-          setMovimientos(data.movimientos.slice(0, 5));
+        if (data.ok && data.items && Array.isArray(data.items)) {
+          setMovimientos(data.items.slice(0, 5));
         }
       }
     } catch (error) {
