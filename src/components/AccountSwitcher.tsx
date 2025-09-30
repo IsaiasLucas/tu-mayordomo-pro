@@ -92,6 +92,10 @@ export default function AccountSwitcher() {
     }
 
     try {
+      // Clear all localStorage data from previous account
+      localStorage.removeItem('tm_phone');
+      localStorage.removeItem('tm_nombre');
+
       // Switch directly to stored session without signing out
       const { error } = await supabase.auth.setSession({
         access_token: account.access_token,
@@ -113,6 +117,8 @@ export default function AccountSwitcher() {
         return;
       }
 
+      console.log(`Switched to account: ${account.display_name} (${account.email})`);
+
       toast({
         title: "Conta alternada",
         description: `Agora você está usando a conta de ${account.display_name}`,
@@ -120,10 +126,10 @@ export default function AccountSwitcher() {
 
       setOpen(false);
       
-      // Reload to refresh all data with new session
+      // Reload after a small delay to ensure session is properly set
       setTimeout(() => {
         window.location.reload();
-      }, 100);
+      }, 300);
     } catch (error) {
       console.error("Error switching account:", error);
       toast({
