@@ -186,6 +186,10 @@ const PerfilView = () => {
       });
 
       // Always sign out and redirect after deletion
+      // Clear all localStorage data
+      localStorage.removeItem('tm_phone');
+      localStorage.removeItem('tm_nombre');
+      
       await supabase.auth.signOut();
       window.location.replace('/auth');
     } catch (error: any) {
@@ -196,6 +200,10 @@ const PerfilView = () => {
         description: error?.message || "Tente novamente mais tarde.",
         variant: "destructive",
       });
+      // Clear all localStorage data
+      localStorage.removeItem('tm_phone');
+      localStorage.removeItem('tm_nombre');
+      
       await supabase.auth.signOut();
       window.location.replace('/auth');
     } finally {

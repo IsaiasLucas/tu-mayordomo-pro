@@ -81,15 +81,9 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
       localStorage.setItem("tm_phone", phoneFromProfile);
       fetchMovimientos(phoneFromProfile);
     } else {
-      // Fallback to localStorage
-      const storedPhone = localStorage.getItem("tm_phone");
-      if (storedPhone) {
-        setPhone(storedPhone);
-        fetchMovimientos(storedPhone);
-      } else {
-        // Si no hay phone, mostrar modal automáticamente
-        setShowProfileModal(true);
-      }
+      // If no phone in profile, clear localStorage and show modal
+      localStorage.removeItem("tm_phone");
+      setShowProfileModal(true);
     }
   }, [profile]);
 
