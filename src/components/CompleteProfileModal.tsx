@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { Shield } from "lucide-react";
+import { Shield, MessageCircle, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface CompleteProfileModalProps {
@@ -18,6 +18,7 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
   const [whatsapp, setWhatsapp] = useState("");
   const [tipo, setTipo] = useState("");
   const [loading, setLoading] = useState(false);
+  const [phoneValid, setPhoneValid] = useState<boolean | null>(null);
 
   const formatPhone = (value: string) => {
     // Remove all non-digits
@@ -38,6 +39,11 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhone(e.target.value);
     setWhatsapp(formatted);
+    
+    // Validate phone number (Chilean format: 9 digits)
+    const digits = formatted.replace(/\D/g, "");
+    const isValid = digits.length === 11 && digits.startsWith("56") && digits[2] === "9";
+    setPhoneValid(formatted.length > 0 ? isValid : null);
   };
 
   const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec";
@@ -53,10 +59,10 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
       return;
     }
 
-    if (!whatsapp.trim()) {
+    if (!whatsapp.trim() || phoneValid !== true) {
       toast({
         title: "Error",
-        description: "El WhatsApp es requerido",
+        description: "Debes ingresar un número de WhatsApp válido chileno",
         variant: "destructive",
       });
       return;
@@ -146,9 +152,14 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
             <div className="p-2 bg-primary/10 rounded-lg">
               <Shield className="w-6 h-6 text-primary" />
             </div>
-            <DialogTitle className="text-xl">
-              Completa tus datos para activar Tu Mayordomo
-            </DialogTitle>
+            <div>
+              <DialogTitle className="text-xl">
+                Completa tus datos para activar Tu Mayordomo
+              </DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground mt-1">
+                Vincula tu WhatsApp para gestionar tus gastos
+              </DialogDescription>
+            </div>
           </div>
         </DialogHeader>
 
@@ -165,16 +176,38 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="whatsapp">WhatsApp *</Label>
-            <Input
-              id="whatsapp"
-              type="tel"
-              placeholder="+56 9 1234 5678"
-              value={whatsapp}
-              onChange={handlePhoneChange}
-              disabled={loading}
-              maxLength={17}
-            />
+            <Label htmlFor="whatsapp" className="flex items-center gap-2">
+              <MessageCircle className="w-4 h-4 text-green-600" />
+              Número de WhatsApp *
+            </Label>
+            <div className="relative">
+              <Input
+                id="whatsapp"
+                type="tel"
+                placeholder="+56 9 1234 5678"
+                value={whatsapp}
+                onChange={handlePhoneChange}
+                disabled={loading}
+                maxLength={17}
+                className={`pr-10 ${
+                  phoneValid === true 
+                    ? "border-green-500 focus-visible:ring-green-500" 
+                    : phoneValid === false 
+                    ? "border-red-500 focus-visible:ring-red-500" 
+                    : ""
+                }`}
+              />
+              {phoneValid === true && (
+                <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-600" />
+              )}
+              {phoneValid === false && (
+                <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-600" />
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <MessageCircle className="w-3 h-3" />
+              Introduce tu número chileno (debe comenzar con 9)
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -201,7 +234,8 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
           </Button>
           <Button
             onClick={handleSave}
-            disabled={loading}
+            disabled={loading || phoneValid !== true || !nombre.trim() || !tipo}
+            className="min-w-[120px]"
           >
             {loading ? "Guardando..." : "Guardar"}
           </Button>
