@@ -60,6 +60,9 @@ export function useAuth() {
   };
 
   const signOut = async () => {
+    // Clear all localStorage data on logout
+    localStorage.removeItem('tm_phone');
+    localStorage.removeItem('tm_nombre');
     await supabase.auth.signOut();
   };
 

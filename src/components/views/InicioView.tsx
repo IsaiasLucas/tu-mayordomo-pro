@@ -76,12 +76,14 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
     // Check phone from profile (Supabase) first
     const phoneFromProfile = profile?.phone_personal || profile?.phone_empresa;
     
-    if (phoneFromProfile) {
+    // Check if phone exists and is not empty
+    if (phoneFromProfile && phoneFromProfile.trim() !== '') {
       setPhone(phoneFromProfile);
       localStorage.setItem("tm_phone", phoneFromProfile);
       fetchMovimientos(phoneFromProfile);
     } else {
       // If no phone in profile, clear localStorage and show modal
+      console.log('No phone found in profile, showing modal');
       localStorage.removeItem("tm_phone");
       setShowProfileModal(true);
     }
