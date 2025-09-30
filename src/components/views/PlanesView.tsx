@@ -182,8 +182,13 @@ export default function PlanesView() {
       if (data?.success) {
         toast({
           title: "Suscripción Cancelada",
-          description: "Tu suscripción Pro permanecerá activa hasta el final del período de 30 días. Después cambiará automáticamente a Gratuito."
+          description: "Tu suscripción será cancelada al final del período actual. El plan cambiará a Gratuito."
         });
+
+        // Refresh page after 2 seconds
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       }
     } catch (error: any) {
       console.error("Error cancelling subscription:", error);
@@ -252,9 +257,7 @@ export default function PlanesView() {
         <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
           Elige tu Plan
         </h1>
-        <p className="text-gray-600 mb-4">
-          Empieza gratis. Actualiza cuando quieras.
-        </p>
+        
         
         {isProPlan && <div className="flex gap-3 justify-center items-center">
             <Button variant="outline" onClick={handleManageSubscription} disabled={loadingPortal} className="rounded-xl">
