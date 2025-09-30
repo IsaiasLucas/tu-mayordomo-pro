@@ -16,6 +16,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   User,
   Crown,
@@ -32,7 +42,9 @@ import {
   Eye,
   EyeOff,
   Receipt,
-  PiggyBank
+  PiggyBank,
+  Camera,
+  Upload
 } from "lucide-react";
 
 const PerfilView = () => {
@@ -41,8 +53,12 @@ const PerfilView = () => {
   const [showBalance, setShowBalance] = useState(true);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const isPro = profile?.plan === 'pro' || profile?.plan === 'premium';
   
@@ -188,6 +204,85 @@ const PerfilView = () => {
     }
   };
 
+  const handleEditProfile = () => {
+    setEditName(userProfile.name);
+    setAvatarUrl(profile?.avatar_url || null);
+    setShowEditDialog(true);
+  };
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      setUploading(true);
+      
+      if (!event.target.files || event.target.files.length === 0) {
+        return;
+      }
+
+      const file = event.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user?.id}-${Math.random()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      setAvatarUrl(publicUrl);
+
+      toast({
+        title: "Foto carregada",
+        description: "Sua foto foi carregada com sucesso.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao carregar foto",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      setLoading(true);
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          display_name: editName,
+          avatar_url: avatarUrl,
+        })
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Perfil atualizado",
+        description: "Suas informações foram atualizadas com sucesso.",
+      });
+
+      setShowEditDialog(false);
+      window.location.reload();
+    } catch (error: any) {
+      toast({
+        title: "Erro ao atualizar perfil",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const stats = [
     { label: "Transacciones registradas", value: userProfile.totalTransactions, icon: Receipt },
     { label: "Meses activo", value: userProfile.monthsActive, icon: Calendar },
@@ -200,9 +295,12 @@ const PerfilView = () => {
       <Card className="bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-lg rounded-3xl p-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-6">
-            <div className="bg-white/20 backdrop-blur-sm p-6 rounded-3xl">
-              <User className="h-12 w-12" />
-            </div>
+            <Avatar className="h-24 w-24 border-4 border-white/20">
+              <AvatarImage src={profile?.avatar_url || undefined} />
+              <AvatarFallback className="bg-white/20 text-white text-2xl">
+                {userProfile.name.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
             <div>
               <div className="flex items-center space-x-3 mb-2">
                 <h1 className="text-3xl font-bold">{userProfile.name}</h1>
@@ -226,7 +324,11 @@ const PerfilView = () => {
               </div>
             </div>
           </div>
-          <Button variant="ghost" className="text-white hover:bg-white/20 rounded-2xl px-6">
+          <Button 
+            variant="ghost" 
+            className="text-white hover:bg-white/20 rounded-2xl px-6"
+            onClick={handleEditProfile}
+          >
             <Edit3 className="h-4 w-4 mr-2" />
             Editar Perfil
           </Button>
@@ -433,6 +535,106 @@ const PerfilView = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Profile Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Editar Perfil</DialogTitle>
+            <DialogDescription>
+              Atualize suas informações pessoais e foto de perfil.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* Avatar Upload */}
+            <div className="flex flex-col items-center space-y-4">
+              <Avatar className="h-32 w-32 border-4 border-gray-200">
+                <AvatarImage src={avatarUrl || profile?.avatar_url || undefined} />
+                <AvatarFallback className="text-3xl bg-purple-100 text-purple-600">
+                  {editName.charAt(0).toUpperCase() || userProfile.name.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              
+              <Label 
+                htmlFor="avatar-upload" 
+                className="cursor-pointer inline-flex items-center justify-center rounded-xl bg-purple-600 text-white px-4 py-2 hover:bg-purple-700 transition-colors"
+              >
+                {uploading ? (
+                  "Carregando..."
+                ) : (
+                  <>
+                    <Camera className="h-4 w-4 mr-2" />
+                    Alterar Foto
+                  </>
+                )}
+              </Label>
+              <Input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+                disabled={uploading}
+                className="hidden"
+              />
+            </div>
+
+            {/* Name Input */}
+            <div className="space-y-2">
+              <Label htmlFor="name">Nome</Label>
+              <Input
+                id="name"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="Seu nome"
+                className="rounded-xl"
+              />
+            </div>
+
+            {/* Phone (disabled) */}
+            <div className="space-y-2">
+              <Label htmlFor="phone">Telefone</Label>
+              <Input
+                id="phone"
+                value={userProfile.phone}
+                disabled
+                className="rounded-xl bg-gray-100 cursor-not-allowed"
+              />
+              <p className="text-xs text-gray-500">
+                O telefone não pode ser alterado pois está vinculado à sua conta.
+              </p>
+            </div>
+
+            {/* Email (disabled) */}
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                value={userProfile.email}
+                disabled
+                className="rounded-xl bg-gray-100 cursor-not-allowed"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowEditDialog(false)}
+              className="rounded-xl"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSaveProfile}
+              disabled={loading || uploading}
+              className="rounded-xl bg-purple-600 hover:bg-purple-700"
+            >
+              {loading ? "Salvando..." : "Salvar Alterações"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
