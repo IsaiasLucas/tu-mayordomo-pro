@@ -234,7 +234,7 @@ export default function PlanesView() {
       </div>
 
       {/* Plans Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
         {plans.map((plan, index) => {
           const Icon = getIcon(plan.iconName);
           const isCurrent = currentPlan === plan.id;
@@ -247,9 +247,9 @@ export default function PlanesView() {
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <Card
-                className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 group ${
-                  plan.popular ? "ring-2 ring-purple-500" : ""
-                } ${isSelecting ? "scale-95" : ""}`}
+                className={`relative overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 group cursor-pointer h-full flex flex-col ${
+                  plan.popular ? "ring-2 ring-purple-500 scale-105" : ""
+                } ${isSelecting ? "scale-95 opacity-70" : ""}`}
               >
                 {plan.popular && (
                   <div className="absolute top-0 right-0 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-1 text-xs font-bold rounded-bl-xl">
@@ -257,12 +257,13 @@ export default function PlanesView() {
                   </div>
                 )}
 
-                <div className={`absolute inset-0 bg-gradient-to-br ${plan.gradient} opacity-50 group-hover:opacity-70 transition-opacity`} />
+                <div className={`absolute inset-0 bg-gradient-to-br ${plan.gradient} opacity-40 group-hover:opacity-60 transition-all duration-500`} />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                 <CardHeader className="relative z-10 pb-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform">
-                      <Icon className="h-6 w-6 text-gray-700" />
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                      <Icon className="h-6 w-6 text-gray-700 group-hover:text-purple-600 transition-colors" />
                     </div>
                     {isCurrent && (
                       <Badge className="bg-green-100 text-green-700 font-semibold">
@@ -276,9 +277,9 @@ export default function PlanesView() {
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="relative z-10 pt-0 space-y-4">
-                  <div className="bg-white rounded-xl p-4 shadow-sm">
-                    <div className="flex items-baseline gap-1">
+                <CardContent className="relative z-10 pt-0 space-y-4 flex-grow">
+                  <div className="bg-white rounded-xl p-4 shadow-sm group-hover:shadow-md transition-shadow">
+                    <div className="flex items-baseline justify-center gap-1">
                       {plan.price === 0 ? (
                         <span className="text-3xl font-bold text-gray-900">Gratis</span>
                       ) : (
@@ -293,19 +294,19 @@ export default function PlanesView() {
                     </div>
                   </div>
 
-                  <ul className="space-y-2.5">
+                  <ul className="space-y-3">
                     {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm">
-                        <div className={`mt-0.5 rounded-full p-0.5 ${
-                          feature.included ? "bg-green-100" : "bg-gray-100"
+                      <li key={idx} className="flex items-start gap-3 text-sm group/item">
+                        <div className={`mt-0.5 rounded-full p-1 transition-all duration-300 ${
+                          feature.included ? "bg-green-100 group-hover/item:bg-green-200" : "bg-gray-100"
                         }`}>
                           <Check
-                            className={`h-3.5 w-3.5 ${
-                              feature.included ? "text-green-600" : "text-gray-300"
+                            className={`h-3.5 w-3.5 transition-transform duration-300 ${
+                              feature.included ? "text-green-600 group-hover/item:scale-110" : "text-gray-300"
                             }`}
                           />
                         </div>
-                        <span className={feature.included ? "text-gray-700" : "text-gray-400"}>
+                        <span className={`transition-colors ${feature.included ? "text-gray-700 font-medium" : "text-gray-400"}`}>
                           {feature.text}
                         </span>
                       </li>
@@ -313,10 +314,10 @@ export default function PlanesView() {
                   </ul>
                 </CardContent>
 
-                <CardFooter className="relative z-10 pt-4">
+                <CardFooter className="relative z-10 pt-6 mt-auto">
                   <Button
                     variant={plan.popular ? "default" : "outline"}
-                    className="w-full rounded-xl font-semibold transition-all group-hover:scale-105"
+                    className="w-full rounded-xl font-semibold transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg"
                     onClick={() => handleSelectPlan(plan.id, plan.priceId)}
                     disabled={isCurrent || isSelecting}
                   >
