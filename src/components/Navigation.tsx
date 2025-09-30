@@ -57,6 +57,8 @@ const Navigation = ({
             return <Button key={item.id} variant={isActive ? "default" : "ghost"} size="sm" onClick={() => !isDisabled && onViewChange(item.id)} disabled={isDisabled} className={cn("flex flex-col items-center gap-1 h-auto py-2 px-3 rounded-full transition-all", isActive && "bg-primary text-primary-foreground", isDisabled && "opacity-50", "hover:scale-105")}>
                   <Icon size={18} />
                   <span className="text-xs">{item.label}</span>
+                  {item.requiresPro && !isPro && <Badge variant="secondary" className="absolute -top-1 -right-1 text-xs w-4 h-4 p-0 flex items-center justify-center">
+              </Badge>}
                 </Button>;
           })}
           </div>
