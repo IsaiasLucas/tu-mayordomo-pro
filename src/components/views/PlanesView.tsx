@@ -260,16 +260,6 @@ export default function PlanesView() {
         
         
         {isProPlan && <div className="flex gap-3 justify-center items-center">
-            <Button variant="outline" onClick={handleManageSubscription} disabled={loadingPortal} className="rounded-xl">
-              {loadingPortal ? <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Cargando...
-                </> : <>
-                  <Settings className="h-4 w-4 mr-2" />
-                  Administrar
-                </>}
-            </Button>
-
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive" className="rounded-xl" disabled={cancellingSubscription}>
