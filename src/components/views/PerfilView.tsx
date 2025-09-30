@@ -50,7 +50,10 @@ import {
 const PerfilView = () => {
   const { user, profile, signOut } = useAuth();
   const { toast } = useToast();
-  const [showBalance, setShowBalance] = useState(true);
+  const [showBalance, setShowBalance] = useState(() => {
+    const saved = localStorage.getItem("tm_show_balance");
+    return saved === null ? true : saved === "true";
+  });
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -439,7 +442,15 @@ const PerfilView = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setShowBalance(!showBalance)}
+                onClick={() => {
+                  const newValue = !showBalance;
+                  setShowBalance(newValue);
+                  localStorage.setItem("tm_show_balance", String(newValue));
+                  toast({
+                    title: newValue ? "Saldo visível" : "Saldo oculto",
+                    description: newValue ? "O saldo será exibido na tela inicial." : "O saldo será ocultado na tela inicial.",
+                  });
+                }}
                 className="rounded-xl"
               >
                 {showBalance ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
