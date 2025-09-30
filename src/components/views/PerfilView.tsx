@@ -215,31 +215,70 @@ const PerfilView = () => {
       setUploading(true);
       
       if (!event.target.files || event.target.files.length === 0) {
+        toast({
+          title: "Nenhum arquivo selecionado",
+          variant: "destructive",
+        });
         return;
       }
 
       const file = event.target.files[0];
+      
+      // Validar tipo de arquivo
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Arquivo inválido",
+          description: "Por favor, selecione uma imagem.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validar tamanho (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Arquivo muito grande",
+          description: "A imagem deve ter no máximo 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const fileExt = file.name.split('.').pop();
       const fileName = `avatar.${fileExt}`;
       const filePath = `${user?.id}/${fileName}`;
 
+      console.log('Iniciando upload...', filePath);
+
       // Remove avatar antigo se existir
       if (profile?.avatar_url) {
-        const oldPath = profile.avatar_url.split('/').slice(-2).join('/');
-        await supabase.storage.from('avatars').remove([oldPath]);
+        try {
+          const oldPath = profile.avatar_url.split('/').slice(-2).join('/');
+          await supabase.storage.from('avatars').remove([oldPath]);
+        } catch (e) {
+          console.log('Erro ao remover foto antiga (ignorado):', e);
+        }
       }
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data: uploadData } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file, { upsert: true });
+        .upload(filePath, file, { 
+          upsert: true,
+          contentType: file.type 
+        });
 
       if (uploadError) {
+        console.error('Erro no upload:', uploadError);
         throw uploadError;
       }
+
+      console.log('Upload concluído:', uploadData);
 
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
+
+      console.log('URL pública:', publicUrl);
 
       setAvatarUrl(publicUrl);
 
@@ -248,9 +287,10 @@ const PerfilView = () => {
         description: "Sua foto foi carregada com sucesso.",
       });
     } catch (error: any) {
+      console.error('Erro completo:', error);
       toast({
         title: "Erro ao carregar foto",
-        description: error.message,
+        description: error.message || "Tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -262,15 +302,27 @@ const PerfilView = () => {
     try {
       setLoading(true);
 
-      const { error } = await supabase
+      console.log('Salvando perfil...', {
+        user_id: user?.id,
+        display_name: editName,
+        avatar_url: avatarUrl
+      });
+
+      const { error, data } = await supabase
         .from('profiles')
         .update({
           display_name: editName,
           avatar_url: avatarUrl,
         })
-        .eq('user_id', user?.id);
+        .eq('user_id', user?.id)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao atualizar:', error);
+        throw error;
+      }
+
+      console.log('Perfil atualizado:', data);
 
       toast({
         title: "Perfil atualizado",
@@ -278,11 +330,16 @@ const PerfilView = () => {
       });
 
       setShowEditDialog(false);
-      window.location.reload();
+      
+      // Aguardar um pouco antes de recarregar
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } catch (error: any) {
+      console.error('Erro completo ao salvar:', error);
       toast({
         title: "Erro ao atualizar perfil",
-        description: error.message,
+        description: error.message || "Tente novamente.",
         variant: "destructive",
       });
     } finally {
