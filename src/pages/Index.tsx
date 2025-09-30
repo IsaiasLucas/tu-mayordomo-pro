@@ -12,7 +12,7 @@ import AccountSwitcher from "@/components/AccountSwitcher";
 import { toast } from "@/hooks/use-toast";
 
 const Index = () => {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading, profile } = useAuth();
   const [currentView, setCurrentView] = useState("inicio");
   const [userPlan, setUserPlan] = useState("free"); // free, pro, premium
   const [phoneFilter, setPhoneFilter] = useState("");
@@ -27,13 +27,16 @@ const Index = () => {
 
   // Check if user needs to complete profile after login
   useEffect(() => {
-    if (isAuthenticated && !authLoading) {
-      const hasPhone = localStorage.getItem("tm_phone");
-      if (!hasPhone) {
+    if (isAuthenticated && !authLoading && profile) {
+      // Check if phone exists in Supabase profile
+      const phoneFromProfile = profile?.phone_personal || profile?.phone_empresa;
+      const hasValidPhone = phoneFromProfile && phoneFromProfile.trim() !== '';
+      
+      if (!hasValidPhone) {
         setShowProfileModal(true);
       }
     }
-  }, [isAuthenticated, authLoading]);
+  }, [isAuthenticated, authLoading, profile]);
 
   if (authLoading) {
     return (

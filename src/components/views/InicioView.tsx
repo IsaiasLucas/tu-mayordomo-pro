@@ -9,7 +9,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, ArrowRight, TrendingUp, TrendingDown } from "lucide-react";
 import { format } from "date-fns";
-import CompleteProfileModal from "@/components/CompleteProfileModal";
 
 interface InicioViewProps {
   onOpenProfileModal: () => void;
@@ -28,7 +27,6 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
   const [phone, setPhone] = useState<string | null>(null);
   const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
   const [loadingMovimientos, setLoadingMovimientos] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const ingresos = gastos.filter(g=>String(g.tipo).toLowerCase()==="ingreso")
                          .reduce((s,g)=>s+Number(g.valor||0),0);
@@ -82,10 +80,9 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
       localStorage.setItem("tm_phone", phoneFromProfile);
       fetchMovimientos(phoneFromProfile);
     } else {
-      // If no phone in profile, clear localStorage and show modal
-      console.log('No phone found in profile, showing modal');
+      // If no phone in profile, clear localStorage
+      console.log('No phone found in profile');
       localStorage.removeItem("tm_phone");
-      setShowProfileModal(true);
     }
   }, [profile]);
 
@@ -126,8 +123,6 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
     if (storedPhone) {
       fetchMovimientos(storedPhone);
     }
-    
-    setShowProfileModal(false);
   };
 
   return (
@@ -167,7 +162,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => setShowProfileModal(true)}
+                  onClick={onOpenProfileModal}
                   className="ml-2"
                 >
                   Añadir ahora
@@ -233,11 +228,6 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
           </CardFooter>
         )}
       </Card>
-
-      <CompleteProfileModal 
-        open={showProfileModal}
-        onClose={handleProfileModalClose}
-      />
     </main>
   );
 };
