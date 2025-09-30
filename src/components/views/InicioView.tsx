@@ -7,7 +7,7 @@ import { fmtCLP } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, ArrowRight, TrendingUp, TrendingDown } from "lucide-react";
+import { AlertCircle, TrendingUp, TrendingDown } from "lucide-react";
 import { format } from "date-fns";
 
 interface InicioViewProps {
@@ -274,17 +274,6 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
             </div>
           )}
         </CardContent>
-        {phone && movimientos.length > 0 && (
-          <CardFooter>
-            <Link
-              to="/gastos"
-              className="flex items-center gap-2 text-primary hover:underline font-medium"
-            >
-              Ver todos
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </CardFooter>
-        )}
       </Card>
     </main>
   );
