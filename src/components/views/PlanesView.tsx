@@ -6,7 +6,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Check, Sparkles, Zap, GraduationCap, MessageCircle, Loader2, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { StudentVerificationDialog } from "@/components/StudentVerificationDialog";
 
 interface PlanFeature {
   text: string;
@@ -30,8 +29,6 @@ export default function PlanesView() {
   const { toast } = useToast();
   const { profile, user } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [showStudentDialog, setShowStudentDialog] = useState(false);
-  const [pendingCheckout, setPendingCheckout] = useState<{ priceId: string; planId: string } | null>(null);
   const [checkingSubscription, setCheckingSubscription] = useState(false);
   const [loadingPortal, setLoadingPortal] = useState(false);
 
@@ -85,22 +82,6 @@ export default function PlanesView() {
         { text: "~$2.083/mes (30% off)", included: true },
         { text: "Backup automático", included: true },
         { text: "Soporte prioritario", included: true },
-      ],
-    },
-    {
-      id: "estudante",
-      name: "Estudiante",
-      description: "50% de descuento",
-      price: 1500,
-      period: "mes",
-      priceId: "price_1SDBGGCGNOUldBA3fdub9gbE",
-      iconName: "graduation",
-      gradient: "from-green-100 to-green-200",
-      features: [
-        { text: "Mensajes ilimitados", included: true },
-        { text: "Reportes detallados", included: true },
-        { text: "Análisis avanzado", included: true },
-        { text: "Requiere email .edu", included: true },
       ],
     },
   ];
@@ -178,24 +159,8 @@ export default function PlanesView() {
       return;
     }
 
-    // Student plan requires verification
-    if (planId === "estudante") {
-      if (!profile?.student_verified) {
-        setPendingCheckout({ priceId, planId });
-        setShowStudentDialog(true);
-        return;
-      }
-    }
-
     // Proceed with checkout
     await createCheckout(priceId, planId);
-  };
-
-  const handleStudentVerified = async () => {
-    if (pendingCheckout) {
-      await createCheckout(pendingCheckout.priceId, pendingCheckout.planId);
-      setPendingCheckout(null);
-    }
   };
 
   const createCheckout = async (priceId: string, planId: string) => {
@@ -400,11 +365,6 @@ export default function PlanesView() {
         </p>
       </div>
 
-      <StudentVerificationDialog
-        open={showStudentDialog}
-        onOpenChange={setShowStudentDialog}
-        onVerified={handleStudentVerified}
-      />
     </main>
   );
 }
