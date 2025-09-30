@@ -12,8 +12,6 @@ export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [nombre, setNombre] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,12 +34,10 @@ export default function Auth() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || (isSignUp && !telefone)) {
+    if (!email || !password) {
       toast({
         title: "Error",
-        description: isSignUp 
-          ? "Por favor completa todos los campos obligatorios incluyendo el teléfono"
-          : "Por favor completa email y contraseña",
+        description: "Por favor completa email y contraseña",
         variant: "destructive",
       });
       return;
@@ -52,35 +48,15 @@ export default function Auth() {
     try {
       if (isSignUp) {
         // Sign up
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/`,
-            data: {
-              telefone: telefone,
-              nombre: nombre,
-            }
           }
         });
 
         if (error) throw error;
-
-        // Add user to Google Sheets
-        if (data.user) {
-          try {
-            await supabase.functions.invoke('add-user-to-sheets', {
-              body: {
-                telefone,
-                email,
-                nombre
-              }
-            });
-          } catch (sheetsError) {
-            console.error('Error adding to sheets:', sheetsError);
-            // Don't fail the registration if sheets fails
-          }
-        }
 
         toast({
           title: "Registro realizado",
@@ -149,35 +125,6 @@ export default function Auth() {
               />
             </div>
 
-            {isSignUp && (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="telefone">Teléfono *</Label>
-                  <Input
-                    id="telefone"
-                    type="tel"
-                    value={telefone}
-                    onChange={(e) => setTelefone(e.target.value)}
-                    placeholder="56999999999"
-                    required
-                  />
-                  <p className="text-xs text-gray-500">
-                    Este número será usado para comunicação via WhatsApp
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="nombre">Nome (opcional)</Label>
-                  <Input
-                    id="nombre"
-                    type="text"
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
-                    placeholder="Seu nome"
-                  />
-                </div>
-              </>
-            )}
 
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Processando..." : (isSignUp ? "Criar conta" : "Iniciar sesión")}
