@@ -37,10 +37,17 @@ const HeroOverview = ({ total, varPct, title }: HeroOverviewProps) => {
         <span className="text-3xl font-bold">
           {showBalance ? formatCLP(total) : "••••••"}
         </span>
-        <span className="text-sm bg-white/20 px-2 py-1 rounded-full">
+        <span className={`text-sm px-2 py-1 rounded-full font-medium ${
+          varPct >= 0 
+            ? "bg-green-500/30 text-green-100" 
+            : "bg-red-500/30 text-red-100"
+        }`}>
           {varPct > 0 ? '+' : ''}{varPct}%
         </span>
       </div>
+      <p className="text-xs text-white/70 mt-2">
+        Variación diaria vs ayer
+      </p>
     </div>
   );
 };
