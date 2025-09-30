@@ -38,6 +38,13 @@ const Index = () => {
     }
   }, [isAuthenticated, authLoading, profile]);
 
+  // Sync userPlan with profile.plan
+  useEffect(() => {
+    if (profile?.plan) {
+      setUserPlan(profile.plan);
+    }
+  }, [profile?.plan]);
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -49,7 +56,7 @@ const Index = () => {
     );
   }
 
-  const isPro = userPlan !== "free";
+  const isPro = userPlan === "pro" || userPlan === "mensal" || userPlan === "anual";
 
   const handleViewChange = (view: string) => {
     setCurrentView(view);
