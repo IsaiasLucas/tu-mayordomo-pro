@@ -51,11 +51,24 @@ export function useAuth() {
         console.error('Error fetching profile:', error);
       } else {
         setProfile(data);
+        
+        // Check subscription status after fetching profile
+        setTimeout(() => {
+          checkSubscriptionStatus();
+        }, 0);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkSubscriptionStatus = async () => {
+    try {
+      await supabase.functions.invoke("check-subscription");
+    } catch (error) {
+      console.error('Error checking subscription:', error);
     }
   };
 

@@ -158,9 +158,39 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
       <HeroOverview total={saldoMes||0} varPct={variacionDiaria} title="Overview" />
 
       {!loading && profile?.plan === "free" && (
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-900 rounded-xl p-3">
-          Plano gratuito ativo. 
-          <a href="/planes" className="underline ml-2">Fazer upgrade para PRO</a>
+        <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-gray-900">Plano Gratuito Ativo</p>
+              <p className="text-sm text-gray-600">Atualize para desbloquear mensagens ilimitadas</p>
+            </div>
+            <a 
+              href="/planes" 
+              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-xl font-semibold hover:scale-105 transition-transform"
+            >
+              Ver Planos
+            </a>
+          </div>
+        </div>
+      )}
+
+      {!loading && profile?.plan && profile.plan !== "free" && (
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-gray-900 flex items-center gap-2">
+                <span className="text-green-600">✓</span>
+                Plano {profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1)} Ativo
+              </p>
+              <p className="text-sm text-gray-600">Você tem acesso completo a todos os recursos</p>
+            </div>
+            <a 
+              href="/planes" 
+              className="text-green-700 px-4 py-2 rounded-xl font-semibold hover:bg-green-100 transition-colors"
+            >
+              Gerenciar
+            </a>
+          </div>
         </div>
       )}
 

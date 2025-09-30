@@ -57,9 +57,12 @@ export type Database = {
           plan: string | null
           plan_renewal_date: string | null
           stripe_customer_id: string | null
+          stripe_customer_id_updated_at: string | null
           stripe_subscription_id: string | null
+          student_email: string | null
           student_trial_end: string | null
           student_verification_status: string | null
+          student_verified: boolean | null
           updated_at: string
           user_id: string
         }
@@ -75,9 +78,12 @@ export type Database = {
           plan?: string | null
           plan_renewal_date?: string | null
           stripe_customer_id?: string | null
+          stripe_customer_id_updated_at?: string | null
           stripe_subscription_id?: string | null
+          student_email?: string | null
           student_trial_end?: string | null
           student_verification_status?: string | null
+          student_verified?: boolean | null
           updated_at?: string
           user_id: string
         }
@@ -93,9 +99,12 @@ export type Database = {
           plan?: string | null
           plan_renewal_date?: string | null
           stripe_customer_id?: string | null
+          stripe_customer_id_updated_at?: string | null
           stripe_subscription_id?: string | null
+          student_email?: string | null
           student_trial_end?: string | null
           student_verification_status?: string | null
+          student_verified?: boolean | null
           updated_at?: string
           user_id?: string
         }

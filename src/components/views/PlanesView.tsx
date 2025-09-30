@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Check, Sparkles, Zap, GraduationCap, MessageCircle } from "lucide-react";
+import { Check, Sparkles, Zap, GraduationCap, MessageCircle, Loader2, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { StudentVerificationDialog } from "@/components/StudentVerificationDialog";
 
 interface PlanFeature {
   text: string;
@@ -17,6 +19,7 @@ interface Plan {
   description: string;
   price: number;
   period: string;
+  priceId: string;
   features: PlanFeature[];
   iconName: string;
   popular?: boolean;
@@ -25,8 +28,12 @@ interface Plan {
 
 export default function PlanesView() {
   const { toast } = useToast();
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [showStudentDialog, setShowStudentDialog] = useState(false);
+  const [pendingCheckout, setPendingCheckout] = useState<{ priceId: string; planId: string } | null>(null);
+  const [checkingSubscription, setCheckingSubscription] = useState(false);
+  const [loadingPortal, setLoadingPortal] = useState(false);
 
   const plans: Plan[] = [
     {
@@ -35,6 +42,7 @@ export default function PlanesView() {
       description: "Para começar",
       price: 0,
       period: "sempre",
+      priceId: "",
       iconName: "message",
       gradient: "from-gray-100 to-gray-200",
       features: [
@@ -51,6 +59,7 @@ export default function PlanesView() {
       description: "Uso sem limites",
       price: 3000,
       period: "mês",
+      priceId: "price_1SAb6WCGNOUldBA37lsDjBgB",
       iconName: "zap",
       popular: true,
       gradient: "from-purple-100 to-purple-200",
@@ -68,6 +77,7 @@ export default function PlanesView() {
       description: "Economize $11.000",
       price: 25000,
       period: "ano",
+      priceId: "price_1SBRZJCGNOUldBA3dPc3DIqU",
       iconName: "sparkles",
       gradient: "from-blue-100 to-blue-200",
       features: [
@@ -83,13 +93,14 @@ export default function PlanesView() {
       description: "50% de desconto",
       price: 1500,
       period: "mês",
+      priceId: "price_1SCvQSCGNOUldBA3BNvCtbWE",
       iconName: "graduation",
       gradient: "from-green-100 to-green-200",
       features: [
         { text: "Mensagens ilimitadas", included: true },
         { text: "Relatórios detalhados", included: true },
         { text: "Análise avançada", included: true },
-        { text: "Requer comprovante", included: true },
+        { text: "Requer email .edu", included: true },
       ],
     },
   ];
@@ -109,32 +120,116 @@ export default function PlanesView() {
     }
   };
 
-  const handleSelectPlan = (planId: string) => {
+  // Check subscription status on mount
+  useEffect(() => {
+    checkSubscription();
+  }, [user]);
+
+  const checkSubscription = async () => {
+    if (!user) return;
+    
+    setCheckingSubscription(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("check-subscription");
+      
+      if (error) {
+        console.error("Error checking subscription:", error);
+        return;
+      }
+
+      if (data.subscribed) {
+        console.log("Subscription active:", data.plan);
+      }
+    } catch (error) {
+      console.error("Error checking subscription:", error);
+    } finally {
+      setCheckingSubscription(false);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    setLoadingPortal(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("customer-portal");
+      
+      if (error) throw error;
+      
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (error: any) {
+      console.error("Error opening customer portal:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível abrir o portal de gerenciamento.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingPortal(false);
+    }
+  };
+
+  const handleSelectPlan = async (planId: string, priceId: string) => {
+    if (planId === "free") {
+      toast({
+        title: "Plano Gratuito",
+        description: "Você já tem acesso ao plano gratuito!",
+      });
+      return;
+    }
+
+    // Student plan requires verification
+    if (planId === "estudante") {
+      if (!profile?.student_verified) {
+        setPendingCheckout({ priceId, planId });
+        setShowStudentDialog(true);
+        return;
+      }
+    }
+
+    // Proceed with checkout
+    await createCheckout(priceId, planId);
+  };
+
+  const handleStudentVerified = async () => {
+    if (pendingCheckout) {
+      await createCheckout(pendingCheckout.priceId, pendingCheckout.planId);
+      setPendingCheckout(null);
+    }
+  };
+
+  const createCheckout = async (priceId: string, planId: string) => {
     setSelectedPlan(planId);
     
-    setTimeout(() => {
-      const plan = plans.find(p => p.id === planId);
-      
-      if (planId === "free") {
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { priceId, planId },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+        
         toast({
-          title: "Plano Gratuito",
-          description: "Você já tem acesso ao plano gratuito!",
-        });
-      } else if (planId === "estudante") {
-        toast({
-          title: "Verificação Necessária",
-          description: "Envie seu comprovante de estudante para ativar este plano.",
-        });
-      } else {
-        toast({
-          title: `Plano ${plan?.name}`,
-          description: `${plan?.price?.toLocaleString('es-CL')} CLP/${plan?.period}. Pagamento em breve.`,
+          title: "Redirecionando...",
+          description: "Você será levado para a página de pagamento do Stripe.",
         });
       }
-      
-      setSelectedPlan(null);
-    }, 400);
+    } catch (error: any) {
+      console.error("Error creating checkout:", error);
+      toast({
+        title: "Erro",
+        description: error.message || "Não foi possível criar a sessão de pagamento.",
+        variant: "destructive",
+      });
+    } finally {
+      setTimeout(() => setSelectedPlan(null), 1000);
+    }
   };
+
+  const currentPlan = profile?.plan || "free";
+  const hasActivePlan = currentPlan !== "free";
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50 to-blue-50 p-4 pb-20">
@@ -147,16 +242,37 @@ export default function PlanesView() {
         <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
           Escolha seu Plano
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 mb-4">
           Comece grátis. Atualize quando precisar.
         </p>
+        
+        {hasActivePlan && (
+          <Button
+            variant="outline"
+            onClick={handleManageSubscription}
+            disabled={loadingPortal}
+            className="rounded-xl"
+          >
+            {loadingPortal ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Carregando...
+              </>
+            ) : (
+              <>
+                <Settings className="h-4 w-4 mr-2" />
+                Gerenciar Assinatura
+              </>
+            )}
+          </Button>
+        )}
       </div>
 
       {/* Plans Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
         {plans.map((plan, index) => {
           const Icon = getIcon(plan.iconName);
-          const isCurrent = profile?.plan === plan.id || (plan.id === "free" && !profile?.plan);
+          const isCurrent = currentPlan === plan.id;
           const isSelecting = selectedPlan === plan.id;
 
           return (
@@ -170,14 +286,12 @@ export default function PlanesView() {
                   plan.popular ? "ring-2 ring-purple-500" : ""
                 } ${isSelecting ? "scale-95" : ""}`}
               >
-                {/* Popular Badge */}
                 {plan.popular && (
                   <div className="absolute top-0 right-0 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-1 text-xs font-bold rounded-bl-xl">
                     POPULAR
                   </div>
                 )}
 
-                {/* Gradient Background */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${plan.gradient} opacity-50 group-hover:opacity-70 transition-opacity`} />
 
                 <CardHeader className="relative z-10 pb-4">
@@ -198,7 +312,6 @@ export default function PlanesView() {
                 </CardHeader>
 
                 <CardContent className="relative z-10 pt-0 space-y-4">
-                  {/* Price */}
                   <div className="bg-white rounded-xl p-4 shadow-sm">
                     <div className="flex items-baseline gap-1">
                       {plan.price === 0 ? (
@@ -215,7 +328,6 @@ export default function PlanesView() {
                     </div>
                   </div>
 
-                  {/* Features */}
                   <ul className="space-y-2.5">
                     {plan.features.map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-sm">
@@ -240,18 +352,16 @@ export default function PlanesView() {
                   <Button
                     variant={plan.popular ? "default" : "outline"}
                     className="w-full rounded-xl font-semibold transition-all group-hover:scale-105"
-                    onClick={() => handleSelectPlan(plan.id)}
-                    disabled={isCurrent && plan.id === "free"}
+                    onClick={() => handleSelectPlan(plan.id, plan.priceId)}
+                    disabled={isCurrent || isSelecting}
                   >
-                    {isCurrent && plan.id === "free" ? (
+                    {isCurrent ? (
                       "Plano Atual"
                     ) : isSelecting ? (
                       <span className="flex items-center gap-2">
-                        <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        <Loader2 className="h-4 w-4 animate-spin" />
                         Processando...
                       </span>
-                    ) : plan.id === "estudante" ? (
-                      "Verificar Estudante"
                     ) : (
                       `Escolher ${plan.name}`
                     )}
@@ -286,9 +396,15 @@ export default function PlanesView() {
         </div>
         
         <p className="text-gray-500 text-sm">
-          Pagamentos processados com segurança
+          Pagamentos processados com segurança via Stripe
         </p>
       </div>
+
+      <StudentVerificationDialog
+        open={showStudentDialog}
+        onOpenChange={setShowStudentDialog}
+        onVerified={handleStudentVerified}
+      />
     </main>
   );
 }
