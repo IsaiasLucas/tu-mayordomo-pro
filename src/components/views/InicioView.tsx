@@ -26,26 +26,27 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
   const { items: gastos } = useGastos();
   const [phone, setPhone] = useState<string | null>(null);
   const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
+  const [allMovimientos, setAllMovimientos] = useState<Movimiento[]>([]);
   const [loadingMovimientos, setLoadingMovimientos] = useState(false);
 
-  // Calculate from movimientos instead of gastos hook
-  const ingresos = movimientos
+  // Calculate from ALL movimientos of the month
+  const ingresos = allMovimientos
     .filter(m => m.tipo.toLowerCase() === "ingreso" || m.tipo.toLowerCase() === "receita")
     .reduce((s, m) => s + Number(m.monto || 0), 0);
   
-  const egresos = movimientos
-    .filter(m => m.tipo.toLowerCase() === "egreso" || m.tipo.toLowerCase() === "despesa")
+  const egresos = allMovimientos
+    .filter(m => m.tipo.toLowerCase() === "egreso" || m.tipo.toLowerCase() === "despesa" || m.tipo.toLowerCase() === "gasto")
     .reduce((s, m) => s + Number(m.monto || 0), 0);
   
   const saldoMes = ingresos - egresos;
 
-  // Calcular variação diária
+  // Calcular variação diária usando todos os movimientos
   const calcularVariacionDiaria = () => {
     const hoy = new Date();
     const ayer = new Date(hoy);
     ayer.setDate(ayer.getDate() - 1);
 
-    const saldoHoy = movimientos
+    const saldoHoy = allMovimientos
       .filter(m => {
         const fechaMov = new Date(m.fecha);
         return fechaMov.toDateString() === hoy.toDateString();
@@ -57,7 +58,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
         return total + valor;
       }, 0);
 
-    const saldoAyer = movimientos
+    const saldoAyer = allMovimientos
       .filter(m => {
         const fechaMov = new Date(m.fecha);
         return fechaMov.toDateString() === ayer.toDateString();
@@ -84,6 +85,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
       setPhone(phoneFromProfile);
       localStorage.setItem("tm_phone", phoneFromProfile);
       fetchMovimientos(phoneFromProfile);
+      fetchAllMovimientos(phoneFromProfile);
     } else {
       // If no phone in profile, clear localStorage
       console.log('No phone found in profile');
@@ -111,6 +113,26 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
     }
   };
 
+  const fetchAllMovimientos = async (phoneNumber: string) => {
+    try {
+      const now = new Date();
+      const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      
+      const response = await fetch(
+        `https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec?action=month&phone=${encodeURIComponent(phoneNumber)}&mes=${mes}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.ok && data.items && Array.isArray(data.items)) {
+          setAllMovimientos(data.items);
+        }
+      }
+    } catch (error) {
+      console.error("Error al cargar todos los movimientos:", error);
+    }
+  };
+
   const formatMovimientoDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -127,6 +149,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
     
     if (storedPhone) {
       fetchMovimientos(storedPhone);
+      fetchAllMovimientos(storedPhone);
     }
   };
 
