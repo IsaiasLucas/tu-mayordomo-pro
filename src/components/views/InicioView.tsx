@@ -7,6 +7,7 @@ import { fmtCLP } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, TrendingUp, TrendingDown } from "lucide-react";
 import { format } from "date-fns";
 
@@ -228,8 +229,16 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
               </AlertDescription>
             </Alert>
           ) : loadingMovimientos ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Cargando movimientos...
+            <div className="space-y-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="flex items-center justify-between p-3 rounded-lg border">
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-5 w-48" />
+                  </div>
+                  <Skeleton className="h-6 w-24" />
+                </div>
+              ))}
             </div>
           ) : movimientos.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
