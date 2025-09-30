@@ -39,7 +39,8 @@ serve(async (req) => {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
       logStep("Webhook signature verified", { type: event.type });
     } catch (err) {
-      logStep("Webhook signature verification failed", { error: err.message });
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      logStep("Webhook signature verification failed", { error: errorMsg });
       return new Response(JSON.stringify({ error: "Webhook signature verification failed" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
@@ -61,6 +62,7 @@ serve(async (req) => {
 
       // Extract customer information
       let customerEmail = "";
+      let telefone = "";
       let customerId = "";
       let subscriptionStatus = "";
       let plan = "free";
@@ -71,30 +73,42 @@ serve(async (req) => {
         customerEmail = session.customer_email || "";
         customerId = session.customer as string;
         
+        // Get customer metadata for phone number
+        if (customerId) {
+          const customer = await stripe.customers.retrieve(customerId);
+          if ('metadata' in customer && customer.metadata) {
+            telefone = customer.metadata.telefone || "";
+          }
+        }
+        
         // Fetch subscription details if available
         if (session.subscription) {
           const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
           subscriptionStatus = subscription.status;
           const priceId = subscription.items.data[0].price.id;
           
-          // Map price to plan
+          // Map price to plan - all paid plans become "pro"
           const planMap: Record<string, string> = {
-            "price_1SAb6WCGNOUldBA37lsDjBgB": "mensal",
-            "price_1SBRZJCGNOUldBA3dPc3DIqU": "anual",
-            "price_1SCvQSCGNOUldBA3BNvCtbWE": "estudante",
+            "price_1SAb6WCGNOUldBA37lsDjBgB": "pro",
+            "price_1SBRZJCGNOUldBA3dPc3DIqU": "pro",
+            "price_1SCvQSCGNOUldBA3BNvCtbWE": "pro",
           };
           plan = planMap[priceId] || "pro";
         }
 
         eventData = {
-          event_type: event.type,
-          customer_email: customerEmail,
+          event_type: "payment_approved",
+          action: "update_plan",
+          email: customerEmail,
+          telefone: telefone,
+          plan: plan,
+          old_plan: "free",
           customer_id: customerId,
           subscription_status: subscriptionStatus,
-          plan: plan,
           session_id: session.id,
           amount_total: session.amount_total,
           currency: session.currency,
+          timestamp: new Date().toISOString(),
         };
       } else if (event.type.startsWith("customer.subscription.")) {
         const subscription = event.data.object as Stripe.Subscription;
@@ -107,23 +121,30 @@ serve(async (req) => {
         if ('email' in customer) {
           customerEmail = customer.email || "";
         }
+        if ('metadata' in customer && customer.metadata) {
+          telefone = customer.metadata.telefone || "";
+        }
 
-        // Map price to plan
+        // Map price to plan - all paid plans are "pro", cancelled is "free"
         const planMap: Record<string, string> = {
-          "price_1SAb6WCGNOUldBA37lsDjBgB": "mensal",
-          "price_1SBRZJCGNOUldBA3dPc3DIqU": "anual",
-          "price_1SCvQSCGNOUldBA3BNvCtbWE": "estudante",
+          "price_1SAb6WCGNOUldBA37lsDjBgB": "pro",
+          "price_1SBRZJCGNOUldBA3dPc3DIqU": "pro",
+          "price_1SCvQSCGNOUldBA3BNvCtbWE": "pro",
         };
         plan = event.type === "customer.subscription.deleted" ? "free" : (planMap[priceId] || "pro");
 
         eventData = {
-          event_type: event.type,
-          customer_email: customerEmail,
+          event_type: event.type === "customer.subscription.deleted" ? "subscription_cancelled" : "subscription_updated",
+          action: "update_plan",
+          email: customerEmail,
+          telefone: telefone,
+          plan: plan,
+          old_plan: event.type === "customer.subscription.deleted" ? "pro" : "free",
           customer_id: customerId,
           subscription_id: subscription.id,
           subscription_status: subscriptionStatus,
-          plan: plan,
           current_period_end: subscription.current_period_end,
+          timestamp: new Date().toISOString(),
         };
       } else if (event.type.startsWith("invoice.payment_")) {
         const invoice = event.data.object as Stripe.Invoice;
@@ -134,14 +155,25 @@ serve(async (req) => {
         if ('email' in customer) {
           customerEmail = customer.email || "";
         }
+        if ('metadata' in customer && customer.metadata) {
+          telefone = customer.metadata.telefone || "";
+        }
+
+        const paymentStatus = event.type === "invoice.payment_succeeded" ? "succeeded" : "failed";
+        const newPlan = paymentStatus === "succeeded" ? "pro" : "free";
 
         eventData = {
-          event_type: event.type,
-          customer_email: customerEmail,
+          event_type: paymentStatus === "succeeded" ? "payment_approved" : "payment_failed",
+          action: paymentStatus === "succeeded" ? "update_plan" : "keep_plan",
+          email: customerEmail,
+          telefone: telefone,
+          plan: newPlan,
+          old_plan: "free",
           customer_id: customerId,
           invoice_id: invoice.id,
           amount_paid: invoice.amount_paid,
           status: invoice.status,
+          timestamp: new Date().toISOString(),
         };
       }
 
