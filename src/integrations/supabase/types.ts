@@ -101,6 +101,42 @@ export type Database = {
         }
         Relationships: []
       }
+      reportes: {
+        Row: {
+          created_at: string
+          data: Json | null
+          id: string
+          pdf_url: string | null
+          periodo: string
+          phone: string
+          tipo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          pdf_url?: string | null
+          periodo: string
+          phone: string
+          tipo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          pdf_url?: string | null
+          periodo?: string
+          phone?: string
+          tipo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       student_verifications: {
         Row: {
           admin_notes: string | null
