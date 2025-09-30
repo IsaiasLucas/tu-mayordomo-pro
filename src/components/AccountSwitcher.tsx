@@ -92,10 +92,7 @@ export default function AccountSwitcher() {
     }
 
     try {
-      // Sign out current user
-      await supabase.auth.signOut();
-
-      // Sign in with stored session
+      // Switch directly to stored session without signing out
       const { error } = await supabase.auth.setSession({
         access_token: account.access_token,
         refresh_token: account.refresh_token,
@@ -103,8 +100,17 @@ export default function AccountSwitcher() {
 
       if (error) {
         // If session expired, remove account and show error
+        console.error('Session expired for account:', account.email);
         removeAccount(account.user_id);
-        throw error;
+        
+        toast({
+          title: "Sessão expirada",
+          description: "Esta conta precisa fazer login novamente.",
+          variant: "destructive",
+        });
+        
+        setOpen(false);
+        return;
       }
 
       toast({
@@ -113,15 +119,18 @@ export default function AccountSwitcher() {
       });
 
       setOpen(false);
-      window.location.reload();
+      
+      // Reload to refresh all data with new session
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     } catch (error) {
       console.error("Error switching account:", error);
       toast({
         title: "Erro ao alternar conta",
-        description: "Sessão expirada. Faça login novamente.",
+        description: "Não foi possível trocar de conta.",
         variant: "destructive",
       });
-      navigate("/auth");
     }
   };
 
