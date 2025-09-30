@@ -20,7 +20,6 @@ import {
   User,
   Crown,
   Settings,
-  Bell,
   Shield,
   Phone,
   Mail,
@@ -47,12 +46,6 @@ const PerfilView = () => {
 
   const isPro = profile?.plan === 'pro' || profile?.plan === 'premium';
   
-  const [notifications, setNotifications] = useState({
-    expenses: true,
-    budgets: true,
-    reports: isPro,
-    marketing: false
-  });
 
   const userProfile = {
     name: profile?.display_name || user?.user_metadata?.nombre || user?.email?.split('@')[0] || "Usuario",
@@ -80,16 +73,6 @@ const PerfilView = () => {
     }).format(amount);
   };
 
-  const handleNotificationChange = (key: string) => {
-    setNotifications(prev => ({
-      ...prev,
-      [key]: !prev[key as keyof typeof prev]
-    }));
-    toast({
-      title: "Preferência salva",
-      description: "Sua configuração de notificação foi atualizada.",
-    });
-  };
 
   const handleExportData = async () => {
     try {
@@ -318,67 +301,6 @@ const PerfilView = () => {
           </div>
         </Card>
 
-        <Card className="bg-white shadow-sm rounded-3xl p-6">
-          <h3 className="text-lg font-semibold mb-6 flex items-center">
-            <Bell className="h-5 w-5 mr-2" />
-            Notificações
-          </h3>
-          
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-medium">Alertas de gastos</h4>
-                <p className="text-sm text-gray-600">Notificações quando registrar novos gastos</p>
-              </div>
-              <Button
-                variant={notifications.expenses ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleNotificationChange('expenses')}
-                className="rounded-xl"
-              >
-                {notifications.expenses ? "Ativado" : "Desativado"}
-              </Button>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-medium">Limites de orçamento</h4>
-                <p className="text-sm text-gray-600">Avisos quando superar seus orçamentos</p>
-              </div>
-              <Button
-                variant={notifications.budgets ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleNotificationChange('budgets')}
-                className="rounded-xl"
-              >
-                {notifications.budgets ? "Ativado" : "Desativado"}
-              </Button>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <div>
-                  <h4 className="font-medium">Relatórios semanais</h4>
-                  <p className="text-sm text-gray-600">Resumo semanal das suas finanças</p>
-                </div>
-                {isPro && (
-                  <Badge className="bg-yellow-500 text-black px-2 py-0 text-xs rounded-full">
-                    PRO
-                  </Badge>
-                )}
-              </div>
-              <Button
-                variant={notifications.reports ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleNotificationChange('reports')}
-                disabled={!isPro}
-                className="rounded-xl"
-              >
-                {notifications.reports ? "Ativado" : "Desativado"}
-              </Button>
-            </div>
-          </div>
-        </Card>
       </div>
 
       {/* Security & Data */}
