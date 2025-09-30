@@ -72,6 +72,10 @@ serve(async (req) => {
     
     logStep("Sheets data fetched", { rowCount: rows.length });
 
+    // Normalizar telefone (remover espaços e caracteres especiais)
+    const normalizeTelefone = (tel: string) => tel.replace(/\D/g, '');
+    const telefoneNormalizado = normalizeTelefone(telefone);
+    
     // Buscar linha do usuário (por telefone)
     let userRow = null;
     let planFromSheets = "free";
@@ -79,9 +83,10 @@ serve(async (req) => {
     for (let i = 1; i < rows.length; i++) { // Skip header row
       const row = rows[i];
       const rowTelefone = row[0] || "";
+      const rowTelefoneNormalizado = normalizeTelefone(rowTelefone);
       const rowPlan = row[3] || "free"; // Column D (index 3)
 
-      if (rowTelefone === telefone) {
+      if (rowTelefoneNormalizado === telefoneNormalizado) {
         userRow = row;
         planFromSheets = rowPlan.toLowerCase();
         logStep("User found in sheets", { telefone: rowTelefone, plan: planFromSheets });
