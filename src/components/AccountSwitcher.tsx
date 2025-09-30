@@ -91,45 +91,60 @@ export default function AccountSwitcher() {
       return;
     }
 
+    setOpen(false);
+
     try {
       // Clear all localStorage data from previous account
       localStorage.removeItem('tm_phone');
       localStorage.removeItem('tm_nombre');
 
-      // Switch directly to stored session without signing out
-      const { error } = await supabase.auth.setSession({
-        access_token: account.access_token,
+      // Use refreshSession to automatically refresh expired tokens
+      const { data, error } = await supabase.auth.refreshSession({
         refresh_token: account.refresh_token,
       });
 
-      if (error) {
-        // If session expired, remove account and show error
-        console.error('Session expired for account:', account.email);
+      if (error || !data.session) {
+        console.error('Failed to refresh session:', error);
+        
+        // Remove expired account
         removeAccount(account.user_id);
         
         toast({
           title: "Sessão expirada",
-          description: "Esta conta precisa fazer login novamente.",
+          description: `A conta de ${account.display_name} expirou. Faça login novamente.`,
           variant: "destructive",
         });
         
-        setOpen(false);
         return;
+      }
+
+      // Update stored account with new tokens
+      const updatedAccount: StoredAccount = {
+        ...account,
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      };
+
+      const stored = localStorage.getItem("tm_accounts");
+      let existingAccounts: StoredAccount[] = stored ? JSON.parse(stored) : [];
+      const index = existingAccounts.findIndex(acc => acc.user_id === account.user_id);
+      
+      if (index >= 0) {
+        existingAccounts[index] = updatedAccount;
+        localStorage.setItem("tm_accounts", JSON.stringify(existingAccounts));
       }
 
       console.log(`Switched to account: ${account.display_name} (${account.email})`);
 
       toast({
         title: "Conta alternada",
-        description: `Agora você está usando a conta de ${account.display_name}`,
+        description: `Agora você está usando ${account.display_name}`,
       });
-
-      setOpen(false);
       
       // Reload after a small delay to ensure session is properly set
       setTimeout(() => {
         window.location.reload();
-      }, 300);
+      }, 200);
     } catch (error) {
       console.error("Error switching account:", error);
       toast({
