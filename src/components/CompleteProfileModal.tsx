@@ -72,7 +72,7 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
 
     try {
       const response = await fetch(
-        "https://script.google.com/macros/s/AKfycbyF1bpzDkaBqRmk_lshvclbyVcr0GGeQaAwU3KM_3rYLw7csxLO9rNLsl7pACrronj1/exec",
+        "https://script.google.com/macros/s/AKfycbyCWcSuxX5X3U3NXFj2MKkA9e_Kk4wHtofRw1mKLI_6_HYHN4siyRRKbXAjdkNULkS1rQ/exec",
         {
           method: "POST",
           headers: {
