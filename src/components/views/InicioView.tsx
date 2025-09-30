@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import HeroOverview from "../HeroOverview";
 import { useAuth } from "@/hooks/useAuth";
@@ -29,6 +29,8 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
   const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
   const [allMovimientos, setAllMovimientos] = useState<Movimiento[]>([]);
   const [loadingMovimientos, setLoadingMovimientos] = useState(false);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Calculate from ALL movimientos of the month
   const ingresos = allMovimientos
@@ -85,17 +87,58 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
     if (phoneFromProfile && phoneFromProfile.trim() !== '') {
       setPhone(phoneFromProfile);
       localStorage.setItem("tm_phone", phoneFromProfile);
+      
+      // Initial load
       fetchMovimientos(phoneFromProfile);
       fetchAllMovimientos(phoneFromProfile);
+      
+      // Setup polling every 5 seconds
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+      
+      pollingIntervalRef.current = setInterval(() => {
+        fetchMovimientosUpdate(phoneFromProfile);
+        fetchAllMovimientosUpdate(phoneFromProfile);
+      }, 5000);
     } else {
-      // If no phone in profile, clear localStorage
       console.log('No phone found in profile');
       localStorage.removeItem("tm_phone");
     }
+    
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
   }, [profile]);
 
   const fetchMovimientos = async (phoneNumber: string) => {
-    setLoadingMovimientos(true);
+    if (!initialLoadComplete) {
+      setLoadingMovimientos(true);
+    }
+    try {
+      const response = await fetch(
+        `https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec?action=last5&phone=${encodeURIComponent(phoneNumber)}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.ok && data.items && Array.isArray(data.items)) {
+          setMovimientos(data.items.slice(0, 5));
+          setInitialLoadComplete(true);
+        }
+      }
+    } catch (error) {
+      console.error("Error al cargar movimientos:", error);
+    } finally {
+      if (!initialLoadComplete) {
+        setLoadingMovimientos(false);
+      }
+    }
+  };
+
+  const fetchMovimientosUpdate = async (phoneNumber: string) => {
     try {
       const response = await fetch(
         `https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec?action=last5&phone=${encodeURIComponent(phoneNumber)}`
@@ -108,9 +151,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
         }
       }
     } catch (error) {
-      console.error("Error al cargar movimientos:", error);
-    } finally {
-      setLoadingMovimientos(false);
+      console.error("Error al actualizar movimientos:", error);
     }
   };
 
@@ -131,6 +172,26 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
       }
     } catch (error) {
       console.error("Error al cargar todos los movimientos:", error);
+    }
+  };
+
+  const fetchAllMovimientosUpdate = async (phoneNumber: string) => {
+    try {
+      const now = new Date();
+      const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      
+      const response = await fetch(
+        `https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec?action=month&phone=${encodeURIComponent(phoneNumber)}&mes=${mes}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.ok && data.items && Array.isArray(data.items)) {
+          setAllMovimientos(data.items);
+        }
+      }
+    } catch (error) {
+      console.error("Error al actualizar todos los movimientos:", error);
     }
   };
 

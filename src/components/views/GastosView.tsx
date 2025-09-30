@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { fmtCLP } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,8 +35,10 @@ export default function GastosView() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [data, setData] = useState<MonthData>({ items: [], totalIngresos: 0, totalGastos: 0, saldo: 0 });
   const [loading, setLoading] = useState(false);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 50;
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const storedPhone = localStorage.getItem("tm_phone");
@@ -52,7 +54,28 @@ export default function GastosView() {
     if (!phone) return;
 
     const fetchData = async () => {
-      setLoading(true);
+      if (!initialLoadComplete) {
+        setLoading(true);
+      }
+      try {
+        const url = `https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec?action=month&phone=${encodeURIComponent(phone)}&ym=${selectedMonth}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        
+        if (result.ok) {
+          setData(result);
+          setInitialLoadComplete(true);
+        }
+      } catch (error) {
+        console.error("Error fetching month data:", error);
+      } finally {
+        if (!initialLoadComplete) {
+          setLoading(false);
+        }
+      }
+    };
+
+    const fetchDataUpdate = async () => {
       try {
         const url = `https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec?action=month&phone=${encodeURIComponent(phone)}&ym=${selectedMonth}`;
         const response = await fetch(url);
@@ -62,13 +85,27 @@ export default function GastosView() {
           setData(result);
         }
       } catch (error) {
-        console.error("Error fetching month data:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error updating month data:", error);
       }
     };
 
+    // Initial fetch
     fetchData();
+    
+    // Setup polling
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+    }
+    
+    pollingIntervalRef.current = setInterval(() => {
+      fetchDataUpdate();
+    }, 5000);
+
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
   }, [phone, selectedMonth]);
 
   const handleDownloadPDF = () => {
