@@ -8,6 +8,7 @@ import ReportesView from "@/components/views/ReportesView";
 import PlanesView from "@/components/views/PlanesView";
 import PerfilView from "@/components/views/PerfilView";
 import CompleteProfileModal from "@/components/CompleteProfileModal";
+import AccountSwitcher from "@/components/AccountSwitcher";
 import { toast } from "@/hooks/use-toast";
 
 const Index = () => {
@@ -88,6 +89,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Header fixo com Account Switcher */}
+      <header className="fixed top-0 right-0 z-50 p-4">
+        <AccountSwitcher />
+      </header>
+
       <Navigation
         currentView={currentView}
         onViewChange={handleViewChange}
@@ -96,7 +102,7 @@ const Index = () => {
         onPhoneFilterChange={handlePhoneFilterChange}
       />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 pt-20">
         {renderCurrentView()}
       </main>
 
