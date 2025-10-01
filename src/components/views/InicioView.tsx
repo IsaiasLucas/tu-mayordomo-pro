@@ -229,7 +229,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
             </p>
           </div>
           {profile?.plan && profile.plan !== "free" && (
-            <div className="bg-accent text-accent-foreground px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 flex-shrink-0">
+            <div className="bg-yellow-500 text-yellow-950 px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 flex-shrink-0">
               <Crown className="w-3 h-3" />
               PRO
             </div>
