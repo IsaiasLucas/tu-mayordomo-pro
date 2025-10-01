@@ -46,8 +46,6 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
     setPhoneValid(formatted.length > 0 ? isValid : null);
   };
 
-  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec";
-
   const handleSave = async () => {
     // Validación
     if (!nombre.trim()) {
@@ -84,31 +82,7 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
-      // Extract only digits for the sheet (without + or spaces)
-      const phoneDigits = whatsapp.replace(/\D/g, ""); // This gives us "569xxxx"
-
-      // Save to Google Sheets via Supabase Edge Function
-      const { data: addRes, error: fnError } = await supabase.functions.invoke('add-user-to-sheets', {
-        body: {
-          telefone: phoneDigits,
-          email: user.email,
-          nombre,
-        },
-      });
-
-      if (fnError) throw fnError as Error;
-      if (!(addRes as any)?.success) {
-        const errMsg = (addRes as any)?.error || 'Failed to add user to sheets';
-        throw new Error(errMsg);
-      }
-
-      const data = await response.json();
-
-      if (!data.ok) {
-        throw new Error(data.error || "Falha ao salvar");
-      }
-
-      // Save to Supabase profile (keep formatted for display)
+      // Save to Supabase profile
       const phoneField = tipo === "Empresa" ? "phone_empresa" : "phone_personal";
       const { error: profileError } = await supabase
         .from('profiles')
@@ -121,12 +95,9 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
 
       if (profileError) throw profileError;
 
-      // Save to localStorage for quick access (both formatted and digits)
-      localStorage.setItem("tm_phone", whatsapp);
-      localStorage.setItem("telefono", phoneDigits);
       toast({
-        title: "✅ Número verificado",
-        description: "Tu cuenta está activa.",
+        title: "✅ Perfil completado",
+        description: "Tus datos han sido guardados correctamente.",
       });
 
       onClose();
