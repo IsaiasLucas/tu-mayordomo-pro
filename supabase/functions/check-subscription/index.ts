@@ -12,11 +12,13 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CHECK-SUBSCRIPTION] ${step}${detailsStr}`);
 };
 
-// Map price IDs to plan names
+// Map price IDs to plan names - all paid plans are "pro"
 const PLAN_MAP: Record<string, string> = {
-  "price_1SAb6WCGNOUldBA37lsDjBgB": "mensal",
-  "price_1SBRZJCGNOUldBA3dPc3DIqU": "anual",
-  "price_1SCvQSCGNOUldBA3BNvCtbWE": "estudante",
+  "price_1SDBEqCGNOUldBA3Fh0quBIN": "pro", // mensal
+  "price_1SDBGGCGNOUldBA3YXBfTYl4": "pro", // anual
+  "price_1SAb6WCGNOUldBA37lsDjBgB": "pro",
+  "price_1SBRZJCGNOUldBA3dPc3DIqU": "pro",
+  "price_1SCvQSCGNOUldBA3BNvCtbWE": "pro",
 };
 
 serve(async (req) => {
@@ -131,7 +133,7 @@ serve(async (req) => {
 
     const subscription = subscriptions.data[0];
     const priceId = subscription.items.data[0].price.id;
-    const planName = PLAN_MAP[priceId] || "free";
+    const planName = PLAN_MAP[priceId] || "pro"; // Default to "pro" for any paid plan
     const subscriptionEnd = subscription.current_period_end 
       ? new Date(subscription.current_period_end * 1000).toISOString()
       : null;

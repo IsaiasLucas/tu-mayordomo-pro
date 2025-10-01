@@ -96,6 +96,8 @@ serve(async (req) => {
           
           // Map price to plan - all paid plans become "pro"
           const planMap: Record<string, string> = {
+            "price_1SDBEqCGNOUldBA3Fh0quBIN": "pro", // mensal
+            "price_1SDBGGCGNOUldBA3YXBfTYl4": "pro", // anual
             "price_1SAb6WCGNOUldBA37lsDjBgB": "pro",
             "price_1SBRZJCGNOUldBA3dPc3DIqU": "pro",
             "price_1SCvQSCGNOUldBA3BNvCtbWE": "pro",
@@ -134,6 +136,8 @@ serve(async (req) => {
 
         // Map price to plan - all paid plans are "pro", cancelled is "free"
         const planMap: Record<string, string> = {
+          "price_1SDBEqCGNOUldBA3Fh0quBIN": "pro", // mensal
+          "price_1SDBGGCGNOUldBA3YXBfTYl4": "pro", // anual
           "price_1SAb6WCGNOUldBA37lsDjBgB": "pro",
           "price_1SBRZJCGNOUldBA3dPc3DIqU": "pro",
           "price_1SCvQSCGNOUldBA3BNvCtbWE": "pro",
