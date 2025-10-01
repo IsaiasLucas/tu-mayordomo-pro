@@ -1,6 +1,6 @@
 // Configuración de fecha y hora para Chile/Santiago
 import { es } from 'date-fns/locale';
-import { toZonedTime } from 'date-fns-tz';
+import { formatInTimeZone } from 'date-fns-tz';
 
 // Timezone para Chile/Santiago
 export const CHILE_TIMEZONE = 'America/Santiago';
@@ -10,10 +10,9 @@ export const chileLocale = es;
 
 // Función para obtener la fecha actual en hora de Santiago
 export const getCurrentDateInSantiago = (): Date => {
-  const now = new Date();
-  const santiagDate = toZonedTime(now, CHILE_TIMEZONE);
-  console.log('Santiago date:', santiagDate, 'Month:', santiagDate.getMonth() + 1);
-  return santiagDate;
+  // Obtener la fecha actual en formato string de Santiago y convertir a Date
+  const santiagTimeString = new Date().toLocaleString('en-US', { timeZone: CHILE_TIMEZONE });
+  return new Date(santiagTimeString);
 };
 
 // Función para formatear fecha en hora de Santiago
