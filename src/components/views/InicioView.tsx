@@ -79,14 +79,35 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         return total + (isIngreso ? Number(m.monto) : -Number(m.monto));
       }, 0);
 
-    // Se não há saldo ontem, mas há hoje, mostrar variação baseada no saldo atual
+    // Se não há saldo ontem
     if (saldoAyer === 0) {
-      if (saldoHoy > 0) return 100; // 100% de melhora
-      if (saldoHoy < 0) return -100; // 100% de piora
+      if (saldoHoy > 0) return 100;
+      if (saldoHoy < 0) return -100;
       return 0;
     }
-    
-    return Math.round(((saldoHoy - saldoAyer) / Math.abs(saldoAyer)) * 100);
+
+    // Cálculo considerando valores negativos e positivos
+    // Se ambos têm o mesmo sinal, calculamos normalmente
+    if ((saldoHoy >= 0 && saldoAyer >= 0) || (saldoHoy < 0 && saldoAyer < 0)) {
+      // Para valores negativos, melhora = ficar menos negativo (variação positiva)
+      if (saldoAyer < 0) {
+        return Math.round(((saldoHoy - saldoAyer) / Math.abs(saldoAyer)) * 100);
+      }
+      // Para valores positivos, melhora = aumentar (variação positiva)
+      return Math.round(((saldoHoy - saldoAyer) / Math.abs(saldoAyer)) * 100);
+    }
+
+    // Transição de negativo para positivo = grande melhora
+    if (saldoAyer < 0 && saldoHoy >= 0) {
+      return 100 + Math.round((saldoHoy / Math.abs(saldoAyer)) * 100);
+    }
+
+    // Transição de positivo para negativo = grande piora
+    if (saldoAyer >= 0 && saldoHoy < 0) {
+      return -100 - Math.round((Math.abs(saldoHoy) / saldoAyer) * 100);
+    }
+
+    return 0;
   };
 
   const variacionDiaria = calcularVariacionDiaria();
