@@ -87,7 +87,7 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
       // Extract only digits for the sheet (without + or spaces)
       const phoneDigits = whatsapp.replace(/\D/g, ""); // This gives us "569xxxx"
 
-      // Save to Google Sheets with phone without +
+      // Save to Google Sheets with phone without + and all required fields
       const response = await fetch(WEBAPP_URL, {
         method: "POST",
         headers: { 
@@ -98,6 +98,9 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
           name: nombre,
           phone: phoneDigits, // Send as "569xxxx"
           kind: tipo === "Empresa" ? "empresa" : "pessoal",
+          reporte: "semanal,mensal", // Default report settings
+          plan: "free", // Default plan
+          usage: "0" // Default usage count
         }),
       });
 
