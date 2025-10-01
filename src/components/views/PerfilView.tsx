@@ -393,64 +393,95 @@ const PerfilView = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20">
       {/* Profile Header */}
-      <Card className="bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-lg rounded-3xl p-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-6">
-            <Avatar className="h-24 w-24 border-4 border-white/20">
-              <AvatarImage src={profile?.avatar_url || undefined} />
-              <AvatarFallback className="bg-white/20 text-white text-2xl">
-                {userProfile.name.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <div className="flex items-center space-x-3 mb-2">
-                <h1 className="text-3xl font-bold">{userProfile.name}</h1>
-                {isPro && (
-                  <Badge className="bg-yellow-500 text-black px-3 py-1 rounded-full font-semibold">
-                    <Crown className="h-3 w-3 mr-1" />
-                    PRO
-                  </Badge>
-                )}
+      <Card className="bg-gradient-to-br from-purple-600 via-purple-500 to-blue-600 text-white shadow-2xl rounded-3xl overflow-hidden">
+        {/* Header Content */}
+        <div className="p-6 sm:p-8">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
+            {/* Profile Info */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 flex-1 min-w-0">
+              <div className="relative group">
+                <Avatar className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-white/30 shadow-xl transition-transform group-hover:scale-105">
+                  <AvatarImage src={profile?.avatar_url || undefined} />
+                  <AvatarFallback className="bg-white/20 text-white text-3xl backdrop-blur">
+                    {userProfile.name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <button 
+                  onClick={handleEditProfile}
+                  className="absolute -bottom-2 -right-2 bg-white text-purple-600 p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
+                  aria-label="Editar foto"
+                >
+                  <Camera className="h-4 w-4" />
+                </button>
               </div>
-              <p className="text-white/80 text-lg">{userProfile.email}</p>
-              <div className="flex items-center space-x-4 mt-2 text-white/70">
-                <span className="flex items-center">
-                  <Phone className="h-4 w-4 mr-1" />
-                  {userProfile.phone}
-                </span>
-                <span className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  {userProfile.location}
-                </span>
+              
+              <div className="flex-1 min-w-0 text-center sm:text-left">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                  <h1 className="text-2xl sm:text-3xl font-bold truncate">{userProfile.name}</h1>
+                  {isPro && (
+                    <Badge className="bg-yellow-400 text-black px-3 py-1 rounded-full font-semibold w-fit mx-auto sm:mx-0 animate-pulse shadow-lg">
+                      <Crown className="h-3 w-3 mr-1" />
+                      PRO
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-white/90 text-base sm:text-lg mb-3 truncate">{userProfile.email}</p>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-white/80">
+                  <span className="flex items-center justify-center sm:justify-start gap-1.5">
+                    <Phone className="h-4 w-4 flex-shrink-0" />
+                    <span className="truncate">{userProfile.phone}</span>
+                  </span>
+                  <span className="hidden sm:inline text-white/50">•</span>
+                  <span className="flex items-center justify-center sm:justify-start gap-1.5">
+                    <MapPin className="h-4 w-4 flex-shrink-0" />
+                    {userProfile.location}
+                  </span>
+                  <span className="hidden sm:inline text-white/50">•</span>
+                  <span className="flex items-center justify-center sm:justify-start gap-1.5">
+                    <Calendar className="h-4 w-4 flex-shrink-0" />
+                    {userProfile.joinDate}
+                  </span>
+                </div>
               </div>
             </div>
+            
+            {/* Edit Button */}
+            <Button 
+              variant="ghost" 
+              className="text-white hover:bg-white/20 rounded-2xl px-6 py-3 border-2 border-white/30 hover:border-white/50 transition-all hover:scale-105 shadow-lg backdrop-blur-sm w-full sm:w-auto"
+              onClick={handleEditProfile}
+            >
+              <Edit3 className="h-4 w-4 mr-2" />
+              Editar Perfil
+            </Button>
           </div>
-          <Button 
-            variant="ghost" 
-            className="text-white hover:bg-white/20 rounded-2xl px-6"
-            onClick={handleEditProfile}
-          >
-            <Edit3 className="h-4 w-4 mr-2" />
-            Editar Perfil
-          </Button>
+          
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {stats.map((stat, index) => {
+              const IconComponent = stat.icon;
+              return (
+                <div 
+                  key={index} 
+                  className="bg-white/15 backdrop-blur-md rounded-2xl p-5 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-xl group"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="bg-white/20 p-2 rounded-xl group-hover:bg-white/30 transition-colors">
+                      <IconComponent className="h-5 w-5" />
+                    </div>
+                    <span className="text-sm font-medium text-white/90 line-clamp-2">{stat.label}</span>
+                  </div>
+                  <p className="text-2xl font-bold tracking-tight">{stat.value}</p>
+                </div>
+              );
+            })}
+          </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {stats.map((stat, index) => {
-            const IconComponent = stat.icon;
-            return (
-              <div key={index} className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-                <div className="flex items-center space-x-3 mb-2">
-                  <IconComponent className="h-5 w-5" />
-                  <span className="text-sm font-medium">{stat.label}</span>
-                </div>
-                <p className="text-2xl font-bold">{stat.value}</p>
-              </div>
-            );
-          })}
-        </div>
+        {/* Bottom Gradient Accent */}
+        <div className="h-2 bg-gradient-to-r from-yellow-400 via-purple-400 to-blue-400"></div>
       </Card>
 
       {/* Account Settings */}
