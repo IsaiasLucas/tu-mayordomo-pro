@@ -216,19 +216,53 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
   };
 
   return (
-    <main className="p-4 space-y-4">
-      <HeroOverview total={saldoMes||0} varPct={variacionDiaria} title="Overview" />
+    <main className="px-3 py-4 pb-28 space-y-4 max-w-2xl mx-auto">
+      {/* User Profile Card */}
+      <div className="bg-gradient-to-br from-primary to-primary-glow text-primary-foreground rounded-3xl p-4 sm:p-6 shadow-card">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1">
+            <h1 className="text-xl sm:text-2xl font-bold mb-1">
+              ¡Hola, {profile?.name || 'Usuario'}!
+            </h1>
+            <p className="text-sm sm:text-base text-primary-foreground/80">
+              {phone || 'Configura tu perfil'}
+            </p>
+          </div>
+          {profile?.plan && profile.plan !== "free" && (
+            <span className="bg-yellow-500 text-yellow-950 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+              👑 PRO
+            </span>
+          )}
+        </div>
+        
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
+          <p className="text-sm text-primary-foreground/70 mb-1">Saldo del Mes</p>
+          <div className="flex items-end justify-between">
+            <p className="text-3xl sm:text-4xl font-bold">{fmtCLP(saldoMes||0)}</p>
+            <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
+              variacionDiaria >= 0 
+                ? "bg-green-500/30 text-green-100" 
+                : "bg-red-500/30 text-red-100"
+            }`}>
+              {variacionDiaria > 0 ? '+' : ''}{variacionDiaria}%
+            </span>
+          </div>
+          <p className="text-xs text-primary-foreground/60 mt-2">
+            Variación vs ayer
+          </p>
+        </div>
+      </div>
 
       {!loading && profile?.plan === "free" && (
-        <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-4">
-          <div className="flex items-center justify-between">
+        <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-2xl p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <p className="font-semibold text-gray-900">Plan Gratuito Activo</p>
-              <p className="text-sm text-gray-600">Actualiza pa' desbloquear mensajes ilimitados</p>
+              <p className="font-semibold text-gray-900 text-sm sm:text-base">Plan Gratuito Activo</p>
+              <p className="text-xs sm:text-sm text-gray-600">Actualiza para desbloquear más funciones</p>
             </div>
             <a 
               href="/planes" 
-              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-xl font-semibold hover:scale-105 transition-transform"
+              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:scale-105 transition-transform text-center whitespace-nowrap"
             >
               Ver Planes
             </a>
@@ -237,18 +271,18 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
       )}
 
       {!loading && profile?.plan && profile.plan !== "free" && (
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
-          <div className="flex items-center justify-between">
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <p className="font-semibold text-gray-900 flex items-center gap-2">
+              <p className="font-semibold text-gray-900 flex items-center gap-2 text-sm sm:text-base">
                 <span className="text-green-600">✓</span>
                 Plan {profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1)} Activo
               </p>
-              <p className="text-sm text-gray-600">Tienes acceso completo a todos los recursos</p>
+              <p className="text-xs sm:text-sm text-gray-600">Acceso completo a todos los recursos</p>
             </div>
             <a 
               href="/planes" 
-              className="text-green-700 px-4 py-2 rounded-xl font-semibold hover:bg-green-100 transition-colors"
+              className="text-green-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-green-100 transition-colors text-center whitespace-nowrap"
             >
               Administrar
             </a>
@@ -283,71 +317,75 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
       </a>
 
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white rounded-[24px] p-4 shadow">
-          <div className="text-xs sm:text-sm text-gray-500">Ingresos del mes</div>
-          <div className="text-lg sm:text-xl font-semibold">{fmtCLP(ingresos)}</div>
-        </div>
-        <div className="bg-white rounded-[24px] p-4 shadow">
-          <div className="text-xs sm:text-sm text-gray-500">Gastos del mes</div>
-          <div className="text-lg sm:text-xl font-semibold">{fmtCLP(egresos)}</div>
-        </div>
+        <Card className="bg-card border-0 shadow-card rounded-2xl">
+          <CardContent className="p-4">
+            <div className="text-xs text-muted-foreground mb-1">Ingresos</div>
+            <div className="text-lg sm:text-xl font-bold text-green-600">{fmtCLP(ingresos)}</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-card border-0 shadow-card rounded-2xl">
+          <CardContent className="p-4">
+            <div className="text-xs text-muted-foreground mb-1">Gastos</div>
+            <div className="text-lg sm:text-xl font-bold text-red-600">{fmtCLP(egresos)}</div>
+          </CardContent>
+        </Card>
       </div>
 
-      <Card className="bg-white">
-        <CardHeader>
-          <CardTitle className="text-lg sm:text-xl">Tus últimos movimientos</CardTitle>
+      <Card className="bg-card border-0 shadow-card rounded-2xl">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base sm:text-lg">Transacciones Destacadas</CardTitle>
         </CardHeader>
         <CardContent>
           {!phone ? (
-            <Alert className="bg-yellow-50 border-yellow-200">
+            <Alert className="bg-yellow-50 border-yellow-200 rounded-xl">
               <AlertCircle className="h-4 w-4 text-yellow-600" />
-              <AlertDescription className="flex items-center justify-between">
-                <span className="text-yellow-900">
-                  ⚠️ Falta confirmar tu WhatsApp para vincular tu cuenta.
+              <AlertDescription className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <span className="text-yellow-900 text-sm">
+                  ⚠️ Confirma tu WhatsApp para ver tus transacciones
                 </span>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={onOpenProfileModal}
-                  className="ml-2"
+                  className="w-full sm:w-auto whitespace-nowrap"
                 >
                   Añadir ahora
                 </Button>
               </AlertDescription>
             </Alert>
           ) : loadingMovimientos ? (
-            <div className="space-y-3">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-lg border">
+            <div className="space-y-2">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center justify-between p-3 rounded-xl border">
                   <div className="flex-1 space-y-2">
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-5 w-48" />
+                    <Skeleton className="h-3 w-24" />
+                    <Skeleton className="h-4 w-40" />
                   </div>
-                  <Skeleton className="h-6 w-24" />
+                  <Skeleton className="h-5 w-20" />
                 </div>
               ))}
             </div>
           ) : movimientos.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-muted-foreground text-sm">
               No hay movimientos recientes
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {movimientos.map((mov, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                  className="flex items-start sm:items-center justify-between p-3 rounded-xl border bg-card hover:bg-accent/50 transition-colors gap-3"
                 >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm text-muted-foreground">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
                         {formatMovimientoDate(mov.fecha)}
                       </span>
                       <span
                         className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
                           mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+                            : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
                         }`}
                       >
                         {mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita" ? (
@@ -358,10 +396,10 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
                         {mov.tipo}
                       </span>
                     </div>
-                    <p className="font-medium">{mov.descripcion}</p>
+                    <p className="font-medium text-sm sm:text-base truncate">{mov.descripcion}</p>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-lg">
+                  <div className="text-right flex-shrink-0">
+                    <p className="font-semibold text-base sm:text-lg whitespace-nowrap">
                       {fmtCLP(mov.monto)}
                     </p>
                   </div>

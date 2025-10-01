@@ -100,8 +100,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header fixo com Account Switcher */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
-        <div className="container mx-auto px-4 py-3 flex justify-end">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground border-b border-primary-glow/20 shadow-md">
+        <div className="container mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h1 className="text-base sm:text-lg font-bold">Tu Mayordomo</h1>
+          </div>
           <AccountSwitcher />
         </div>
       </header>
@@ -114,7 +117,7 @@ const Index = () => {
         onPhoneFilterChange={handlePhoneFilterChange}
       />
       
-      <main className="container mx-auto px-4 py-8 pt-20">
+      <main className="container mx-auto px-0 pb-24 pt-16">
         {renderCurrentView()}
       </main>
 
