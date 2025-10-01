@@ -336,7 +336,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
             <Alert className="bg-yellow-50 border-yellow-200 rounded-xl">
               <AlertCircle className="h-4 w-4 text-yellow-600" />
               <AlertDescription className="flex flex-col gap-2">
-                <span className="text-yellow-900 text-xs">
+                <span className="text-yellow-900 text-sm">
                   Confirma tu WhatsApp para ver transacciones
                 </span>
                 <Button
@@ -350,27 +350,27 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
               </AlertDescription>
             </Alert>
           ) : loadingMovimientos ? (
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-xl border">
+                <div key={i} className="flex items-center justify-between p-3.5 rounded-xl border">
                   <div className="flex-1 space-y-2">
                     <Skeleton className="h-3 w-20" />
-                    <Skeleton className="h-3 w-32" />
+                    <Skeleton className="h-4 w-32" />
                   </div>
-                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-5 w-16" />
                 </div>
               ))}
             </div>
           ) : movimientos.length === 0 ? (
-            <div className="text-center py-6 text-muted-foreground text-xs">
+            <div className="text-center py-6 text-muted-foreground text-sm">
               No hay movimientos recientes
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {movimientos.map((mov, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 rounded-xl border bg-card hover:bg-accent/50 transition-colors gap-2"
+                  className="flex items-center justify-between p-3.5 rounded-xl border bg-card hover:bg-accent/50 transition-colors gap-2"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -378,7 +378,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
                         {formatMovimientoDate(mov.fecha)}
                       </span>
                       <span
-                        className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
                           mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita"
                             ? "bg-green-100 text-green-800"
                             : "bg-red-100 text-red-800"
@@ -392,9 +392,9 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
                         {mov.tipo}
                       </span>
                     </div>
-                    <p className="font-medium text-sm truncate">{mov.descripcion}</p>
+                    <p className="font-medium text-base truncate">{mov.descripcion}</p>
                   </div>
-                  <p className="font-semibold text-sm whitespace-nowrap flex-shrink-0">
+                  <p className="font-semibold text-base whitespace-nowrap flex-shrink-0">
                     {fmtCLP(mov.monto)}
                   </p>
                 </div>
