@@ -401,7 +401,7 @@ const PerfilView = () => {
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 flex-1 min-w-0">
               <div className="relative group">
                 <Avatar className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-white/30 shadow-xl transition-transform group-hover:scale-105">
-                  <AvatarImage src={profile?.avatar_url || undefined} />
+                  <AvatarImage src={profile?.avatar_url || undefined} className="object-cover" />
                   <AvatarFallback className="bg-white/20 text-white text-3xl backdrop-blur">
                     {userProfile.name.charAt(0).toUpperCase()}
                   </AvatarFallback>
@@ -719,7 +719,7 @@ const PerfilView = () => {
             {/* Avatar Upload */}
             <div className="flex flex-col items-center space-y-4">
               <Avatar className="h-32 w-32 border-4 border-gray-200">
-                <AvatarImage src={avatarUrl || profile?.avatar_url || undefined} />
+                <AvatarImage src={avatarUrl || profile?.avatar_url || undefined} className="object-cover" />
                 <AvatarFallback className="text-3xl bg-purple-100 text-purple-600">
                   {editName.charAt(0).toUpperCase() || userProfile.name.charAt(0).toUpperCase()}
                 </AvatarFallback>
