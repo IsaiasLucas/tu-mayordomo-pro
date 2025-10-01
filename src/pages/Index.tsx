@@ -117,7 +117,7 @@ const Index = () => {
         onPhoneFilterChange={handlePhoneFilterChange}
       />
       
-      <main className="container mx-auto px-0 pb-24 pt-16">
+      <main className="pb-24 pt-16">
         {renderCurrentView()}
       </main>
 
