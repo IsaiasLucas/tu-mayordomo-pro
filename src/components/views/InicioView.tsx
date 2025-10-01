@@ -78,7 +78,13 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         return total + (isIngreso ? Number(m.monto) : -Number(m.monto));
       }, 0);
 
-    if (saldoAyer === 0) return 0;
+    // Se não há saldo ontem, mas há hoje, mostrar variação baseada no saldo atual
+    if (saldoAyer === 0) {
+      if (saldoHoy > 0) return 100; // 100% de melhora
+      if (saldoHoy < 0) return -100; // 100% de piora
+      return 0;
+    }
+    
     return Math.round(((saldoHoy - saldoAyer) / Math.abs(saldoAyer)) * 100);
   };
 
