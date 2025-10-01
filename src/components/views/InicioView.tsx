@@ -26,8 +26,14 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
   const { profile, loading } = useAuth();
   const { items: gastos } = useGastos();
   const [phone, setPhone] = useState<string | null>(null);
-  const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
-  const [allMovimientos, setAllMovimientos] = useState<Movimiento[]>([]);
+  const [movimientos, setMovimientos] = useState<Movimiento[]>(() => {
+    const cached = localStorage.getItem('tm_movimientos_cache');
+    return cached ? JSON.parse(cached) : [];
+  });
+  const [allMovimientos, setAllMovimientos] = useState<Movimiento[]>(() => {
+    const cached = localStorage.getItem('tm_all_movimientos_cache');
+    return cached ? JSON.parse(cached) : [];
+  });
   const [loadingMovimientos, setLoadingMovimientos] = useState(false);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -125,7 +131,9 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
       if (response.ok) {
         const data = await response.json();
         if (data.ok && data.items && Array.isArray(data.items)) {
-          setMovimientos(data.items.slice(0, 5));
+          const newMovimientos = data.items.slice(0, 5);
+          localStorage.setItem('tm_movimientos_cache', JSON.stringify(newMovimientos));
+          setMovimientos(newMovimientos);
           setInitialLoadComplete(true);
         }
       }
@@ -147,7 +155,14 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
       if (response.ok) {
         const data = await response.json();
         if (data.ok && data.items && Array.isArray(data.items)) {
-          setMovimientos(data.items.slice(0, 5));
+          const newMovimientos = data.items.slice(0, 5);
+          // Só atualiza se houver mudanças
+          const currentCache = localStorage.getItem('tm_movimientos_cache');
+          const newCache = JSON.stringify(newMovimientos);
+          if (currentCache !== newCache) {
+            localStorage.setItem('tm_movimientos_cache', newCache);
+            setMovimientos(newMovimientos);
+          }
         }
       }
     } catch (error) {
@@ -167,6 +182,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
       if (response.ok) {
         const data = await response.json();
         if (data.ok && data.items && Array.isArray(data.items)) {
+          localStorage.setItem('tm_all_movimientos_cache', JSON.stringify(data.items));
           setAllMovimientos(data.items);
         }
       }
@@ -187,7 +203,13 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
       if (response.ok) {
         const data = await response.json();
         if (data.ok && data.items && Array.isArray(data.items)) {
-          setAllMovimientos(data.items);
+          // Só atualiza se houver mudanças
+          const currentCache = localStorage.getItem('tm_all_movimientos_cache');
+          const newCache = JSON.stringify(data.items);
+          if (currentCache !== newCache) {
+            localStorage.setItem('tm_all_movimientos_cache', newCache);
+            setAllMovimientos(data.items);
+          }
         }
       }
     } catch (error) {
