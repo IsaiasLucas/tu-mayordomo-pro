@@ -12,6 +12,7 @@ import { AlertCircle, TrendingUp, TrendingDown, Crown } from "lucide-react";
 import { format } from "date-fns";
 import { getCurrentDateInSantiago, CHILE_TIMEZONE } from "@/lib/date-config";
 import { formatInTimeZone } from "date-fns-tz";
+import { supabase } from "@/integrations/supabase/client";
 
 interface InicioViewProps {
   onOpenProfileModal: () => void;
@@ -147,19 +148,20 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
       setLoadingMovimientos(true);
     }
     try {
-      const response = await fetch(
-        `https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec?action=last5&phone=${encodeURIComponent(phoneNumber)}`
-      );
+      const phoneDigits = phoneNumber.replace(/\D/g, "");
+      const { data: gastos, error } = await (supabase as any)
+        .from('gastos')
+        .select('*')
+        .eq('telefono', phoneDigits)
+        .order('fecha', { ascending: false })
+        .limit(5);
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.ok && data.items && Array.isArray(data.items)) {
-          const newMovimientos = data.items.slice(0, 5);
-          localStorage.setItem('tm_movimientos_cache', JSON.stringify(newMovimientos));
-          setMovimientos(newMovimientos);
-          setInitialLoadComplete(true);
-        }
-      }
+      if (error) throw error;
+
+      const newMovimientos = gastos || [];
+      localStorage.setItem('tm_movimientos_cache', JSON.stringify(newMovimientos));
+      setMovimientos(newMovimientos);
+      setInitialLoadComplete(true);
     } catch (error) {
       console.error("Error al cargar movimientos:", error);
     } finally {
@@ -171,22 +173,22 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
 
   const fetchMovimientosUpdate = async (phoneNumber: string) => {
     try {
-      const response = await fetch(
-        `https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec?action=last5&phone=${encodeURIComponent(phoneNumber)}`
-      );
+      const phoneDigits = phoneNumber.replace(/\D/g, "");
+      const { data: gastos, error } = await (supabase as any)
+        .from('gastos')
+        .select('*')
+        .eq('telefono', phoneDigits)
+        .order('fecha', { ascending: false })
+        .limit(5);
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.ok && data.items && Array.isArray(data.items)) {
-          const newMovimientos = data.items.slice(0, 5);
-          // Só atualiza se houver mudanças
-          const currentCache = localStorage.getItem('tm_movimientos_cache');
-          const newCache = JSON.stringify(newMovimientos);
-          if (currentCache !== newCache) {
-            localStorage.setItem('tm_movimientos_cache', newCache);
-            setMovimientos(newMovimientos);
-          }
-        }
+      if (error) throw error;
+
+      const newMovimientos = gastos || [];
+      const currentCache = localStorage.getItem('tm_movimientos_cache');
+      const newCache = JSON.stringify(newMovimientos);
+      if (currentCache !== newCache) {
+        localStorage.setItem('tm_movimientos_cache', newCache);
+        setMovimientos(newMovimientos);
       }
     } catch (error) {
       console.error("Error al actualizar movimientos:", error);
@@ -195,21 +197,29 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
 
   const fetchAllMovimientos = async (phoneNumber: string) => {
     try {
+      const phoneDigits = phoneNumber.replace(/\D/g, "");
       const now = getCurrentDateInSantiago();
       const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-      console.log('📅 Buscando movimientos del mes:', mes, 'Fecha Santiago:', now);
+      const startDate = `${mes}-01`;
+      const endDate = new Date(
+        now.getFullYear(), 
+        now.getMonth() + 1, 
+        0
+      ).toISOString().split('T')[0];
       
-      const response = await fetch(
-        `https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec?action=month&phone=${encodeURIComponent(phoneNumber)}&mes=${mes}`
-      );
+      const { data: gastos, error } = await (supabase as any)
+        .from('gastos')
+        .select('*')
+        .eq('telefono', phoneDigits)
+        .gte('fecha', startDate)
+        .lte('fecha', endDate)
+        .order('fecha', { ascending: false });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.ok && data.items && Array.isArray(data.items)) {
-          localStorage.setItem('tm_all_movimientos_cache', JSON.stringify(data.items));
-          setAllMovimientos(data.items);
-        }
-      }
+      if (error) throw error;
+
+      const items = gastos || [];
+      localStorage.setItem('tm_all_movimientos_cache', JSON.stringify(items));
+      setAllMovimientos(items);
     } catch (error) {
       console.error("Error al cargar todos los movimientos:", error);
     }
@@ -217,24 +227,32 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
 
   const fetchAllMovimientosUpdate = async (phoneNumber: string) => {
     try {
+      const phoneDigits = phoneNumber.replace(/\D/g, "");
       const now = getCurrentDateInSantiago();
       const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const startDate = `${mes}-01`;
+      const endDate = new Date(
+        now.getFullYear(), 
+        now.getMonth() + 1, 
+        0
+      ).toISOString().split('T')[0];
       
-      const response = await fetch(
-        `https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec?action=month&phone=${encodeURIComponent(phoneNumber)}&mes=${mes}`
-      );
+      const { data: gastos, error } = await (supabase as any)
+        .from('gastos')
+        .select('*')
+        .eq('telefono', phoneDigits)
+        .gte('fecha', startDate)
+        .lte('fecha', endDate)
+        .order('fecha', { ascending: false });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.ok && data.items && Array.isArray(data.items)) {
-          // Só atualiza se houver mudanças
-          const currentCache = localStorage.getItem('tm_all_movimientos_cache');
-          const newCache = JSON.stringify(data.items);
-          if (currentCache !== newCache) {
-            localStorage.setItem('tm_all_movimientos_cache', newCache);
-            setAllMovimientos(data.items);
-          }
-        }
+      if (error) throw error;
+
+      const items = gastos || [];
+      const currentCache = localStorage.getItem('tm_all_movimientos_cache');
+      const newCache = JSON.stringify(items);
+      if (currentCache !== newCache) {
+        localStorage.setItem('tm_all_movimientos_cache', newCache);
+        setAllMovimientos(items);
       }
     } catch (error) {
       console.error("Error al actualizar todos los movimientos:", error);

@@ -44,19 +44,20 @@ export default function ReportesView() {
     if (!phone) return [];
 
     try {
-      const response = await fetch(
-        `https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec?action=month&phone=${encodeURIComponent(phone)}&mes=${format(startDate, 'yyyy-MM')}`
-      );
+      const phoneDigits = phone.replace(/\D/g, "");
+      const startDateStr = format(startDate, 'yyyy-MM-dd');
+      const endDateStr = format(endDate, 'yyyy-MM-dd');
+      
+      const { data: gastos, error } = await (supabase as any)
+        .from('gastos')
+        .select('*')
+        .eq('telefono', phoneDigits)
+        .gte('fecha', startDateStr)
+        .lte('fecha', endDateStr)
+        .order('fecha', { ascending: false });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.ok && data.items && Array.isArray(data.items)) {
-          return data.items.filter((m: Movimiento) => {
-            const movDate = new Date(m.fecha);
-            return movDate >= startDate && movDate <= endDate;
-          });
-        }
-      }
+      if (error) throw error;
+      return gastos || [];
     } catch (error) {
       console.error("Error al cargar movimientos:", error);
     }

@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import CompleteProfileModal from "@/components/CompleteProfileModal";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Movement {
   id: string;
@@ -59,34 +60,46 @@ export default function GastosView() {
         setLoading(true);
       }
       try {
-        const url = `https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec?action=month&phone=${encodeURIComponent(phone)}&ym=${selectedMonth}`;
-        const response = await fetch(url);
-        const result = await response.json();
+        const phoneDigits = phone.replace(/\D/g, "");
+        const startDate = `${selectedMonth}-01`;
+        const endDate = new Date(
+          parseInt(selectedMonth.split('-')[0]), 
+          parseInt(selectedMonth.split('-')[1]), 
+          0
+        ).toISOString().split('T')[0];
         
-        if (result.ok) {
-          setData(result);
-          setInitialLoadComplete(true);
-        }
+        const { data: gastos, error } = await (supabase as any)
+          .from('gastos')
+          .select('*')
+          .eq('telefono', phoneDigits)
+          .gte('fecha', startDate)
+          .lte('fecha', endDate)
+          .order('fecha', { ascending: false });
+
+        if (error) throw error;
+
+        const items = gastos || [];
+        const totalIngresos = items
+          .filter((m: any) => m.tipo?.toLowerCase() === "ingreso")
+          .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
+        
+        const totalGastos = items
+          .filter((m: any) => m.tipo?.toLowerCase() === "egreso" || m.tipo?.toLowerCase() === "gasto")
+          .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
+
+        setData({
+          items,
+          totalIngresos,
+          totalGastos,
+          saldo: totalIngresos - totalGastos
+        });
+        setInitialLoadComplete(true);
       } catch (error) {
         console.error("Error fetching month data:", error);
       } finally {
         if (!initialLoadComplete) {
           setLoading(false);
         }
-      }
-    };
-
-    const fetchDataUpdate = async () => {
-      try {
-        const url = `https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec?action=month&phone=${encodeURIComponent(phone)}&ym=${selectedMonth}`;
-        const response = await fetch(url);
-        const result = await response.json();
-        
-        if (result.ok) {
-          setData(result);
-        }
-      } catch (error) {
-        console.error("Error updating month data:", error);
       }
     };
 
@@ -99,7 +112,7 @@ export default function GastosView() {
     }
     
     pollingIntervalRef.current = setInterval(() => {
-      fetchDataUpdate();
+      fetchData();
     }, 5000);
 
     return () => {
