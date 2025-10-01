@@ -37,6 +37,10 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
   const [loadingMovimientos, setLoadingMovimientos] = useState(false);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [showBalance, setShowBalance] = useState(() => {
+    const saved = localStorage.getItem("tm_show_balance");
+    return saved === null ? true : saved === "true";
+  });
 
   // Calculate from ALL movimientos of the month
   const ingresos = allMovimientos
@@ -118,6 +122,24 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
       }
     };
   }, [profile]);
+
+  // Listen for changes in showBalance preference
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const saved = localStorage.getItem("tm_show_balance");
+      setShowBalance(saved === null ? true : saved === "true");
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    
+    // Also check on component mount/update
+    const checkInterval = setInterval(handleStorageChange, 500);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(checkInterval);
+    };
+  }, []);
 
   const fetchMovimientos = async (phoneNumber: string) => {
     if (!initialLoadComplete) {
@@ -261,14 +283,18 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3.5">
           <p className="text-xs opacity-75 mb-1">Saldo del Mes</p>
           <div className="flex items-end justify-between gap-2">
-            <p className="text-2xl font-bold truncate">{fmtCLP(saldoMes||0)}</p>
-            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold flex-shrink-0 ${
-              variacionDiaria >= 0 
-                ? "bg-green-500/30 text-green-100" 
-                : "bg-red-500/30 text-red-100"
-            }`}>
-              {variacionDiaria > 0 ? '+' : ''}{variacionDiaria}%
-            </span>
+            <p className="text-2xl font-bold truncate">
+              {showBalance ? fmtCLP(saldoMes||0) : "••••••"}
+            </p>
+            {showBalance && (
+              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold flex-shrink-0 ${
+                variacionDiaria >= 0 
+                  ? "bg-green-500/30 text-green-100" 
+                  : "bg-red-500/30 text-red-100"
+              }`}>
+                {variacionDiaria > 0 ? '+' : ''}{variacionDiaria}%
+              </span>
+            )}
           </div>
           <p className="text-xs opacity-60 mt-1">
             vs ayer
