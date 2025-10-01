@@ -308,7 +308,7 @@ export default function PlanesView() {
           <Carousel
             opts={{
               align: "center",
-              loop: true,
+              loop: false,
             }}
             className="w-full"
             setApi={setCarouselApi}
@@ -320,7 +320,7 @@ export default function PlanesView() {
                 const isSelecting = selectedPlan === plan.id;
                 return (
                   <CarouselItem key={plan.id} className="pl-4 basis-[90%]">
-                    <Card className={`relative overflow-hidden transition-all duration-500 shadow-xl hover:shadow-2xl group cursor-pointer h-full flex flex-col border-2 ${plan.popular ? "ring-4 ring-purple-400 border-purple-300" : "border-gray-200"} ${isSelecting ? "scale-95 opacity-70" : ""}`}>
+                    <Card className={`relative overflow-hidden transition-all duration-500 shadow-xl hover:shadow-2xl group cursor-pointer h-full flex flex-col border-2 ${plan.popular ? "border-purple-400 shadow-purple-200" : "border-gray-200"} ${isSelecting ? "scale-95 opacity-70" : ""}`}>
                       {plan.popular && <div className="absolute top-0 right-0 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-1 text-xs font-bold rounded-bl-xl">
                           POPULAR
                         </div>}
@@ -431,7 +431,7 @@ export default function PlanesView() {
             return <div key={plan.id} className="animate-fade-in" style={{
               animationDelay: `${index * 100}ms`
             }}>
-                <Card className={`relative overflow-hidden transition-all duration-500 shadow-xl hover:shadow-2xl hover:-translate-y-3 group cursor-pointer h-full flex flex-col border-2 ${plan.popular ? "ring-4 ring-purple-400 border-purple-300 scale-105" : "border-gray-200"} ${isSelecting ? "scale-95 opacity-70" : ""}`}>
+                <Card className={`relative overflow-hidden transition-all duration-500 shadow-xl hover:shadow-2xl hover:-translate-y-3 group cursor-pointer h-full flex flex-col border-2 ${plan.popular ? "border-purple-400 shadow-purple-200 scale-105" : "border-gray-200"} ${isSelecting ? "scale-95 opacity-70" : ""}`}>
                   {plan.popular && <div className="absolute top-0 right-0 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-1 text-xs font-bold rounded-bl-xl">
                       POPULAR
                     </div>}
