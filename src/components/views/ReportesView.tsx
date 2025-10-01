@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from "date-fns";
 import { es } from "date-fns/locale";
+import { CHILE_TIMEZONE, chileDateOptions } from "@/lib/date-config";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Download, FileText, Loader2, PieChart, Lock, Calendar } from "lucide-react";
@@ -124,7 +125,8 @@ export default function ReportesView() {
     doc.text(`Reporte ${tipo}`, 105, 20, { align: "center" });
     doc.setFontSize(12);
     doc.text(periodo, 105, 30, { align: "center" });
-    doc.text(`Generado el: ${format(new Date(), "dd/MM/yyyy HH:mm")}`, 105, 37, { align: "center" });
+    const currentDate = new Date().toLocaleString('es-CL', chileDateOptions);
+    doc.text(`Generado el: ${currentDate}`, 105, 37, { align: "center" });
 
     // Calcular totales
     const ingresos = movimientos
@@ -300,13 +302,13 @@ export default function ReportesView() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <PieChart className="h-5 w-5" />
-              Gastos por Categoria (Mês Atual)
+              Gastos por Categoría (Mes Actual)
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4">
             {chartData.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                Sem dados para mostrar
+                Sin datos para mostrar
               </div>
             ) : (
               <ResponsiveContainer width="100%" height={350}>
@@ -336,12 +338,12 @@ export default function ReportesView() {
 
         <Card className="rounded-[24px] shadow border-0">
           <CardHeader>
-            <CardTitle>Gastos por Categoria (Detalle)</CardTitle>
+            <CardTitle>Gastos por Categoría (Detalle)</CardTitle>
           </CardHeader>
           <CardContent>
             {chartData.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                Sem dados para mostrar
+                Sin datos para mostrar
               </div>
             ) : (
               <ResponsiveContainer width="100%" height={300}>
@@ -409,7 +411,7 @@ export default function ReportesView() {
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              Semana Passada
+              Semana Pasada
             </Button>
             <Button 
               onClick={() => generar("mensual")} 
@@ -421,7 +423,7 @@ export default function ReportesView() {
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              Mês Passado
+              Mes Pasado
             </Button>
           </div>
           
@@ -430,7 +432,7 @@ export default function ReportesView() {
               <PopoverTrigger asChild>
                 <Button variant="outline" className="rounded-xl">
                   <Calendar className="h-4 w-4 mr-2" />
-                  {customStartDate ? format(customStartDate, "dd/MM/yyyy") : "Data Início"}
+                  {customStartDate ? format(customStartDate, "dd/MM/yyyy") : "Fecha Inicio"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -447,7 +449,7 @@ export default function ReportesView() {
               <PopoverTrigger asChild>
                 <Button variant="outline" className="rounded-xl">
                   <Calendar className="h-4 w-4 mr-2" />
-                  {customEndDate ? format(customEndDate, "dd/MM/yyyy") : "Data Fim"}
+                  {customEndDate ? format(customEndDate, "dd/MM/yyyy") : "Fecha Fin"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -470,26 +472,26 @@ export default function ReportesView() {
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              Gerar
+              Generar
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Histórico de Relatórios */}
+      {/* Historial de Reportes */}
       <Card className="rounded-[24px] shadow border-0">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Histórico de Relatórios
+            Historial de Reportes
           </CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-center py-8 text-muted-foreground">Carregando...</div>
+            <div className="text-center py-8 text-muted-foreground">Cargando...</div>
           ) : items.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              Nenhum relatório gerado ainda. Clique nos botões acima para gerar seu primeiro relatório.
+              Ningún reporte generado aún. Haz clic en los botones de arriba para generar tu primer reporte.
             </div>
           ) : (
             <div className="space-y-3">
@@ -501,11 +503,18 @@ export default function ReportesView() {
                   <div>
                     <div className="font-medium capitalize">{r.tipo} · {r.periodo}</div>
                     <div className="text-sm text-muted-foreground">
-                      Gerado em {format(new Date(r.created_at), "dd/MM/yyyy 'às' HH:mm")}
+                      Generado el {new Date(r.created_at).toLocaleString('es-CL', { 
+                        ...chileDateOptions,
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
                     </div>
                     {r.data?.movimientos_count && (
                       <div className="text-xs text-muted-foreground mt-1">
-                        {r.data.movimientos_count} movimentos
+                        {r.data.movimientos_count} movimientos
                       </div>
                     )}
                   </div>

@@ -182,8 +182,8 @@ const PerfilView = () => {
     } catch (error: any) {
       console.error("Error cancelling plan:", error);
       toast({
-        title: "Erro",
-        description: error.message || "Não foi possível cancelar o plano.",
+        title: "Error",
+        description: error.message || "No fue posible cancelar el plan.",
         variant: "destructive",
       });
     } finally {
@@ -342,7 +342,7 @@ const PerfilView = () => {
     try {
       setLoading(true);
 
-      console.log('Salvando perfil...', {
+      console.log('Guardando perfil...', {
         user_id: user?.id,
         display_name: editName,
         avatar_url: avatarUrl
@@ -358,28 +358,28 @@ const PerfilView = () => {
         .select();
 
       if (error) {
-        console.error('Erro ao atualizar:', error);
+        console.error('Error al actualizar:', error);
         throw error;
       }
 
-      console.log('Perfil atualizado:', data);
+      console.log('Perfil actualizado:', data);
 
       toast({
-        title: "Perfil atualizado",
-        description: "Suas informações foram atualizadas com sucesso.",
+        title: "Perfil actualizado",
+        description: "Tu información ha sido actualizada exitosamente.",
       });
 
       setShowEditDialog(false);
       
-      // Aguardar um pouco antes de recarregar
+      // Esperar un momento antes de recargar
       setTimeout(() => {
         window.location.reload();
       }, 500);
     } catch (error: any) {
-      console.error('Erro completo ao salvar:', error);
+      console.error('Error completo al guardar:', error);
       toast({
-        title: "Erro ao atualizar perfil",
-        description: error.message || "Tente novamente.",
+        title: "Error al actualizar perfil",
+        description: error.message || "Intenta nuevamente.",
         variant: "destructive",
       });
     } finally {
@@ -751,14 +751,14 @@ const PerfilView = () => {
                 id="name"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
-                placeholder="Seu nome"
+                placeholder="Tu nombre"
                 className="rounded-xl"
               />
             </div>
 
             {/* Phone (disabled) */}
             <div className="space-y-2">
-              <Label htmlFor="phone">Telefone</Label>
+              <Label htmlFor="phone">Teléfono</Label>
               <Input
                 id="phone"
                 value={userProfile.phone}
@@ -766,7 +766,7 @@ const PerfilView = () => {
                 className="rounded-xl bg-gray-100 cursor-not-allowed"
               />
               <p className="text-xs text-gray-500">
-                O telefone não pode ser alterado pois está vinculado à sua conta.
+                El teléfono no puede ser modificado porque está vinculado a tu cuenta.
               </p>
             </div>
 
@@ -795,7 +795,7 @@ const PerfilView = () => {
               disabled={loading || uploading}
               className="rounded-xl bg-purple-600 hover:bg-purple-700"
             >
-              {loading ? "Salvando..." : "Salvar Alterações"}
+              {loading ? "Guardando..." : "Guardar Cambios"}
             </Button>
           </DialogFooter>
         </DialogContent>

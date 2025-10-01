@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { fmtCLP } from "@/lib/api";
+import { CHILE_TIMEZONE, chileDateOptions } from "@/lib/date-config";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -154,8 +155,9 @@ export default function GastosView() {
     // Pie de página
     const finalY = (doc as any).lastAutoTable.finalY || 80;
     doc.setFontSize(8);
+    const generatedDate = new Date().toLocaleString('es-CL', chileDateOptions);
     doc.text(
-      `Generado automáticamente el ${format(new Date(), "dd/MM/yyyy HH:mm")}`,
+      `Generado automáticamente el ${generatedDate}`,
       20,
       finalY + 15
     );
