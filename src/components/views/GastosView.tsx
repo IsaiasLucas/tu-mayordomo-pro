@@ -257,65 +257,70 @@ export default function GastosView() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="space-y-2">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Fecha</TableHead>
-                    <TableHead>Descripción</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead className="text-right">Monto</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                    <TableRow key={i}>
-                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-40" /></TableCell>
-                      <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-                      <TableCell className="text-right"><Skeleton className="h-4 w-20 ml-auto" /></TableCell>
+            <div className="space-y-3">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-base py-4">Fecha</TableHead>
+                      <TableHead className="text-base py-4">Descripción</TableHead>
+                      <TableHead className="text-base py-4">Tipo</TableHead>
+                      <TableHead className="text-right text-base py-4">Monto</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                      <TableRow key={i}>
+                        <TableCell className="py-4"><Skeleton className="h-5 w-24" /></TableCell>
+                        <TableCell className="py-4"><Skeleton className="h-5 w-40" /></TableCell>
+                        <TableCell className="py-4"><Skeleton className="h-6 w-20" /></TableCell>
+                        <TableCell className="text-right py-4"><Skeleton className="h-5 w-20 ml-auto" /></TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           ) : (
             <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Fecha</TableHead>
-                    <TableHead>Descripción</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead className="text-right">Monto</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedMovements.map((mov) => (
-                    <TableRow key={mov.id}>
-                      <TableCell>
-                        {format(new Date(mov.fecha), "dd/MM HH:mm")}
-                      </TableCell>
-                      <TableCell>{mov.descripcion}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            mov.tipo.toLowerCase().includes("ingreso") || 
-                            mov.tipo.toLowerCase().includes("receita")
-                              ? "default"
-                              : "destructive"
-                          }
-                        >
-                          {mov.tipo}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right font-medium">
-                        {fmtCLP(mov.monto)}
-                      </TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-base py-4 whitespace-nowrap">Fecha</TableHead>
+                      <TableHead className="text-base py-4">Descripción</TableHead>
+                      <TableHead className="text-base py-4 whitespace-nowrap">Tipo</TableHead>
+                      <TableHead className="text-right text-base py-4 whitespace-nowrap">Monto</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedMovements.map((mov) => (
+                      <TableRow key={mov.id}>
+                        <TableCell className="py-4 whitespace-nowrap text-base">
+                          {format(new Date(mov.fecha), "dd/MM HH:mm")}
+                        </TableCell>
+                        <TableCell className="py-4 text-base">{mov.descripcion}</TableCell>
+                        <TableCell className="py-4">
+                          <Badge
+                            variant={
+                              mov.tipo.toLowerCase().includes("ingreso") || 
+                              mov.tipo.toLowerCase().includes("receita")
+                                ? "default"
+                                : "destructive"
+                            }
+                            className="text-sm whitespace-nowrap"
+                          >
+                            {mov.tipo}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right font-medium py-4 whitespace-nowrap text-base">
+                          {fmtCLP(mov.monto)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
 
               {paginatedMovements.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
