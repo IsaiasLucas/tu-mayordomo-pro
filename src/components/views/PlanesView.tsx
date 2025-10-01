@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Check, Sparkles, Zap, GraduationCap, MessageCircle, Loader2, Settings, XCircle } from "lucide-react";
+import { Check, Sparkles, Zap, GraduationCap, MessageCircle, Loader2, Settings, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 interface PlanFeature {
   text: string;
   included: boolean;
@@ -36,6 +36,8 @@ export default function PlanesView() {
   const [checkingSubscription, setCheckingSubscription] = useState(false);
   const [loadingPortal, setLoadingPortal] = useState(false);
   const [cancellingSubscription, setCancellingSubscription] = useState(false);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [currentSlide, setCurrentSlide] = useState(0);
   const plans: Plan[] = [{
     id: "free",
     name: "Gratuito",
@@ -129,6 +131,17 @@ export default function PlanesView() {
   useEffect(() => {
     checkSubscription();
   }, [user]);
+
+  // Carousel slide tracking
+  useEffect(() => {
+    if (!carouselApi) return;
+
+    setCurrentSlide(carouselApi.selectedScrollSnap());
+
+    carouselApi.on("select", () => {
+      setCurrentSlide(carouselApi.selectedScrollSnap());
+    });
+  }, [carouselApi]);
   const checkSubscription = async () => {
     if (!user) return;
     setCheckingSubscription(true);
@@ -291,13 +304,14 @@ export default function PlanesView() {
       {/* Plans - Mobile Carousel / Desktop Grid */}
       <div className="max-w-6xl mx-auto">
         {/* Mobile Carousel */}
-        <div className="md:hidden">
+        <div className="md:hidden relative">
           <Carousel
             opts={{
-              align: "start",
+              align: "center",
               loop: true,
             }}
             className="w-full"
+            setApi={setCarouselApi}
           >
             <CarouselContent className="-ml-4">
               {plans.map((plan, index) => {
@@ -305,8 +319,8 @@ export default function PlanesView() {
                 const isCurrent = currentPlan === plan.id;
                 const isSelecting = selectedPlan === plan.id;
                 return (
-                  <CarouselItem key={plan.id} className="pl-4 basis-[85%]">
-                    <Card className={`relative overflow-hidden transition-all duration-500 hover:shadow-2xl group cursor-pointer h-full flex flex-col ${plan.popular ? "ring-2 ring-purple-500" : ""} ${isSelecting ? "scale-95 opacity-70" : ""}`}>
+                  <CarouselItem key={plan.id} className="pl-4 basis-[90%]">
+                    <Card className={`relative overflow-hidden transition-all duration-500 shadow-xl hover:shadow-2xl group cursor-pointer h-full flex flex-col border-2 ${plan.popular ? "ring-4 ring-purple-400 border-purple-300" : "border-gray-200"} ${isSelecting ? "scale-95 opacity-70" : ""}`}>
                       {plan.popular && <div className="absolute top-0 right-0 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-1 text-xs font-bold rounded-bl-xl">
                           POPULAR
                         </div>}
@@ -367,7 +381,45 @@ export default function PlanesView() {
                 );
               })}
             </CarouselContent>
+
+            {/* Carousel Navigation Buttons */}
+            <div className="absolute -left-3 top-1/2 -translate-y-1/2 z-10">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 rounded-full bg-white/95 shadow-lg hover:bg-white hover:scale-110 transition-all"
+                onClick={() => carouselApi?.scrollPrev()}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+            </div>
+            <div className="absolute -right-3 top-1/2 -translate-y-1/2 z-10">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 rounded-full bg-white/95 shadow-lg hover:bg-white hover:scale-110 transition-all"
+                onClick={() => carouselApi?.scrollNext()}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
+            </div>
           </Carousel>
+
+          {/* Dots Indicator */}
+          <div className="flex justify-center gap-2 mt-6">
+            {plans.map((_, index) => (
+              <button
+                key={index}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  currentSlide === index 
+                    ? "w-8 bg-purple-600" 
+                    : "w-2 bg-gray-300 hover:bg-gray-400"
+                }`}
+                onClick={() => carouselApi?.scrollTo(index)}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Desktop Grid */}
@@ -379,7 +431,7 @@ export default function PlanesView() {
             return <div key={plan.id} className="animate-fade-in" style={{
               animationDelay: `${index * 100}ms`
             }}>
-                <Card className={`relative overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 group cursor-pointer h-full flex flex-col ${plan.popular ? "ring-2 ring-purple-500 scale-105" : ""} ${isSelecting ? "scale-95 opacity-70" : ""}`}>
+                <Card className={`relative overflow-hidden transition-all duration-500 shadow-xl hover:shadow-2xl hover:-translate-y-3 group cursor-pointer h-full flex flex-col border-2 ${plan.popular ? "ring-4 ring-purple-400 border-purple-300 scale-105" : "border-gray-200"} ${isSelecting ? "scale-95 opacity-70" : ""}`}>
                   {plan.popular && <div className="absolute top-0 right-0 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-1 text-xs font-bold rounded-bl-xl">
                       POPULAR
                     </div>}
