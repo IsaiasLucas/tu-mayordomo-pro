@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useTheme } from "next-themes";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,12 +45,15 @@ import {
   Receipt,
   PiggyBank,
   Camera,
-  Upload
+  Upload,
+  Moon,
+  Sun
 } from "lucide-react";
 
 const PerfilView = () => {
   const { user, profile, signOut } = useAuth();
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
   const [showBalance, setShowBalance] = useState(() => {
     const saved = localStorage.getItem("tm_show_balance");
     return saved === null ? true : saved === "true";
@@ -511,6 +515,21 @@ const PerfilView = () => {
                 className="rounded-xl"
               >
                 {showBalance ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+              </Button>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t">
+              <div>
+                <h4 className="font-medium">Modo oscuro</h4>
+                <p className="text-sm text-gray-600">Cambia entre modo claro y oscuro</p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="rounded-xl"
+              >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
             </div>
 
