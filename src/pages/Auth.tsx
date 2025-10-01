@@ -177,7 +177,7 @@ export default function Auth() {
                     </>
                   ) : (
                     <>
-                      Continúa donde lo dejaste{" "}
+                      ¿No tienes cuenta?{" "}
                       <button
                         type="button"
                         onClick={() => setIsSignUp(true)}
