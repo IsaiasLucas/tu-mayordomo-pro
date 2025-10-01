@@ -82,6 +82,9 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
+      // Extract only digits for usuarios table
+      const phoneDigits = whatsapp.replace(/\D/g, "");
+
       // Save to Supabase profile
       const phoneField = tipo === "Empresa" ? "phone_empresa" : "phone_personal";
       const { error: profileError } = await supabase
@@ -94,6 +97,21 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
         .eq('user_id', user.id);
 
       if (profileError) throw profileError;
+
+      // Add to usuarios table
+      const { error: usuariosError } = await (supabase as any)
+        .from('usuarios')
+        .insert({
+          telefono: phoneDigits,
+          plan: 'free',
+          usage_count: 0,
+          reporte_mensual: true,
+          reporte_semanal: true
+        });
+
+      if (usuariosError && usuariosError.code !== '23505') { // Ignore duplicate key errors
+        console.error('Error adding to usuarios:', usuariosError);
+      }
 
       toast({
         title: "✅ Perfil completado",
