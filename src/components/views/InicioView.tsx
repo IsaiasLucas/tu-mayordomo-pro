@@ -222,7 +222,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
         <div className="flex items-start justify-between gap-3 mb-4">
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-bold mb-1 truncate">
-              {profile?.name || 'Usuario'}
+              {profile?.display_name || profile?.name || 'Usuario'}
             </h1>
             <p className="text-xs opacity-90 truncate">
               {phone || 'Sin teléfono'}
