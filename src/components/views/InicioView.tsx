@@ -190,6 +190,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
     try {
       const now = getCurrentDateInSantiago();
       const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      console.log('📅 Buscando movimientos del mes:', mes, 'Fecha Santiago:', now);
       
       const response = await fetch(
         `https://script.google.com/macros/s/AKfycbxeeTtJBWnKJIXHAgXfmGrTym21lpL7cKnFUuTW45leWFVVdP9301aXQnr0sItTnn8vWA/exec?action=month&phone=${encodeURIComponent(phoneNumber)}&mes=${mes}`
