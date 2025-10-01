@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, TrendingUp, TrendingDown, Crown } from "lucide-react";
 import { format } from "date-fns";
-import { getCurrentDateInSantiago } from "@/lib/date-config";
+import { getCurrentDateInSantiago, CHILE_TIMEZONE } from "@/lib/date-config";
+import { formatInTimeZone } from "date-fns-tz";
 
 interface InicioViewProps {
   onOpenProfileModal: () => void;
@@ -54,34 +55,26 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
   
   const saldoMes = ingresos - egresos;
 
-  // Calcular variação diária usando todos os movimientos
+  // Calcular variación diaria usando todos los movimientos en horario de Santiago
   const calcularVariacionDiaria = () => {
-    const hoy = new Date();
+    const hoy = getCurrentDateInSantiago();
     const ayer = new Date(hoy);
     ayer.setDate(ayer.getDate() - 1);
 
+    const fmtDay = (d: Date | string) => formatInTimeZone(new Date(d), CHILE_TIMEZONE, 'yyyy-MM-dd');
+
     const saldoHoy = allMovimientos
-      .filter(m => {
-        const fechaMov = new Date(m.fecha);
-        return fechaMov.toDateString() === hoy.toDateString();
-      })
+      .filter(m => fmtDay(m.fecha) === fmtDay(hoy))
       .reduce((total, m) => {
-        const valor = m.tipo.toLowerCase() === "ingreso" || m.tipo.toLowerCase() === "receita" 
-          ? m.monto 
-          : -m.monto;
-        return total + valor;
+        const isIngreso = m.tipo.toLowerCase() === 'ingreso' || m.tipo.toLowerCase() === 'receita';
+        return total + (isIngreso ? Number(m.monto) : -Number(m.monto));
       }, 0);
 
     const saldoAyer = allMovimientos
-      .filter(m => {
-        const fechaMov = new Date(m.fecha);
-        return fechaMov.toDateString() === ayer.toDateString();
-      })
+      .filter(m => fmtDay(m.fecha) === fmtDay(ayer))
       .reduce((total, m) => {
-        const valor = m.tipo.toLowerCase() === "ingreso" || m.tipo.toLowerCase() === "receita" 
-          ? m.monto 
-          : -m.monto;
-        return total + valor;
+        const isIngreso = m.tipo.toLowerCase() === 'ingreso' || m.tipo.toLowerCase() === 'receita';
+        return total + (isIngreso ? Number(m.monto) : -Number(m.monto));
       }, 0);
 
     if (saldoAyer === 0) return 0;
@@ -242,8 +235,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
 
   const formatMovimientoDate = (dateString: string) => {
     try {
-      const date = new Date(dateString);
-      return format(date, "dd/MM HH:mm");
+      return formatInTimeZone(new Date(dateString), CHILE_TIMEZONE, "dd/MM HH:mm");
     } catch {
       return dateString;
     }
