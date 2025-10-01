@@ -40,7 +40,33 @@ serve(async (req) => {
 
     console.log(`Deleting user account: ${user.id}`);
 
-    // Delete user profile first (this will cascade delete related data if foreign keys are set up)
+    // Get user profile to retrieve phone number
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('phone_personal, phone_empresa')
+      .eq('user_id', user.id)
+      .single();
+
+    // Delete from usuarios table if phone exists
+    if (profile) {
+      const phone = profile.phone_personal || profile.phone_empresa;
+      if (phone) {
+        // Extract only digits for usuarios table
+        const phoneDigits = phone.replace(/\D/g, '');
+        
+        const { error: usuariosError } = await supabaseAdmin
+          .from('usuarios')
+          .delete()
+          .eq('telefono', phoneDigits);
+
+        if (usuariosError) {
+          console.error('Error deleting from usuarios:', usuariosError);
+          // Continue anyway
+        }
+      }
+    }
+
+    // Delete user profile (this will cascade delete related data if foreign keys are set up)
     const { error: profileError } = await supabaseAdmin
       .from('profiles')
       .delete()
