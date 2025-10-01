@@ -77,6 +77,25 @@ serve(async (req) => {
           cancel_at_period_end: true,
         });
         logStep("Subscription cancelled in Stripe");
+        
+        // Update plan to free in both tables
+        await supabaseClient
+          .from("profiles")
+          .update({ plan: "free" })
+          .eq("user_id", user.id);
+        
+        logStep("Updated profiles table to free");
+        
+        // Update usuarios table if phone exists
+        if (telefone) {
+          const telefoneLimpo = telefone.replace(/\D/g, '');
+          await supabaseClient
+            .from("usuarios")
+            .update({ plan: "free" })
+            .eq("telefono", telefoneLimpo);
+          
+          logStep("Updated usuarios table to free", { telefono: telefoneLimpo });
+        }
       } else {
         logStep("No active subscription found in Stripe");
       }

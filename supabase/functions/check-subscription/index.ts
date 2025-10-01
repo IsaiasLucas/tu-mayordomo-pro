@@ -48,6 +48,16 @@ serve(async (req) => {
     
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    // Get user's profile for phone number
+    const { data: profile } = await supabaseClient
+      .from("profiles")
+      .select("phone_personal, phone_empresa")
+      .eq("user_id", user.id)
+      .single();
+
+    const telefone = profile?.phone_personal || profile?.phone_empresa;
+    logStep("Profile found", { telefone });
+
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
 
@@ -59,6 +69,15 @@ serve(async (req) => {
         .from("profiles")
         .update({ plan: "free" })
         .eq("user_id", user.id);
+      
+      // Update usuarios table if phone exists
+      if (telefone) {
+        const telefoneLimpo = telefone.replace(/\D/g, '');
+        await supabaseClient
+          .from("usuarios")
+          .update({ plan: "free" })
+          .eq("telefono", telefoneLimpo);
+      }
 
       return new Response(
         JSON.stringify({ subscribed: false, plan: "free" }),
@@ -91,6 +110,15 @@ serve(async (req) => {
           stripe_customer_id: customerId 
         })
         .eq("user_id", user.id);
+      
+      // Update usuarios table if phone exists
+      if (telefone) {
+        const telefoneLimpo = telefone.replace(/\D/g, '');
+        await supabaseClient
+          .from("usuarios")
+          .update({ plan: "free" })
+          .eq("telefono", telefoneLimpo);
+      }
 
       return new Response(
         JSON.stringify({ subscribed: false, plan: "free" }),
@@ -127,6 +155,17 @@ serve(async (req) => {
       .eq("user_id", user.id);
 
     logStep("Profile updated successfully");
+    
+    // Update usuarios table if phone exists
+    if (telefone) {
+      const telefoneLimpo = telefone.replace(/\D/g, '');
+      await supabaseClient
+        .from("usuarios")
+        .update({ plan: planName })
+        .eq("telefono", telefoneLimpo);
+      
+      logStep("Usuarios table updated successfully", { telefono: telefoneLimpo });
+    }
 
     return new Response(
       JSON.stringify({

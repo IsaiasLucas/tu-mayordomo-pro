@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,6 +16,12 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    { auth: { persistSession: false } }
+  );
 
   try {
     logStep("Webhook received");
@@ -175,6 +182,40 @@ serve(async (req) => {
           status: invoice.status,
           timestamp: new Date().toISOString(),
         };
+      }
+
+      // Update Supabase tables based on plan change
+      if (eventData.action === "update_plan" && customerEmail) {
+        logStep("Updating Supabase tables", { email: customerEmail, plan: eventData.plan });
+        
+        // Get user ID from email
+        const { data: authUser } = await supabaseClient.auth.admin.listUsers();
+        const targetUser = authUser?.users?.find(u => u.email === customerEmail);
+        
+        if (targetUser) {
+          logStep("Found user", { userId: targetUser.id });
+          
+          // Update profiles table
+          await supabaseClient
+            .from("profiles")
+            .update({ plan: eventData.plan })
+            .eq("user_id", targetUser.id);
+          
+          logStep("Updated profiles table");
+          
+          // Update usuarios table if phone exists
+          if (telefone) {
+            const telefoneLimpo = telefone.replace(/\D/g, '');
+            await supabaseClient
+              .from("usuarios")
+              .update({ plan: eventData.plan })
+              .eq("telefono", telefoneLimpo);
+            
+            logStep("Updated usuarios table", { telefono: telefoneLimpo });
+          }
+        } else {
+          logStep("User not found in Supabase", { email: customerEmail });
+        }
       }
 
       logStep("Sending to n8n", { url: n8nWebhook, data: eventData });
