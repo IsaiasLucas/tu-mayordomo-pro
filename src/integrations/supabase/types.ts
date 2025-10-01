@@ -44,6 +44,45 @@ export type Database = {
         }
         Relationships: []
       }
+      gastos: {
+        Row: {
+          categoria: string | null
+          created_at: string | null
+          descripcion: string | null
+          detalles: string | null
+          fecha: string | null
+          id: string
+          monto: number | null
+          subtipo: string | null
+          telefono: string
+          tipo: string | null
+        }
+        Insert: {
+          categoria?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          detalles?: string | null
+          fecha?: string | null
+          id?: string
+          monto?: number | null
+          subtipo?: string | null
+          telefono: string
+          tipo?: string | null
+        }
+        Update: {
+          categoria?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          detalles?: string | null
+          fecha?: string | null
+          id?: string
+          monto?: number | null
+          subtipo?: string | null
+          telefono?: string
+          tipo?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -176,6 +215,42 @@ export type Database = {
           user_id?: string
           verification_data?: Json | null
           verification_type?: string
+        }
+        Relationships: []
+      }
+      usuarios: {
+        Row: {
+          created_at: string | null
+          id: string
+          plan: string | null
+          plan_expires_at: string | null
+          reporte_mensual: boolean | null
+          reporte_semanal: boolean | null
+          telefono: string
+          usage_count: number | null
+          usage_month: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          plan?: string | null
+          plan_expires_at?: string | null
+          reporte_mensual?: boolean | null
+          reporte_semanal?: boolean | null
+          telefono: string
+          usage_count?: number | null
+          usage_month?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          plan?: string | null
+          plan_expires_at?: string | null
+          reporte_mensual?: boolean | null
+          reporte_semanal?: boolean | null
+          telefono?: string
+          usage_count?: number | null
+          usage_month?: string | null
         }
         Relationships: []
       }
