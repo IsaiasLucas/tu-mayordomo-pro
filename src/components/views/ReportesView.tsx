@@ -398,7 +398,7 @@ export default function ReportesView() {
             Genera reportes detallados en PDF con análisis por categoría para enviar a tu contador
           </p>
           
-          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button 
               onClick={() => generar("semanal")} 
               className="rounded-xl flex items-center gap-2"
@@ -423,55 +423,55 @@ export default function ReportesView() {
               )}
               Mês Passado
             </Button>
-            
-            <div className="flex gap-2 items-center">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="rounded-xl">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    {customStartDate ? format(customStartDate, "dd/MM/yyyy") : "Data Início"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={customStartDate}
-                    onSelect={setCustomStartDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-2 items-stretch">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="rounded-xl">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  {customStartDate ? format(customStartDate, "dd/MM/yyyy") : "Data Início"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={customStartDate}
+                  onSelect={setCustomStartDate}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
 
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="rounded-xl">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    {customEndDate ? format(customEndDate, "dd/MM/yyyy") : "Data Fim"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={customEndDate}
-                    onSelect={setCustomEndDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="rounded-xl">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  {customEndDate ? format(customEndDate, "dd/MM/yyyy") : "Data Fim"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={customEndDate}
+                  onSelect={setCustomEndDate}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
 
-              <Button 
-                onClick={() => generar("custom")} 
-                className="rounded-xl flex items-center gap-2"
-                disabled={generating !== null || !customStartDate || !customEndDate}
-              >
-                {generating === "custom" ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Download className="h-4 w-4" />
-                )}
-                Gerar
-              </Button>
-            </div>
+            <Button 
+              onClick={() => generar("custom")} 
+              className="rounded-xl flex items-center gap-2"
+              disabled={generating !== null || !customStartDate || !customEndDate}
+            >
+              {generating === "custom" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              Gerar
+            </Button>
           </div>
         </CardContent>
       </Card>
