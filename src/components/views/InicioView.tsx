@@ -329,7 +329,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
 
       <Card className="shadow-card rounded-2xl border-0">
         <CardHeader className="pb-3 px-4">
-          <CardTitle className="text-base">Transacciones Recientes</CardTitle>
+          <CardTitle className="text-lg">Transacciones Recientes</CardTitle>
         </CardHeader>
         <CardContent className="px-4">
           {!phone ? (
