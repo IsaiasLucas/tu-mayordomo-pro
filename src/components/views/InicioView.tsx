@@ -367,7 +367,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         href="https://wa.me/56955264713?text=Enséñame%20a%20usar%20Tu%20Mayordomo%20paso%20a%20paso%20🚀"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-24 right-4 z-40 group"
+        className="fixed bottom-32 right-4 z-40 group"
         title="Chatear con Tu Mayordomo"
       >
         <div className="relative bg-gradient-to-br from-purple-600 to-blue-600 rounded-full p-3.5 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110">
