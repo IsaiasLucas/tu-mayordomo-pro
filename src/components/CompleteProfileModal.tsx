@@ -84,7 +84,10 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
-      // Save to Google Sheets
+      // Extract only digits for the sheet (without + or spaces)
+      const phoneDigits = whatsapp.replace(/\D/g, ""); // This gives us "569xxxx"
+
+      // Save to Google Sheets with phone without +
       const response = await fetch(WEBAPP_URL, {
         method: "POST",
         headers: { 
@@ -93,7 +96,7 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
         body: JSON.stringify({
           action: "addUser",
           name: nombre,
-          phone: whatsapp,
+          phone: phoneDigits, // Send as "569xxxx"
           kind: tipo === "Empresa" ? "empresa" : "pessoal",
         }),
       });
@@ -104,7 +107,7 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
         throw new Error(data.error || "Falha ao salvar");
       }
 
-      // Save to Supabase profile
+      // Save to Supabase profile (keep formatted for display)
       const phoneField = tipo === "Empresa" ? "phone_empresa" : "phone_personal";
       const { error: profileError } = await supabase
         .from('profiles')
