@@ -3,10 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { Shield, MessageCircle, CheckCircle2, AlertCircle } from "lucide-react";
+import { Shield, MessageCircle, CheckCircle2, AlertCircle, Building2, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
 interface CompleteProfileModalProps {
   open: boolean;
@@ -203,17 +203,63 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
             </p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="tipo">Tipo de cuenta *</Label>
-            <Select value={tipo} onValueChange={setTipo} disabled={loading}>
-              <SelectTrigger id="tipo">
-                <SelectValue placeholder="Selecciona una opción" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Personal">Personal</SelectItem>
-                <SelectItem value="Empresa">Empresa</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="space-y-3">
+            <Label>Tipo de cuenta *</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setTipo("Personal")}
+                disabled={loading}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-3 p-6 rounded-xl border-2 transition-all duration-200 touch-manipulation",
+                  "hover:shadow-lg active:scale-95",
+                  tipo === "Personal" 
+                    ? "border-primary bg-primary/10 shadow-md" 
+                    : "border-border bg-card hover:border-primary/50"
+                )}
+              >
+                <User className={cn(
+                  "w-8 h-8 transition-colors",
+                  tipo === "Personal" ? "text-primary" : "text-muted-foreground"
+                )} />
+                <span className={cn(
+                  "text-sm font-medium",
+                  tipo === "Personal" ? "text-primary" : "text-foreground"
+                )}>
+                  Personal
+                </span>
+                {tipo === "Personal" && (
+                  <CheckCircle2 className="w-5 h-5 text-primary absolute top-2 right-2" />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTipo("Empresa")}
+                disabled={loading}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-3 p-6 rounded-xl border-2 transition-all duration-200 relative touch-manipulation",
+                  "hover:shadow-lg active:scale-95",
+                  tipo === "Empresa" 
+                    ? "border-primary bg-primary/10 shadow-md" 
+                    : "border-border bg-card hover:border-primary/50"
+                )}
+              >
+                <Building2 className={cn(
+                  "w-8 h-8 transition-colors",
+                  tipo === "Empresa" ? "text-primary" : "text-muted-foreground"
+                )} />
+                <span className={cn(
+                  "text-sm font-medium",
+                  tipo === "Empresa" ? "text-primary" : "text-foreground"
+                )}>
+                  Empresa
+                </span>
+                {tipo === "Empresa" && (
+                  <CheckCircle2 className="w-5 h-5 text-primary absolute top-2 right-2" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
