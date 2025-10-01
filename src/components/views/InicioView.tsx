@@ -314,15 +314,15 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
 
       <div className="grid grid-cols-2 gap-3">
         <Card className="shadow-card rounded-2xl border-0">
-          <CardContent className="p-3.5">
-            <p className="text-xs text-muted-foreground mb-1">Ingresos</p>
-            <p className="text-lg font-bold text-green-600 truncate">{fmtCLP(ingresos)}</p>
+          <CardContent className="p-4">
+            <p className="text-xs text-muted-foreground mb-1.5">Ingresos</p>
+            <p className="text-xl font-bold text-green-600 truncate">{fmtCLP(ingresos)}</p>
           </CardContent>
         </Card>
         <Card className="shadow-card rounded-2xl border-0">
-          <CardContent className="p-3.5">
-            <p className="text-xs text-muted-foreground mb-1">Gastos</p>
-            <p className="text-lg font-bold text-red-600 truncate">{fmtCLP(egresos)}</p>
+          <CardContent className="p-4">
+            <p className="text-xs text-muted-foreground mb-1.5">Gastos</p>
+            <p className="text-xl font-bold text-red-600 truncate">{fmtCLP(egresos)}</p>
           </CardContent>
         </Card>
       </div>
