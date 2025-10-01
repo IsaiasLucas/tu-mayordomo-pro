@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, TrendingUp, TrendingDown, Crown } from "lucide-react";
 import { format } from "date-fns";
+import { getCurrentDateInSantiago } from "@/lib/date-config";
 
 interface InicioViewProps {
   onOpenProfileModal: () => void;
@@ -194,7 +195,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
 
   const fetchAllMovimientos = async (phoneNumber: string) => {
     try {
-      const now = new Date();
+      const now = getCurrentDateInSantiago();
       const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       
       const response = await fetch(
@@ -215,7 +216,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
 
   const fetchAllMovimientosUpdate = async (phoneNumber: string) => {
     try {
-      const now = new Date();
+      const now = getCurrentDateInSantiago();
       const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       
       const response = await fetch(
