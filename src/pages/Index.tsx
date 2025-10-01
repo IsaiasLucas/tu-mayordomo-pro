@@ -83,7 +83,7 @@ const Index = () => {
   const renderCurrentView = () => {
     switch (currentView) {
       case "inicio":
-        return <InicioView onOpenProfileModal={() => setShowProfileModal(true)} />;
+        return <InicioView onOpenProfileModal={() => setShowProfileModal(true)} onViewChange={handleViewChange} />;
       case "gastos":
         return <GastosView />;
       case "reportes":
@@ -93,7 +93,7 @@ const Index = () => {
       case "perfil":
         return <PerfilView />;
       default:
-        return <InicioView onOpenProfileModal={() => setShowProfileModal(true)} />;
+        return <InicioView onOpenProfileModal={() => setShowProfileModal(true)} onViewChange={handleViewChange} />;
     }
   };
 

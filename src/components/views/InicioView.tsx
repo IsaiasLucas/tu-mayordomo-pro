@@ -15,6 +15,7 @@ import { formatInTimeZone } from "date-fns-tz";
 
 interface InicioViewProps {
   onOpenProfileModal: () => void;
+  onViewChange: (view: string) => void;
 }
 
 interface Movimiento {
@@ -24,7 +25,7 @@ interface Movimiento {
   tipo: string;
 }
 
-const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
+const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
   const { profile, loading } = useAuth();
   const { items: gastos } = useGastos();
   const [phone, setPhone] = useState<string | null>(null);
@@ -307,7 +308,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
                 </p>
               </div>
               <Button
-                onClick={() => window.location.href = "/planes"}
+                onClick={() => onViewChange("planes")}
                 className="w-full bg-gradient-to-r from-primary to-primary-glow"
                 size="sm"
               >
