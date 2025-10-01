@@ -303,21 +303,21 @@ export default function ReportesView() {
               Gastos por Categoria (Mês Atual)
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4">
             {chartData.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 Sem dados para mostrar
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={350}>
                 <RechartsPieChart>
                   <Pie
                     data={chartData}
                     cx="50%"
                     cy="50%"
-                    labelLine={false}
+                    labelLine={true}
                     label={({ name, percentage }) => `${name}: ${percentage.toFixed(0)}%`}
-                    outerRadius={80}
+                    outerRadius={70}
                     fill="#8884d8"
                     dataKey="value"
                   >
