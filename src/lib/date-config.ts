@@ -10,7 +10,10 @@ export const chileLocale = es;
 
 // Función para obtener la fecha actual en hora de Santiago
 export const getCurrentDateInSantiago = (): Date => {
-  return toZonedTime(new Date(), CHILE_TIMEZONE);
+  const now = new Date();
+  const santiagDate = toZonedTime(now, CHILE_TIMEZONE);
+  console.log('Santiago date:', santiagDate, 'Month:', santiagDate.getMonth() + 1);
+  return santiagDate;
 };
 
 // Función para formatear fecha en hora de Santiago
