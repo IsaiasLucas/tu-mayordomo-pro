@@ -261,7 +261,7 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
         href="https://wa.me/56955264713?text=Enséñame%20a%20usar%20Tu%20Mayordomo%20paso%20a%20paso%20🚀"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 group"
+        className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-50 group"
         title="Chatear con Tu Mayordomo"
       >
         <div className="relative bg-gradient-to-br from-purple-600 to-blue-600 rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 animate-fade-in">
@@ -284,18 +284,18 @@ const InicioView = ({ onOpenProfileModal }: InicioViewProps) => {
 
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-white rounded-[24px] p-4 shadow">
-          <div className="text-sm text-gray-500">Ingresos del mes</div>
-          <div className="text-xl font-semibold">{fmtCLP(ingresos)}</div>
+          <div className="text-xs sm:text-sm text-gray-500">Ingresos del mes</div>
+          <div className="text-lg sm:text-xl font-semibold">{fmtCLP(ingresos)}</div>
         </div>
         <div className="bg-white rounded-[24px] p-4 shadow">
-          <div className="text-sm text-gray-500">Gastos del mes</div>
-          <div className="text-xl font-semibold">{fmtCLP(egresos)}</div>
+          <div className="text-xs sm:text-sm text-gray-500">Gastos del mes</div>
+          <div className="text-lg sm:text-xl font-semibold">{fmtCLP(egresos)}</div>
         </div>
       </div>
 
       <Card className="bg-white">
         <CardHeader>
-          <CardTitle className="text-xl">Tus últimos movimientos</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Tus últimos movimientos</CardTitle>
         </CardHeader>
         <CardContent>
           {!phone ? (

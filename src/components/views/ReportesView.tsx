@@ -121,12 +121,12 @@ export default function ReportesView() {
 
     // Header
     doc.setFontSize(20);
-    doc.text(`Relatório ${tipo}`, 105, 20, { align: "center" });
+    doc.text(`Reporte ${tipo}`, 105, 20, { align: "center" });
     doc.setFontSize(12);
     doc.text(periodo, 105, 30, { align: "center" });
-    doc.text(`Gerado em: ${format(new Date(), "dd/MM/yyyy HH:mm")}`, 105, 37, { align: "center" });
+    doc.text(`Generado el: ${format(new Date(), "dd/MM/yyyy HH:mm")}`, 105, 37, { align: "center" });
 
-    // Calcular totais
+    // Calcular totales
     const ingresos = movimientos
       .filter(m => m.tipo.toLowerCase() === "ingreso" || m.tipo.toLowerCase() === "receita")
       .reduce((sum, m) => sum + Number(m.monto || 0), 0);
@@ -137,9 +137,9 @@ export default function ReportesView() {
 
     const saldo = ingresos - egresos;
 
-    // Resumo
+    // Resumen
     doc.setFontSize(14);
-    doc.text("Resumo Financeiro", 14, 50);
+    doc.text("Resumen Financiero", 14, 50);
     doc.setFontSize(11);
     doc.text(`Ingresos: ${new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(ingresos)}`, 14, 60);
     doc.text(`Egresos: ${new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(egresos)}`, 14, 67);
@@ -148,7 +148,7 @@ export default function ReportesView() {
     doc.text(`Saldo: ${new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(saldo)}`, 14, 77);
     doc.setFont(undefined, 'normal');
 
-    // Análise por categoria
+    // Análisis por categoría
     const categoryData = processChartData(movimientos);
     if (categoryData.length > 0) {
       doc.setFontSize(14);
@@ -167,10 +167,10 @@ export default function ReportesView() {
       });
     }
 
-    // Tabela de movimentos
+    // Tabla de movimientos
     autoTable(doc, {
       startY: (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 10 : 130,
-      head: [['Data', 'Descrição', 'Categoria', 'Tipo', 'Valor']],
+      head: [['Fecha', 'Descripción', 'Categoría', 'Tipo', 'Valor']],
       body: movimientos.map(m => [
         format(new Date(m.fecha), "dd/MM/yyyy"),
         m.descripcion,
@@ -188,8 +188,8 @@ export default function ReportesView() {
   const generar = async (tipo: "semanal" | "mensual" | "custom") => {
     if (!user || !profile?.phone_personal) {
       toast({
-        title: "Erro",
-        description: "É necessário ter um telefone cadastrado para gerar relatórios.",
+        title: "Error",
+        description: "Es necesario tener un teléfono registrado para generar reportes.",
         variant: "destructive",
       });
       return;
@@ -197,8 +197,8 @@ export default function ReportesView() {
 
     if (tipo === "custom" && (!customStartDate || !customEndDate)) {
       toast({
-        title: "Erro",
-        description: "Selecione as datas de início e fim.",
+        title: "Error",
+        description: "Selecciona las fechas de inicio y fin.",
         variant: "destructive",
       });
       return;
@@ -230,8 +230,8 @@ export default function ReportesView() {
 
       if (movimientos.length === 0) {
         toast({
-          title: "Sem movimentos",
-          description: `Não há movimentos no período ${periodo}.`,
+          title: "Sin movimientos",
+          description: `No hay movimientos en el período ${periodo}.`,
           variant: "destructive",
         });
         return;
@@ -239,7 +239,7 @@ export default function ReportesView() {
 
       const doc = generatePDF(movimientos, tipo === "custom" ? "Personalizado" : tipo, periodo);
 
-      // Salvar no banco de dados
+      // Guardar en la base de datos
       const { error } = await supabase
         .from('reportes')
         .insert({
@@ -252,18 +252,18 @@ export default function ReportesView() {
 
       if (error) throw error;
 
-      // Download do PDF
-      doc.save(`relatorio-${tipo}-${format(now, "yyyy-MM-dd")}.pdf`);
+      // Descargar PDF
+      doc.save(`reporte-${tipo}-${format(now, "yyyy-MM-dd")}.pdf`);
 
       toast({
-        title: "Relatório gerado",
-        description: `Seu relatório foi gerado e baixado com sucesso.`,
+        title: "Reporte generado",
+        description: `Tu reporte fue generado y descargado con éxito.`,
       });
     } catch (error: any) {
-      console.error('Erro ao gerar relatório:', error);
+      console.error('Error al generar reporte:', error);
       toast({
-        title: "Erro ao gerar relatório",
-        description: error.message || "Tente novamente mais tarde.",
+        title: "Error al generar reporte",
+        description: error.message || "Intenta nuevamente más tarde.",
         variant: "destructive",
       });
     } finally {
@@ -275,16 +275,16 @@ export default function ReportesView() {
     return (
       <main className="p-4">
         <Card className="rounded-[24px] shadow-lg border-0">
-          <CardContent className="p-12 text-center">
+          <CardContent className="p-8 sm:p-12 text-center">
             <div className="flex justify-center mb-4">
               <Lock className="h-16 w-16 text-muted-foreground" />
             </div>
             <h2 className="text-2xl font-bold mb-2">Recurso Pro</h2>
-            <p className="text-muted-foreground mb-6">
-              Os relatórios com análise detalhada e gráficos são exclusivos para usuários Pro.
+            <p className="text-muted-foreground mb-6 text-sm sm:text-base">
+              Los reportes con análisis detallado y gráficos son exclusivos para usuarios Pro.
             </p>
             <Button size="lg" className="rounded-xl">
-              Upgrade para Pro
+              Upgrade a Pro
             </Button>
           </CardContent>
         </Card>
@@ -293,8 +293,8 @@ export default function ReportesView() {
   }
 
   return (
-    <main className="p-4 space-y-4">
-      {/* Gráficos de Análise */}
+    <main className="p-4 space-y-4 pb-24">
+      {/* Gráficos de Análisis */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="rounded-[24px] shadow border-0">
           <CardHeader>
@@ -360,45 +360,45 @@ export default function ReportesView() {
         </Card>
       </div>
 
-      {/* Resumo Mensal */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Resumen Mensual */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="rounded-[24px] shadow border-0">
-          <CardContent className="p-6">
-            <div className="text-sm text-muted-foreground">Ingresos (Mês Atual)</div>
-            <div className="text-2xl font-bold text-green-600">
+          <CardContent className="p-4 sm:p-6">
+            <div className="text-sm text-muted-foreground">Ingresos (Mes Actual)</div>
+            <div className="text-xl sm:text-2xl font-bold text-green-600">
               {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(totalIngresos)}
             </div>
           </CardContent>
         </Card>
         <Card className="rounded-[24px] shadow border-0">
-          <CardContent className="p-6">
-            <div className="text-sm text-muted-foreground">Egresos (Mês Atual)</div>
-            <div className="text-2xl font-bold text-red-600">
+          <CardContent className="p-4 sm:p-6">
+            <div className="text-sm text-muted-foreground">Egresos (Mes Actual)</div>
+            <div className="text-xl sm:text-2xl font-bold text-red-600">
               {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(totalEgresos)}
             </div>
           </CardContent>
         </Card>
         <Card className="rounded-[24px] shadow border-0">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="text-sm text-muted-foreground">Saldo</div>
-            <div className={cn("text-2xl font-bold", totalIngresos - totalEgresos >= 0 ? "text-green-600" : "text-red-600")}>
+            <div className={cn("text-xl sm:text-2xl font-bold", totalIngresos - totalEgresos >= 0 ? "text-green-600" : "text-red-600")}>
               {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(totalIngresos - totalEgresos)}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Gerar Relatórios */}
+      {/* Generar Reportes */}
       <Card className="rounded-[24px] shadow border-0">
         <CardHeader>
-          <CardTitle>Gerar Relatórios PDF</CardTitle>
+          <CardTitle>Generar Reportes PDF</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            Gere relatórios detalhados em PDF com análise por categoria para enviar ao seu contador
+          <p className="text-muted-foreground text-sm sm:text-base">
+            Genera reportes detallados en PDF con análisis por categoría para enviar a tu contador
           </p>
           
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
             <Button 
               onClick={() => generar("semanal")} 
               className="rounded-xl flex items-center gap-2"

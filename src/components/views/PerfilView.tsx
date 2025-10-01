@@ -110,20 +110,20 @@ const PerfilView = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `meus-dados-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `mis-datos-${new Date().toISOString().split('T')[0]}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
       toast({
-        title: "Dados exportados",
-        description: "Seus dados foram exportados com sucesso.",
+        title: "Datos exportados",
+        description: "Tus datos fueron exportados con éxito.",
       });
     } catch (error) {
       toast({
-        title: "Erro ao exportar",
-        description: "Não foi possível exportar seus dados. Tente novamente.",
+        title: "Error al exportar",
+        description: "No fue posible exportar tus datos. Intenta nuevamente.",
         variant: "destructive",
       });
     }
@@ -132,8 +132,8 @@ const PerfilView = () => {
   const handleChangePassword = async () => {
     if (!newPassword || newPassword.length < 6) {
       toast({
-        title: "Senha inválida",
-        description: "A senha deve ter pelo menos 6 caracteres.",
+        title: "Contraseña inválida",
+        description: "La contraseña debe tener al menos 6 caracteres.",
         variant: "destructive",
       });
       return;
@@ -148,15 +148,15 @@ const PerfilView = () => {
       if (error) throw error;
 
       toast({
-        title: "Senha alterada",
-        description: "Sua senha foi atualizada com sucesso.",
+        title: "Contraseña cambiada",
+        description: "Tu contraseña fue actualizada con éxito.",
       });
       setShowPasswordDialog(false);
       setNewPassword("");
     } catch (error: any) {
       toast({
-        title: "Erro ao alterar senha",
-        description: error.message || "Tente novamente mais tarde.",
+        title: "Error al cambiar contraseña",
+        description: error.message || "Intenta nuevamente más tarde.",
         variant: "destructive",
       });
     } finally {
@@ -212,8 +212,8 @@ const PerfilView = () => {
       if (error) throw error;
 
       toast({
-        title: "Conta excluída",
-        description: "Sua conta foi excluída com sucesso.",
+        title: "Cuenta eliminada",
+        description: "Tu cuenta fue eliminada con éxito.",
       });
 
       // Always sign out and redirect after deletion
@@ -227,8 +227,8 @@ const PerfilView = () => {
       // On any error, ensure user is signed out and moved to login
       console.error('Delete account error:', error);
       toast({
-        title: "Erro ao excluir conta",
-        description: error?.message || "Tente novamente mais tarde.",
+        title: "Error al eliminar cuenta",
+        description: error?.message || "Intenta nuevamente más tarde.",
         variant: "destructive",
       });
       // Clear all localStorage data
@@ -255,7 +255,7 @@ const PerfilView = () => {
       
       if (!event.target.files || event.target.files.length === 0) {
         toast({
-          title: "Nenhum arquivo selecionado",
+          title: "Ningún archivo seleccionado",
           variant: "destructive",
         });
         return;
@@ -263,21 +263,21 @@ const PerfilView = () => {
 
       const file = event.target.files[0];
       
-      // Validar tipo de arquivo
+      // Validar tipo de archivo
       if (!file.type.startsWith('image/')) {
         toast({
-          title: "Arquivo inválido",
-          description: "Por favor, selecione uma imagem.",
+          title: "Archivo inválido",
+          description: "Por favor, selecciona una imagen.",
           variant: "destructive",
         });
         return;
       }
 
-      // Validar tamanho (max 5MB)
+      // Validar tamaño (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         toast({
-          title: "Arquivo muito grande",
-          description: "A imagem deve ter no máximo 5MB.",
+          title: "Archivo muy grande",
+          description: "La imagen debe tener máximo 5MB.",
           variant: "destructive",
         });
         return;
@@ -458,14 +458,14 @@ const PerfilView = () => {
         <Card className="bg-white shadow-sm rounded-3xl p-6">
           <h3 className="text-lg font-semibold mb-6 flex items-center">
             <Settings className="h-5 w-5 mr-2" />
-            Configuração da Conta
+            Configuración de la Cuenta
           </h3>
           
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-                <h4 className="font-medium">Mostrar saldo no início</h4>
-                <p className="text-sm text-gray-600">Controle a visibilidade do seu saldo principal</p>
+                <h4 className="font-medium">Mostrar saldo al inicio</h4>
+                <p className="text-sm text-gray-600">Controla la visibilidad de tu saldo principal</p>
               </div>
               <Button
                 variant="ghost"
@@ -475,8 +475,8 @@ const PerfilView = () => {
                   setShowBalance(newValue);
                   localStorage.setItem("tm_show_balance", String(newValue));
                   toast({
-                    title: newValue ? "Saldo visível" : "Saldo oculto",
-                    description: newValue ? "O saldo será exibido na tela inicial." : "O saldo será ocultado na tela inicial.",
+                    title: newValue ? "Saldo visible" : "Saldo oculto",
+                    description: newValue ? "El saldo será mostrado en la pantalla inicial." : "El saldo será ocultado en la pantalla inicial.",
                   });
                 }}
                 className="rounded-xl"
@@ -486,26 +486,26 @@ const PerfilView = () => {
             </div>
 
             <div className="border-t pt-4">
-              <h4 className="font-medium mb-4">Informações Pessoais</h4>
+              <h4 className="font-medium mb-4">Información Personal</h4>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors gap-2">
                   <div className="flex items-center space-x-3">
-                    <Mail className="h-4 w-4 text-gray-500" />
+                    <Mail className="h-4 w-4 text-gray-500 flex-shrink-0" />
                     <span>Email</span>
                   </div>
-                  <span className="text-gray-600">{userProfile.email}</span>
+                  <span className="text-gray-600 break-all">{userProfile.email}</span>
                 </div>
-                <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors gap-2">
                   <div className="flex items-center space-x-3">
-                    <Phone className="h-4 w-4 text-gray-500" />
-                    <span>Telefone</span>
+                    <Phone className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                    <span>Teléfono</span>
                   </div>
                   <span className="text-gray-600">{userProfile.phone}</span>
                 </div>
-                <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors gap-2">
                   <div className="flex items-center space-x-3">
-                    <Calendar className="h-4 w-4 text-gray-500" />
-                    <span>Membro desde</span>
+                    <Calendar className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                    <span>Miembro desde</span>
                   </div>
                   <span className="text-gray-600">{userProfile.joinDate}</span>
                 </div>
@@ -517,12 +517,12 @@ const PerfilView = () => {
         <Card className="bg-white shadow-sm rounded-3xl p-6">
           <h3 className="text-lg font-semibold mb-6 flex items-center">
             <Shield className="h-5 w-5 mr-2" />
-            Segurança e Dados
+            Seguridad y Datos
           </h3>
           
           <div className="space-y-6">
             <div className="space-y-4">
-              <h4 className="font-medium">Gestão de Dados</h4>
+              <h4 className="font-medium">Gestión de Datos</h4>
               <div className="space-y-3">
                 <Button 
                   variant="outline" 
@@ -530,7 +530,7 @@ const PerfilView = () => {
                   className="w-full rounded-2xl py-3 justify-start"
                 >
                   <Download className="h-4 w-4 mr-2" />
-                  Exportar meus dados
+                  Exportar mis datos
                 </Button>
                 <Button 
                   variant="outline" 
@@ -538,13 +538,13 @@ const PerfilView = () => {
                   className="w-full rounded-2xl py-3 justify-start"
                 >
                   <Shield className="h-4 w-4 mr-2" />
-                  Alterar senha
+                  Cambiar contraseña
                 </Button>
               </div>
             </div>
 
             <div className="border-t pt-4">
-              <h4 className="font-medium mb-4">Ações da Conta</h4>
+              <h4 className="font-medium mb-4">Acciones de la Cuenta</h4>
               <div className="space-y-3">
                 <Button 
                   variant="outline" 
@@ -552,7 +552,7 @@ const PerfilView = () => {
                   className="w-full rounded-2xl py-3 justify-start text-red-600 border-red-300 hover:bg-red-50"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Excluir conta
+                  Eliminar cuenta
                 </Button>
                 <Button 
                   variant="outline" 
@@ -560,7 +560,7 @@ const PerfilView = () => {
                   className="w-full rounded-2xl py-3 justify-start"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  Sair
+                  Salir
                 </Button>
               </div>
             </div>
@@ -571,11 +571,11 @@ const PerfilView = () => {
 
       {/* Plan Information */}
       <Card className="bg-white shadow-sm rounded-3xl p-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h3 className="text-lg font-semibold mb-2">Seu Plano Atual</h3>
-            <div className="flex items-center space-x-3">
-              <Badge className={`px-3 py-1 rounded-full font-semibold ${
+            <h3 className="text-lg font-semibold mb-2">Tu Plan Actual</h3>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <Badge className={`px-3 py-1 rounded-full font-semibold w-fit ${
                 isPro 
                   ? 'bg-yellow-500 text-black' 
                   : 'bg-gray-100 text-gray-700'
@@ -584,9 +584,9 @@ const PerfilView = () => {
                 {userProfile.planType.toUpperCase()}
               </Badge>
               {isPro ? (
-                <p className="text-gray-600">Acesso completo a todas as funcionalidades</p>
+                <p className="text-gray-600">Acceso completo a todas las funcionalidades</p>
               ) : (
-                <p className="text-gray-600">Funcionalidades básicas disponíveis</p>
+                <p className="text-gray-600">Funcionalidades básicas disponibles</p>
               )}
             </div>
           </div>
@@ -594,7 +594,7 @@ const PerfilView = () => {
             <Button 
               onClick={() => setShowCancelPlanDialog(true)}
               variant="destructive"
-              className="rounded-2xl px-6"
+              className="rounded-2xl px-6 w-full sm:w-auto"
             >
               Cancelar Plan
             </Button>
@@ -604,22 +604,22 @@ const PerfilView = () => {
 
       {/* Cancel Plan Dialog */}
       <AlertDialog open={showCancelPlanDialog} onOpenChange={setShowCancelPlanDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[90vw] sm:max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Cancelar Plano PRO?</AlertDialogTitle>
+            <AlertDialogTitle>¿Cancelar Plan PRO?</AlertDialogTitle>
             <AlertDialogDescription>
-              Seu plano PRO permanecerá ativo até o final do período de 30 dias. 
-              Após esse período, você retornará automaticamente ao plano Gratuito.
+              Tu plan PRO permanecerá activo hasta el final del período de 30 días. 
+              Después de ese período, volverás automáticamente al plan Gratuito.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl">Não, manter</AlertDialogCancel>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel className="rounded-xl">No, mantener</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleCancelPlan}
               disabled={cancellingPlan}
               className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {cancellingPlan ? "Cancelando..." : "Sim, cancelar"}
+              {cancellingPlan ? "Cancelando..." : "Sí, cancelar"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -627,28 +627,28 @@ const PerfilView = () => {
 
       {/* Password Change Dialog */}
       <AlertDialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[90vw] sm:max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>Alterar Senha</AlertDialogTitle>
+            <AlertDialogTitle>Cambiar Contraseña</AlertDialogTitle>
             <AlertDialogDescription>
-              Digite sua nova senha. Ela deve ter pelo menos 6 caracteres.
+              Ingresa tu nueva contraseña. Debe tener al menos 6 caracteres.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <Input
             type="password"
-            placeholder="Nova senha"
+            placeholder="Nueva contraseña"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             className="rounded-xl"
           />
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
             <AlertDialogCancel className="rounded-xl">Cancelar</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleChangePassword}
               disabled={loading}
               className="rounded-xl"
             >
-              {loading ? "Alterando..." : "Alterar Senha"}
+              {loading ? "Cambiando..." : "Cambiar Contraseña"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -656,21 +656,21 @@ const PerfilView = () => {
 
       {/* Delete Account Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[90vw] sm:max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir Conta</AlertDialogTitle>
+            <AlertDialogTitle>Eliminar Cuenta</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza? Esta ação não pode ser desfeita. Todos os seus dados serão permanentemente excluídos.
+              ¿Estás seguro? Esta acción no se puede deshacer. Todos tus datos serán eliminados permanentemente.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
             <AlertDialogCancel className="rounded-xl">Cancelar</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDeleteAccount}
               disabled={loading}
               className="rounded-xl bg-red-600 hover:bg-red-700"
             >
-              {loading ? "Excluindo..." : "Excluir Conta"}
+              {loading ? "Eliminando..." : "Eliminar Cuenta"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -678,11 +678,11 @@ const PerfilView = () => {
 
       {/* Edit Profile Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="max-w-[90vw] sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Editar Perfil</DialogTitle>
             <DialogDescription>
-              Atualize suas informações pessoais e foto de perfil.
+              Actualiza tu información personal y foto de perfil.
             </DialogDescription>
           </DialogHeader>
           

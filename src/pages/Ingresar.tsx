@@ -30,15 +30,15 @@ export default function Ingresar() {
       );
 
       if (!response.ok) {
-        throw new Error("Erro ao registrar telefone");
+        throw new Error("Error al registrar teléfono");
       }
 
       navigate("/inicio");
     } catch (error) {
-      console.error("Erro ao enviar telefone:", error);
+      console.error("Error al enviar teléfono:", error);
       toast({
-        title: "Erro",
-        description: "Não foi possível registrar o telefone. Tente novamente.",
+        title: "Error",
+        description: "No fue posible registrar el teléfono. Intenta nuevamente.",
         variant: "destructive",
       });
     } finally {
@@ -47,11 +47,11 @@ export default function Ingresar() {
   };
 
   return (
-    <main className="p-6 space-y-4">
+    <main className="p-4 sm:p-6 space-y-4 max-w-md mx-auto">
       <h1 className="text-2xl font-semibold">Ingresar</h1>
-      <p>Escribe tu número (solo dígitos, Chile 56...)</p>
+      <p className="text-sm sm:text-base">Escribe tu número (solo dígitos, Chile 56...)</p>
       <input
-        className="w-full border rounded-xl p-3"
+        className="w-full border rounded-xl p-3 text-base"
         placeholder="56999999999"
         value={v}
         onChange={(e) => setV(e.target.value)}
@@ -59,7 +59,7 @@ export default function Ingresar() {
       <button 
         onClick={go} 
         disabled={loading}
-        className="bg-purple-600 text-white px-4 py-3 rounded-xl w-full disabled:opacity-50 disabled:cursor-not-allowed"
+        className="bg-purple-600 text-white px-4 py-3 rounded-xl w-full disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium"
       >
         {loading ? "Registrando..." : "Entrar"}
       </button>
@@ -68,7 +68,7 @@ export default function Ingresar() {
         <p className="text-sm text-gray-600 mb-3">¿Prefieres crear una cuenta completa?</p>
         <button 
           onClick={() => navigate("/auth")} 
-          className="bg-gray-800 text-white px-4 py-3 rounded-xl w-full"
+          className="bg-gray-800 text-white px-4 py-3 rounded-xl w-full text-base font-medium"
         >
           Crear cuenta con email
         </button>

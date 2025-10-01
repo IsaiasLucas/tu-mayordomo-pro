@@ -199,17 +199,17 @@ export default function GastosView() {
   const totalPages = Math.ceil((data.items || []).length / itemsPerPage);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 pb-20">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-3xl font-bold">Gastos</h1>
-        <div className="flex gap-3 items-center">
+        <h1 className="text-2xl sm:text-3xl font-bold">Gastos</h1>
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full sm:w-auto">
           <input
             type="month"
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
-            className="px-3 py-2 border rounded-md"
+            className="px-3 py-2 border rounded-md w-full sm:w-auto text-base"
           />
-          <Button onClick={handleDownloadPDF}>
+          <Button onClick={handleDownloadPDF} className="w-full sm:w-auto">
             <Download className="w-4 h-4 mr-2" />
             Descargar PDF
           </Button>

@@ -60,7 +60,7 @@ export default function Auth() {
 
         toast({
           title: "Registro realizado",
-          description: "Verifique seu email para confirmar a conta",
+          description: "Verifica tu email para confirmar la cuenta",
         });
       } else {
         // Sign in
@@ -72,8 +72,8 @@ export default function Auth() {
         if (error) throw error;
 
         toast({
-          title: "Login realizado",
-          description: "Bem-vindo de volta",
+          title: "Inicio de sesión exitoso",
+          description: "Bienvenido de nuevo",
         });
       }
     } catch (error: any) {
@@ -92,11 +92,11 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>{isSignUp ? "Criar conta" : "Iniciar sesión"}</CardTitle>
+          <CardTitle>{isSignUp ? "Crear cuenta" : "Iniciar sesión"}</CardTitle>
           <CardDescription>
             {isSignUp 
-              ? "Crie sua conta para acessar o sistema" 
-              : "Entre com sua conta"}
+              ? "Crea tu cuenta para acceder al sistema" 
+              : "Ingresa con tu cuenta"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -127,7 +127,7 @@ export default function Auth() {
 
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Processando..." : (isSignUp ? "Criar conta" : "Iniciar sesión")}
+              {loading ? "Procesando..." : (isSignUp ? "Crear cuenta" : "Iniciar sesión")}
             </Button>
 
             <div className="text-center">
@@ -137,8 +137,8 @@ export default function Auth() {
                 className="text-sm text-primary hover:underline"
               >
                 {isSignUp 
-                  ? "Já tem conta? Faça login" 
-                  : "Não tem conta? Registre-se"}
+                  ? "¿Ya tienes cuenta? Inicia sesión" 
+                  : "¿No tienes cuenta? Regístrate"}
               </button>
             </div>
           </form>

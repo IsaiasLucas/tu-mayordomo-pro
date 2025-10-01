@@ -120,8 +120,8 @@ export default function AccountSwitcher() {
           console.error('Failed to switch/refresh session:', setErr || error);
           // Keep the account but notify the user – they can re-login later
           toast({
-            title: "Sessão expirada",
-            description: `Não foi possível alternar para ${account.display_name}. Tente novamente mais tarde.`,
+            title: "Sesión expirada",
+            description: `No fue posible cambiar a ${account.display_name}. Intenta nuevamente más tarde.`,
             variant: "destructive",
           });
           return;
@@ -143,11 +143,11 @@ export default function AccountSwitcher() {
       }
 
       console.log(`Switched to account: ${account.display_name} (${account.email})`);
-      toast({ title: "Conta alternada", description: `Agora você está usando ${account.display_name}` });
+      toast({ title: "Cuenta cambiada", description: `Ahora estás usando ${account.display_name}` });
       setTimeout(() => window.location.reload(), 150);
     } catch (error) {
       console.error("Error switching account:", error);
-      toast({ title: "Erro ao alternar conta", description: "Não foi possível trocar de conta.", variant: "destructive" });
+      toast({ title: "Error al cambiar cuenta", description: "No fue posible cambiar de cuenta.", variant: "destructive" });
     }
   };
 
@@ -191,7 +191,7 @@ export default function AccountSwitcher() {
         className="w-[280px] p-2 bg-background/95 backdrop-blur-lg border shadow-2xl rounded-2xl"
       >
         <div className="px-2 py-3 text-sm font-semibold text-muted-foreground">
-          Contas
+          Cuentas
         </div>
 
         {accounts.map((account) => {
@@ -237,7 +237,7 @@ export default function AccountSwitcher() {
           <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
             <Plus className="h-5 w-5" />
           </div>
-          <span>Adicionar nova conta</span>
+          <span>Agregar nueva cuenta</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
