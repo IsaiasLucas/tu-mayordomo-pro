@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -496,22 +497,17 @@ const PerfilView = () => {
                 <h4 className="font-medium">Mostrar saldo al inicio</h4>
                 <p className="text-sm text-gray-600">Controla la visibilidad de tu saldo principal</p>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  const newValue = !showBalance;
-                  setShowBalance(newValue);
-                  localStorage.setItem("tm_show_balance", String(newValue));
+              <Switch
+                checked={showBalance}
+                onCheckedChange={(checked) => {
+                  setShowBalance(checked);
+                  localStorage.setItem("tm_show_balance", String(checked));
                   toast({
-                    title: newValue ? "Saldo visible" : "Saldo oculto",
-                    description: newValue ? "El saldo será mostrado en la pantalla inicial." : "El saldo será ocultado en la pantalla inicial.",
+                    title: checked ? "Saldo visible" : "Saldo oculto",
+                    description: checked ? "El saldo será mostrado en la pantalla inicial." : "El saldo será ocultado en la pantalla inicial.",
                   });
                 }}
-                className="rounded-xl"
-              >
-                {showBalance ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-              </Button>
+              />
             </div>
 
             <div className="border-t pt-4">
