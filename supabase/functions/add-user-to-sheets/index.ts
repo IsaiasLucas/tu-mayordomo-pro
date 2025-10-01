@@ -15,14 +15,19 @@ serve(async (req) => {
     const { telefone, email, nombre } = await req.json();
     
     const apiKey = Deno.env.get('GOOGLE_SHEETS_API_KEY');
-    const sheetId = '1your-sheet-id-here'; // You'll need to replace this with actual sheet ID
-    const range = 'Usuarios!A:C'; // Assuming columns A=Telefone, B=Email, C=Nombre
+    const sheetId = '1WeIPDOTFkm748yEJBkNvWvG2MJHJJpdaJAeen1fFzIk'; // User-provided sheet ID
+    const range = 'usuarios!A:C'; // Columns: A=Telefone, B=Email, C=Nombre
     
     if (!apiKey) {
       throw new Error('Google Sheets API key not configured');
     }
 
-    // Add user to Google Sheets
+    // Add user to Google Sheets (sanitize phone and ensure '56' prefix)
+    const phoneDigits = String(telefone || '').replace(/\D/g, '');
+    const normalizedPhone = phoneDigits.startsWith('56')
+      ? phoneDigits
+      : (phoneDigits.startsWith('9') ? `56${phoneDigits}` : `56${phoneDigits.replace(/^0+/, '')}`);
+
     const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}:append?valueInputOption=RAW&key=${apiKey}`;
     
     const response = await fetch(sheetsUrl, {
@@ -31,7 +36,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        values: [[telefone, email, nombre || 'Sin nombre']]
+        values: [[normalizedPhone, email || '', nombre || 'Sin nombre']]
       })
     });
 

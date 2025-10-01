@@ -87,22 +87,20 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
       // Extract only digits for the sheet (without + or spaces)
       const phoneDigits = whatsapp.replace(/\D/g, ""); // This gives us "569xxxx"
 
-      // Save to Google Sheets with phone without + and all required fields
-      const response = await fetch(WEBAPP_URL, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "text/plain"
+      // Save to Google Sheets via Supabase Edge Function
+      const { data: addRes, error: fnError } = await supabase.functions.invoke('add-user-to-sheets', {
+        body: {
+          telefone: phoneDigits,
+          email: user.email,
+          nombre,
         },
-        body: JSON.stringify({
-          action: "addUser",
-          name: nombre,
-          phone: phoneDigits, // Send as "569xxxx"
-          kind: tipo === "Empresa" ? "empresa" : "pessoal",
-          reporte: "semanal,mensal", // Default report settings
-          plan: "free", // Default plan
-          usage: "0" // Default usage count
-        }),
       });
+
+      if (fnError) throw fnError as Error;
+      if (!(addRes as any)?.success) {
+        const errMsg = (addRes as any)?.error || 'Failed to add user to sheets';
+        throw new Error(errMsg);
+      }
 
       const data = await response.json();
 
@@ -123,9 +121,9 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
 
       if (profileError) throw profileError;
 
-      // Save to localStorage for quick access
+      // Save to localStorage for quick access (both formatted and digits)
       localStorage.setItem("tm_phone", whatsapp);
-      
+      localStorage.setItem("telefono", phoneDigits);
       toast({
         title: "✅ Número verificado",
         description: "Tu cuenta está activa.",
