@@ -387,9 +387,7 @@ const PerfilView = () => {
   };
 
   const stats = [
-    { label: "Transacciones registradas", value: userProfile.totalTransactions, icon: Receipt },
     { label: "Meses activo", value: userProfile.monthsActive, icon: Calendar },
-    { label: "Ahorro promedio mensual", value: formatCLP(0), icon: PiggyBank },
   ];
 
   return (
@@ -458,22 +456,22 @@ const PerfilView = () => {
             </Button>
           </div>
           
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Stats - Single Card */}
+          <div className="flex justify-center sm:justify-start">
             {stats.map((stat, index) => {
               const IconComponent = stat.icon;
               return (
                 <div 
                   key={index} 
-                  className="bg-white/15 backdrop-blur-md rounded-2xl p-5 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-xl group"
+                  className="bg-white/15 backdrop-blur-md rounded-2xl p-5 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-xl group w-full max-w-xs"
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <div className="bg-white/20 p-2 rounded-xl group-hover:bg-white/30 transition-colors">
                       <IconComponent className="h-5 w-5" />
                     </div>
-                    <span className="text-sm font-medium text-white/90 line-clamp-2">{stat.label}</span>
+                    <span className="text-sm font-medium text-white/90">{stat.label}</span>
                   </div>
-                  <p className="text-2xl font-bold tracking-tight">{stat.value}</p>
+                  <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
                 </div>
               );
             })}
