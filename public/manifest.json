@@ -1,0 +1,34 @@
+{
+  "name": "Tu Mayordomo - Gestión Financiera",
+  "short_name": "Tu Mayordomo",
+  "description": "Controla tus finanzas personales con Tu Mayordomo. Registra gastos, crea presupuestos y obtén reportes detallados.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#8B5CF6",
+  "theme_color": "#8B5CF6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "productivity", "business"],
+  "screenshots": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

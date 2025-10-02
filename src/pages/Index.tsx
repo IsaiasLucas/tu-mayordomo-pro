@@ -9,6 +9,7 @@ import PlanesView from "@/components/views/PlanesView";
 import PerfilView from "@/components/views/PerfilView";
 import CompleteProfileModal from "@/components/CompleteProfileModal";
 import AccountSwitcher from "@/components/AccountSwitcher";
+import InstallPrompt from "@/components/InstallPrompt";
 import { toast } from "@/hooks/use-toast";
 
 const Index = () => {
@@ -127,6 +128,8 @@ const Index = () => {
         open={showProfileModal}
         onClose={() => setShowProfileModal(false)}
       />
+      
+      <InstallPrompt />
     </div>
   );
 };
