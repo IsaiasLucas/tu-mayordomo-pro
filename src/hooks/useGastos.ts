@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export function useGastos(telefono?: string, mes?: string) {
+export function useGastos(telefono?: string, mes?: string, accountId?: string | null) {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
 
   useEffect(() => {
-    if (!telefono) {
+    if (!telefono || !accountId) {
       setLoading(false);
       return;
     }
@@ -25,6 +25,7 @@ export function useGastos(telefono?: string, mes?: string) {
         const { data, error: fetchError } = await (supabase as any)
           .from('gastos')
           .select('*')
+          .eq('account_id', accountId)
           .eq('telefono', telefono)
           .gte('fecha', startDate)
           .lte('fecha', endDate)
@@ -41,7 +42,7 @@ export function useGastos(telefono?: string, mes?: string) {
     };
 
     fetchGastos();
-  }, [telefono, mes]);
+  }, [telefono, mes, accountId]);
 
   return { items, loading, error };
 }

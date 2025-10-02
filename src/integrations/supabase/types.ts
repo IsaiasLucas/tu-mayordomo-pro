@@ -46,6 +46,7 @@ export type Database = {
       }
       entities: {
         Row: {
+          account_id: string | null
           created_at: string
           id: string
           nombre_legal: string | null
@@ -55,6 +56,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           created_at?: string
           id?: string
           nombre_legal?: string | null
@@ -64,6 +66,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string | null
           created_at?: string
           id?: string
           nombre_legal?: string | null
@@ -72,10 +75,19 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "entities_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       gastos: {
         Row: {
+          account_id: string | null
           categoria: string | null
           created_at: string | null
           descripcion: string | null
@@ -88,6 +100,7 @@ export type Database = {
           tipo: string | null
         }
         Insert: {
+          account_id?: string | null
           categoria?: string | null
           created_at?: string | null
           descripcion?: string | null
@@ -100,6 +113,7 @@ export type Database = {
           tipo?: string | null
         }
         Update: {
+          account_id?: string | null
           categoria?: string | null
           created_at?: string | null
           descripcion?: string | null
@@ -111,7 +125,15 @@ export type Database = {
           telefono?: string
           tipo?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "gastos_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -181,6 +203,7 @@ export type Database = {
       }
       reportes: {
         Row: {
+          account_id: string | null
           created_at: string
           data: Json | null
           id: string
@@ -192,6 +215,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           created_at?: string
           data?: Json | null
           id?: string
@@ -203,6 +227,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string | null
           created_at?: string
           data?: Json | null
           id?: string
@@ -213,7 +238,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "reportes_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       student_verifications: {
         Row: {

@@ -13,6 +13,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import CompleteProfileModal from "@/components/CompleteProfileModal";
 import { supabase } from "@/integrations/supabase/client";
+import { useCurrentAccount } from "@/hooks/useCurrentAccount";
 
 interface Movement {
   id: string;
@@ -30,6 +31,7 @@ interface MonthData {
 }
 
 export default function GastosView() {
+  const { currentAccountId } = useCurrentAccount();
   const [selectedMonth, setSelectedMonth] = useState<string>(
     format(new Date(), "yyyy-MM")
   );
@@ -53,7 +55,7 @@ export default function GastosView() {
   }, []);
 
   useEffect(() => {
-    if (!phone) return;
+    if (!phone || !currentAccountId) return;
 
     const fetchData = async () => {
       if (!initialLoadComplete) {
@@ -71,6 +73,7 @@ export default function GastosView() {
         const { data: gastos, error } = await (supabase as any)
           .from('gastos')
           .select('*')
+          .eq('account_id', currentAccountId)
           .eq('telefono', phoneDigits)
           .gte('fecha', startDate)
           .lte('fecha', endDate)
@@ -120,7 +123,7 @@ export default function GastosView() {
         clearInterval(pollingIntervalRef.current);
       }
     };
-  }, [phone, selectedMonth]);
+  }, [phone, selectedMonth, currentAccountId]);
 
   const handleDownloadPDF = () => {
     const doc = new jsPDF();

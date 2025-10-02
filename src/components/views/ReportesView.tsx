@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useReportes } from "@/hooks/useReportes";
 import { useAuth } from "@/hooks/useAuth";
+import { useCurrentAccount } from "@/hooks/useCurrentAccount";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,8 +26,9 @@ interface Movimiento {
 }
 
 export default function ReportesView() {
-  const { items, loading } = useReportes();
   const { user, profile } = useAuth();
+  const { currentAccountId } = useCurrentAccount();
+  const { items, loading } = useReportes(currentAccountId);
   const { toast } = useToast();
   const [generating, setGenerating] = useState<string | null>(null);
   const [chartData, setChartData] = useState<any[]>([]);
@@ -41,7 +43,7 @@ export default function ReportesView() {
 
   const fetchMovimientos = async (startDate: Date, endDate: Date): Promise<Movimiento[]> => {
     const phone = profile?.phone_personal || profile?.phone_empresa;
-    if (!phone) return [];
+    if (!phone || !currentAccountId) return [];
 
     try {
       const phoneDigits = phone.replace(/\D/g, "");

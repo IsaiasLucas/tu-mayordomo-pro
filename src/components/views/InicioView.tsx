@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import HeroOverview from "../HeroOverview";
 import { useAuth } from "@/hooks/useAuth";
-import { useGastos } from "@/hooks/useGastos";
+import { useCurrentAccount } from "@/hooks/useCurrentAccount";
 import { fmtCLP } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -28,7 +28,7 @@ interface Movimiento {
 
 const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
   const { profile, loading } = useAuth();
-  const { items: gastos } = useGastos();
+  const { currentAccountId } = useCurrentAccount();
   const [phone, setPhone] = useState<string | null>(null);
   const [movimientos, setMovimientos] = useState<Movimiento[]>(() => {
     const cached = localStorage.getItem('tm_movimientos_cache');
@@ -104,8 +104,8 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     // Check phone from profile (Supabase) first
     const phoneFromProfile = profile?.phone_personal || profile?.phone_empresa;
     
-    // Check if phone exists and is not empty
-    if (phoneFromProfile && phoneFromProfile.trim() !== '') {
+    // Check if phone exists and is not empty and currentAccountId is available
+    if (phoneFromProfile && phoneFromProfile.trim() !== '' && currentAccountId) {
       setPhone(phoneFromProfile);
       localStorage.setItem("tm_phone", phoneFromProfile);
       
@@ -123,7 +123,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         fetchAllMovimientosUpdate(phoneFromProfile);
       }, 5000);
     } else {
-      console.log('No phone found in profile');
+      console.log('No phone or account found');
       localStorage.removeItem("tm_phone");
     }
     
@@ -132,7 +132,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         clearInterval(pollingIntervalRef.current);
       }
     };
-  }, [profile]);
+  }, [profile, currentAccountId]);
 
   // Listen for changes in showBalance preference
   useEffect(() => {
@@ -156,11 +156,14 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     if (!initialLoadComplete) {
       setLoadingMovimientos(true);
     }
+    if (!currentAccountId) return;
+    
     try {
       const phoneDigits = phoneNumber.replace(/\D/g, "");
       const { data: gastos, error } = await (supabase as any)
         .from('gastos')
         .select('*')
+        .eq('account_id', currentAccountId)
         .eq('telefono', phoneDigits)
         .order('fecha', { ascending: false })
         .limit(5);
@@ -181,11 +184,14 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
   };
 
   const fetchMovimientosUpdate = async (phoneNumber: string) => {
+    if (!currentAccountId) return;
+    
     try {
       const phoneDigits = phoneNumber.replace(/\D/g, "");
       const { data: gastos, error } = await (supabase as any)
         .from('gastos')
         .select('*')
+        .eq('account_id', currentAccountId)
         .eq('telefono', phoneDigits)
         .order('fecha', { ascending: false })
         .limit(5);
@@ -205,6 +211,8 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
   };
 
   const fetchAllMovimientos = async (phoneNumber: string) => {
+    if (!currentAccountId) return;
+    
     try {
       const phoneDigits = phoneNumber.replace(/\D/g, "");
       const now = getCurrentDateInSantiago();
@@ -219,6 +227,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
       const { data: gastos, error } = await (supabase as any)
         .from('gastos')
         .select('*')
+        .eq('account_id', currentAccountId)
         .eq('telefono', phoneDigits)
         .gte('fecha', startDate)
         .lte('fecha', endDate)
@@ -235,6 +244,8 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
   };
 
   const fetchAllMovimientosUpdate = async (phoneNumber: string) => {
+    if (!currentAccountId) return;
+    
     try {
       const phoneDigits = phoneNumber.replace(/\D/g, "");
       const now = getCurrentDateInSantiago();
@@ -249,6 +260,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
       const { data: gastos, error } = await (supabase as any)
         .from('gastos')
         .select('*')
+        .eq('account_id', currentAccountId)
         .eq('telefono', phoneDigits)
         .gte('fecha', startDate)
         .lte('fecha', endDate)

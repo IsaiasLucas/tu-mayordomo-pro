@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
-export function useReportes() {
+export function useReportes(accountId?: string | null) {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
@@ -10,7 +10,7 @@ export function useReportes() {
 
   useEffect(() => {
     const fetchReportes = async () => {
-      if (!user || !profile?.phone_personal) {
+      if (!user || !profile?.phone_personal || !accountId) {
         setLoading(false);
         return;
       }
@@ -20,6 +20,7 @@ export function useReportes() {
           .from('reportes')
           .select('*')
           .eq('user_id', user.id)
+          .eq('account_id', accountId)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -32,7 +33,7 @@ export function useReportes() {
     };
 
     fetchReportes();
-  }, [user, profile]);
+  }, [user, profile, accountId]);
 
   return { items, loading, error };
 }
