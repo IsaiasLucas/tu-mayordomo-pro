@@ -46,7 +46,7 @@ export default function Auth() {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -56,10 +56,33 @@ export default function Auth() {
 
         if (error) throw error;
 
-        toast({
-          title: "Registro realizado",
-          description: "Verifica tu email para confirmar la cuenta",
-        });
+        // Se a sessão foi criada automaticamente (email confirmation desativado)
+        if (data.session) {
+          toast({
+            title: "Cuenta creada",
+            description: "Bienvenido a Tu Mayordomo",
+          });
+          // O listener onAuthStateChange vai redirecionar automaticamente
+        } else {
+          // Se precisa confirmar email, tenta fazer login imediatamente
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (signInError) {
+            // Se não conseguiu fazer login, mostra mensagem para verificar email
+            toast({
+              title: "Registro realizado",
+              description: "Verifica tu email para confirmar la cuenta",
+            });
+          } else {
+            toast({
+              title: "Cuenta creada",
+              description: "Bienvenido a Tu Mayordomo",
+            });
+          }
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
