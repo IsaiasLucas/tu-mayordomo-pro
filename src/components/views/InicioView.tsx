@@ -152,10 +152,9 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     
     try {
       const phoneDigits = phoneNumber.replace(/\D/g, "");
-      const { data: gastos, error } = await (supabase as any)
+      const { data: gastos, error } = await supabase
         .from('gastos')
         .select('*')
-        .eq('account_id', currentAccountId)
         .eq('telefono', phoneDigits)
         .order('fecha', { ascending: false })
         .limit(5);
@@ -180,10 +179,9 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     
     try {
       const phoneDigits = phoneNumber.replace(/\D/g, "");
-      const { data: gastos, error } = await (supabase as any)
+      const { data: gastos, error } = await supabase
         .from('gastos')
         .select('*')
-        .eq('account_id', currentAccountId)
         .eq('telefono', phoneDigits)
         .order('fecha', { ascending: false })
         .limit(5);
@@ -216,10 +214,9 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         0
       ).toISOString().split('T')[0];
       
-      const { data: gastos, error } = await (supabase as any)
+      const { data: gastos, error } = await supabase
         .from('gastos')
         .select('*')
-        .eq('account_id', currentAccountId)
         .eq('telefono', phoneDigits)
         .gte('fecha', startDate)
         .lte('fecha', endDate)
@@ -249,10 +246,9 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         0
       ).toISOString().split('T')[0];
       
-      const { data: gastos, error } = await (supabase as any)
+      const { data: gastos, error } = await supabase
         .from('gastos')
         .select('*')
-        .eq('account_id', currentAccountId)
         .eq('telefono', phoneDigits)
         .gte('fecha', startDate)
         .lte('fecha', endDate)

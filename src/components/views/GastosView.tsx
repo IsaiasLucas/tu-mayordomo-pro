@@ -61,10 +61,9 @@ export default function GastosView() {
           0
         ).toISOString().split('T')[0];
         
-        const { data: gastos, error } = await (supabase as any)
+        const { data: gastos, error } = await supabase
           .from('gastos')
           .select('*')
-          .eq('account_id', currentAccountId)
           .eq('telefono', phoneDigits)
           .gte('fecha', startDate)
           .lte('fecha', endDate)

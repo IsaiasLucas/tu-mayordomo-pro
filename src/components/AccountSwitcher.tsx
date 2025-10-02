@@ -69,6 +69,32 @@ export default function AccountSwitcher() {
       return;
     }
 
+    // Validar telefone se fornecido
+    if (newAccountPhone.trim()) {
+      const phoneDigits = newAccountPhone.replace(/\D/g, "");
+      if (phoneDigits.length < 8) {
+        toast({
+          title: "Error",
+          description: "El teléfono debe tener al menos 8 dígitos",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    // Validar email se fornecido
+    if (newAccountEmail.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(newAccountEmail.trim())) {
+        toast({
+          title: "Error",
+          description: "Email inválido",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     const result = await addAccount(
       newAccountName.trim(),
       newAccountEmail.trim() || undefined,
@@ -219,6 +245,9 @@ export default function AccountSwitcher() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Agregar nueva cuenta</DialogTitle>
+            <DialogDescription>
+              Crea una nueva cuenta para organizar diferentes números de teléfono y gastos separadamente.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -228,16 +257,7 @@ export default function AccountSwitcher() {
                 placeholder="Ej: Trabajo, Personal, etc."
                 value={newAccountName}
                 onChange={(e) => setNewAccountName(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email (opcional)</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="correo@ejemplo.com"
-                value={newAccountEmail}
-                onChange={(e) => setNewAccountEmail(e.target.value)}
+                maxLength={100}
               />
             </div>
             <div className="space-y-2">
@@ -247,6 +267,21 @@ export default function AccountSwitcher() {
                 placeholder="+56912345678"
                 value={newAccountPhone}
                 onChange={(e) => setNewAccountPhone(e.target.value)}
+                maxLength={20}
+              />
+              <p className="text-xs text-muted-foreground">
+                Los gastos de este número aparecerán en esta cuenta
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email (opcional)</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="correo@ejemplo.com"
+                value={newAccountEmail}
+                onChange={(e) => setNewAccountEmail(e.target.value)}
+                maxLength={255}
               />
             </div>
           </div>
