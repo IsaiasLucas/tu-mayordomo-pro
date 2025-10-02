@@ -53,14 +53,18 @@ export default function GastosView() {
   }, []);
 
   useEffect(() => {
-    if (!phone) return;
-
     const fetchData = async () => {
       if (!initialLoadComplete) {
         setLoading(true);
       }
       try {
-        const phoneDigits = phone.replace(/\D/g, "");
+        // Get authenticated user
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setLoading(false);
+          return;
+        }
+
         const startDate = `${selectedMonth}-01`;
         const endDate = new Date(
           parseInt(selectedMonth.split('-')[0]), 
@@ -68,10 +72,10 @@ export default function GastosView() {
           0
         ).toISOString().split('T')[0];
         
-        const { data: gastos, error } = await (supabase as any)
+        const { data: gastos, error } = await supabase
           .from('gastos')
           .select('*')
-          .eq('telefono', phoneDigits)
+          .eq('user_id', user.id)
           .gte('fecha', startDate)
           .lte('fecha', endDate)
           .order('fecha', { ascending: false });
@@ -120,7 +124,7 @@ export default function GastosView() {
         clearInterval(pollingIntervalRef.current);
       }
     };
-  }, [phone, selectedMonth]);
+  }, [selectedMonth]);
 
   const handleDownloadPDF = () => {
     const doc = new jsPDF();

@@ -121,8 +121,8 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
       localStorage.setItem("tm_phone", phoneFromProfile);
       
       // Initial load
-      fetchMovimientos(phoneFromProfile);
-      fetchAllMovimientos(phoneFromProfile);
+      fetchMovimientos();
+      fetchAllMovimientos();
       
       // Setup polling every 5 seconds
       if (pollingIntervalRef.current) {
@@ -130,8 +130,8 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
       }
       
       pollingIntervalRef.current = setInterval(() => {
-        fetchMovimientosUpdate(phoneFromProfile);
-        fetchAllMovimientosUpdate(phoneFromProfile);
+        fetchMovimientosUpdate();
+        fetchAllMovimientosUpdate();
       }, 5000);
     } else {
       console.log('No phone found in profile');
@@ -167,16 +167,19 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     };
   }, []);
 
-  const fetchMovimientos = async (phoneNumber: string) => {
+  const fetchMovimientos = async () => {
     if (!initialLoadComplete) {
       setLoadingMovimientos(true);
     }
     try {
-      const phoneDigits = phoneNumber.replace(/\D/g, "");
-      const { data: gastos, error } = await (supabase as any)
+      // Get authenticated user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: gastos, error } = await supabase
         .from('gastos')
         .select('*')
-        .eq('telefono', phoneDigits)
+        .eq('user_id', user.id)
         .order('fecha', { ascending: false })
         .limit(5);
 
@@ -195,13 +198,16 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     }
   };
 
-  const fetchMovimientosUpdate = async (phoneNumber: string) => {
+  const fetchMovimientosUpdate = async () => {
     try {
-      const phoneDigits = phoneNumber.replace(/\D/g, "");
-      const { data: gastos, error } = await (supabase as any)
+      // Get authenticated user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: gastos, error } = await supabase
         .from('gastos')
         .select('*')
-        .eq('telefono', phoneDigits)
+        .eq('user_id', user.id)
         .order('fecha', { ascending: false })
         .limit(5);
 
@@ -219,9 +225,12 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     }
   };
 
-  const fetchAllMovimientos = async (phoneNumber: string) => {
+  const fetchAllMovimientos = async () => {
     try {
-      const phoneDigits = phoneNumber.replace(/\D/g, "");
+      // Get authenticated user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
       const now = getCurrentDateInSantiago();
       const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       const startDate = `${mes}-01`;
@@ -231,10 +240,10 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         0
       ).toISOString().split('T')[0];
       
-      const { data: gastos, error } = await (supabase as any)
+      const { data: gastos, error } = await supabase
         .from('gastos')
         .select('*')
-        .eq('telefono', phoneDigits)
+        .eq('user_id', user.id)
         .gte('fecha', startDate)
         .lte('fecha', endDate)
         .order('fecha', { ascending: false });
@@ -249,9 +258,12 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     }
   };
 
-  const fetchAllMovimientosUpdate = async (phoneNumber: string) => {
+  const fetchAllMovimientosUpdate = async () => {
     try {
-      const phoneDigits = phoneNumber.replace(/\D/g, "");
+      // Get authenticated user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
       const now = getCurrentDateInSantiago();
       const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       const startDate = `${mes}-01`;
@@ -261,10 +273,10 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         0
       ).toISOString().split('T')[0];
       
-      const { data: gastos, error } = await (supabase as any)
+      const { data: gastos, error } = await supabase
         .from('gastos')
         .select('*')
-        .eq('telefono', phoneDigits)
+        .eq('user_id', user.id)
         .gte('fecha', startDate)
         .lte('fecha', endDate)
         .order('fecha', { ascending: false });
@@ -297,8 +309,8 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     setPhone(storedPhone);
     
     if (storedPhone) {
-      fetchMovimientos(storedPhone);
-      fetchAllMovimientos(storedPhone);
+      fetchMovimientos();
+      fetchAllMovimientos();
     }
   };
 
