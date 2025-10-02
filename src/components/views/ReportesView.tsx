@@ -191,7 +191,8 @@ export default function ReportesView() {
   const generar = async (
     tipo: "semanal" | "mensual" | "custom" | "semanal_actual" | "mensual_actual"
   ) => {
-    if (!user || !profile?.phone_personal) {
+    const phone = profile?.phone_personal || profile?.phone_empresa;
+    if (!user || !phone) {
       toast({
         title: "Error",
         description: "Es necesario tener un teléfono registrado para generar reportes.",
@@ -262,7 +263,7 @@ export default function ReportesView() {
         .from('reportes')
         .insert({
           user_id: user.id,
-          phone: profile.phone_personal,
+          phone: phone,
           tipo: tipo,
           periodo: periodo,
           data: { movimientos_count: movimientos.length }
