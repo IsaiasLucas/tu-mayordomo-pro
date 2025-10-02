@@ -8,7 +8,7 @@ import ReportesView from "@/components/views/ReportesView";
 import PlanesView from "@/components/views/PlanesView";
 import PerfilView from "@/components/views/PerfilView";
 import CompleteProfileModal from "@/components/CompleteProfileModal";
-import AccountSwitcher from "@/components/AccountSwitcher";
+
 import InstallPrompt from "@/components/InstallPrompt";
 import { toast } from "@/hooks/use-toast";
 
@@ -102,15 +102,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header fixo com Account Switcher */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground border-b border-primary-glow/20 shadow-md">
-        <div className="container mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h1 className="text-base sm:text-lg font-bold">Tu Mayordomo</h1>
-          </div>
-          <AccountSwitcher />
-        </div>
-      </header>
 
       <Navigation
         currentView={currentView}
@@ -120,7 +111,7 @@ const Index = () => {
         onPhoneFilterChange={handlePhoneFilterChange}
       />
       
-      <main className="pb-24 pt-16">
+      <main className="pb-24">
         {renderCurrentView()}
       </main>
 
