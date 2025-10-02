@@ -66,6 +66,17 @@ export default function AccountSwitcher() {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Validar tipo de arquivo
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!validTypes.includes(file.type.toLowerCase())) {
+        toast({
+          title: "Error",
+          description: "Solo se permiten imágenes JPG o PNG",
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (file.size > 2 * 1024 * 1024) {
         toast({
           title: "Error",
@@ -331,7 +342,7 @@ export default function AccountSwitcher() {
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/jpg,image/png"
                     onChange={handleAvatarChange}
                     className="hidden"
                   />
