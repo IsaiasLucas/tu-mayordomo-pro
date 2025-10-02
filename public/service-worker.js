@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tu-mayordomo-v1';
+const CACHE_NAME = 'tu-mayordomo-v2';
 const OFFLINE_URL = '/offline.html';
 const urlsToCache = [
   '/',
@@ -6,7 +6,8 @@ const urlsToCache = [
   '/offline.html',
   '/icon-192.png',
   '/icon-512.png',
-  '/apple-touch-icon.png'
+  '/apple-touch-icon.png',
+  '/favicon.png'
 ];
 
 // Install event - cache essential files
