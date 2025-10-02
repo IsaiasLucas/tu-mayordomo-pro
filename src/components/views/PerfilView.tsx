@@ -100,8 +100,10 @@ const PerfilView = () => {
 
   const handleSignOut = async () => {
     try {
+      setLoading(true);
       await signOut();
-      navigate("/auth");
+      // Use window.location for reliable redirect
+      window.location.href = "/auth";
     } catch (error) {
       console.error("Error signing out:", error);
       toast({
@@ -109,6 +111,7 @@ const PerfilView = () => {
         description: "No se pudo cerrar sesión. Intenta nuevamente.",
         variant: "destructive",
       });
+      setLoading(false);
     }
   };
 
@@ -605,10 +608,11 @@ const PerfilView = () => {
                 <Button 
                   variant="outline" 
                   onClick={handleSignOut}
+                  disabled={loading}
                   className="w-full rounded-2xl py-3 justify-start"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  Salir
+                  {loading ? "Cerrando sesión..." : "Salir"}
                 </Button>
               </div>
             </div>
