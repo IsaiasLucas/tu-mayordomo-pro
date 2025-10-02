@@ -123,6 +123,16 @@ export default function Auth() {
         <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-6 lg:gap-8 items-center">
           {/* Left side - Branding */}
           <div className="flex flex-col space-y-4 sm:space-y-6 lg:space-y-8 text-white">
+            {/* Mobile header */}
+            <div className="lg:hidden text-center space-y-3 animate-fade-in">
+              <h1 className="text-3xl sm:text-4xl font-bold">
+                Gestión Financiera<br />
+                <span className="bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                  Inteligente
+                </span>
+              </h1>
+            </div>
+
             {/* Desktop full branding */}
             <div className="hidden lg:block space-y-4 animate-fade-in">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
