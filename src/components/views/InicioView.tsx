@@ -106,6 +106,17 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     
     // Check if phone exists and is not empty
     if (phoneFromProfile && phoneFromProfile.trim() !== '') {
+      const phoneDigits = phoneFromProfile.replace(/\D/g, "");
+      const cachedPhone = localStorage.getItem("tm_phone")?.replace(/\D/g, "");
+      
+      // Clear cache if phone changed (different user)
+      if (cachedPhone && cachedPhone !== phoneDigits) {
+        localStorage.removeItem('tm_movimientos_cache');
+        localStorage.removeItem('tm_all_movimientos_cache');
+        setMovimientos([]);
+        setAllMovimientos([]);
+      }
+      
       setPhone(phoneFromProfile);
       localStorage.setItem("tm_phone", phoneFromProfile);
       
@@ -125,6 +136,10 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     } else {
       console.log('No phone found in profile');
       localStorage.removeItem("tm_phone");
+      localStorage.removeItem('tm_movimientos_cache');
+      localStorage.removeItem('tm_all_movimientos_cache');
+      setMovimientos([]);
+      setAllMovimientos([]);
     }
     
     return () => {

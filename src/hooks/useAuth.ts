@@ -96,6 +96,9 @@ export function useAuth() {
     // Clear all localStorage data on logout
     localStorage.removeItem('tm_phone');
     localStorage.removeItem('tm_nombre');
+    localStorage.removeItem('tm_movimientos_cache');
+    localStorage.removeItem('tm_all_movimientos_cache');
+    localStorage.removeItem('tm_show_balance');
     await supabase.auth.signOut();
   };
 
