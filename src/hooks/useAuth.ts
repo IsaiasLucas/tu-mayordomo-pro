@@ -53,10 +53,9 @@ export function useAuth() {
         setProfile(data);
         
         // Check subscription status only - removed sync from sheets
-        // COMMENTED FOR MANUAL TESTING - Uncomment to enable Stripe sync
-        // setTimeout(() => {
-        //   checkSubscriptionStatus();
-        // }, 0);
+        setTimeout(() => {
+          checkSubscriptionStatus();
+        }, 0);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
