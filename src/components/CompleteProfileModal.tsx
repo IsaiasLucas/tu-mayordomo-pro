@@ -119,6 +119,9 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
         description: "Tus datos han sido guardados correctamente.",
       });
 
+      // Force page reload to update profile state
+      window.location.reload();
+      
       onClose();
     } catch (error) {
       console.error("Error al guardar datos:", error);
