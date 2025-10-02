@@ -98,6 +98,7 @@ export type Database = {
           subtipo: string | null
           telefono: string
           tipo: string | null
+          user_id: string | null
         }
         Insert: {
           account_id?: string | null
@@ -111,6 +112,7 @@ export type Database = {
           subtipo?: string | null
           telefono: string
           tipo?: string | null
+          user_id?: string | null
         }
         Update: {
           account_id?: string | null
@@ -124,6 +126,7 @@ export type Database = {
           subtipo?: string | null
           telefono?: string
           tipo?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -295,6 +298,7 @@ export type Database = {
           telefono: string
           usage_count: number | null
           usage_month: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -306,6 +310,7 @@ export type Database = {
           telefono: string
           usage_count?: number | null
           usage_month?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -317,6 +322,7 @@ export type Database = {
           telefono?: string
           usage_count?: number | null
           usage_month?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
