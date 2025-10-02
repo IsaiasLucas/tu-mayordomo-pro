@@ -14,8 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      accounts: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       entities: {
         Row: {
+          account_id: string | null
           created_at: string
           id: string
           nombre_legal: string | null
@@ -25,6 +56,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           created_at?: string
           id?: string
           nombre_legal?: string | null
@@ -34,6 +66,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string | null
           created_at?: string
           id?: string
           nombre_legal?: string | null
@@ -42,10 +75,19 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "entities_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       gastos: {
         Row: {
+          account_id: string | null
           categoria: string | null
           created_at: string | null
           descripcion: string | null
@@ -58,6 +100,7 @@ export type Database = {
           tipo: string | null
         }
         Insert: {
+          account_id?: string | null
           categoria?: string | null
           created_at?: string | null
           descripcion?: string | null
@@ -70,6 +113,7 @@ export type Database = {
           tipo?: string | null
         }
         Update: {
+          account_id?: string | null
           categoria?: string | null
           created_at?: string | null
           descripcion?: string | null
@@ -81,7 +125,15 @@ export type Database = {
           telefono?: string
           tipo?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "gastos_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -104,6 +156,7 @@ export type Database = {
           student_verified: boolean | null
           updated_at: string
           user_id: string
+          whatsapp_configured: boolean | null
         }
         Insert: {
           avatar_url?: string | null
@@ -125,6 +178,7 @@ export type Database = {
           student_verified?: boolean | null
           updated_at?: string
           user_id: string
+          whatsapp_configured?: boolean | null
         }
         Update: {
           avatar_url?: string | null
@@ -146,11 +200,13 @@ export type Database = {
           student_verified?: boolean | null
           updated_at?: string
           user_id?: string
+          whatsapp_configured?: boolean | null
         }
         Relationships: []
       }
       reportes: {
         Row: {
+          account_id: string | null
           created_at: string
           data: Json | null
           id: string
@@ -162,6 +218,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           created_at?: string
           data?: Json | null
           id?: string
@@ -173,6 +230,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string | null
           created_at?: string
           data?: Json | null
           id?: string
@@ -183,7 +241,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "reportes_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       student_verifications: {
         Row: {

@@ -92,7 +92,8 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
         .update({
           display_name: nombre,
           [phoneField]: whatsapp,
-          entidad: tipo === "Empresa" ? "empresa" : "personal"
+          entidad: tipo === "Empresa" ? "empresa" : "personal",
+          whatsapp_configured: true
         })
         .eq('user_id', user.id);
 
@@ -147,10 +148,10 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
             </div>
             <div>
               <DialogTitle className="text-xl">
-                Completa tus datos para activar Tu Mayordomo
+                Configura tu WhatsApp
               </DialogTitle>
               <DialogDescription className="text-sm text-muted-foreground mt-1">
-                Vincula tu WhatsApp para gestionar tus gastos
+                Conecta tu WhatsApp una sola vez para comenzar a gestionar tus gastos
               </DialogDescription>
             </div>
           </div>
