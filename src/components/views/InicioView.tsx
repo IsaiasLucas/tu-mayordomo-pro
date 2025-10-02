@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import HeroOverview from "../HeroOverview";
 import { useAuth } from "@/hooks/useAuth";
-import { useCurrentAccount } from "@/hooks/useCurrentAccount";
+import { useGastos } from "@/hooks/useGastos";
 import { fmtCLP } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -28,7 +28,8 @@ interface Movimiento {
 
 const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
   const { profile, loading } = useAuth();
-  const { currentAccountId, currentAccount } = useCurrentAccount();
+  const { items: gastos } = useGastos();
+  const [phone, setPhone] = useState<string | null>(null);
   const [movimientos, setMovimientos] = useState<Movimiento[]>(() => {
     const cached = localStorage.getItem('tm_movimientos_cache');
     return cached ? JSON.parse(cached) : [];
@@ -99,14 +100,18 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
 
   const variacionDiaria = calcularVariacionDiaria();
 
-  const phone = currentAccount?.phone;
-
   useEffect(() => {
-    // Check if phone exists and is not empty and currentAccountId is available
-    if (phone && phone.trim() !== '' && currentAccountId) {
+    // Check phone from profile (Supabase) first
+    const phoneFromProfile = profile?.phone_personal || profile?.phone_empresa;
+    
+    // Check if phone exists and is not empty
+    if (phoneFromProfile && phoneFromProfile.trim() !== '') {
+      setPhone(phoneFromProfile);
+      localStorage.setItem("tm_phone", phoneFromProfile);
+      
       // Initial load
-      fetchMovimientos(phone);
-      fetchAllMovimientos(phone);
+      fetchMovimientos(phoneFromProfile);
+      fetchAllMovimientos(phoneFromProfile);
       
       // Setup polling every 5 seconds
       if (pollingIntervalRef.current) {
@@ -114,9 +119,12 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
       }
       
       pollingIntervalRef.current = setInterval(() => {
-        fetchMovimientosUpdate(phone);
-        fetchAllMovimientosUpdate(phone);
+        fetchMovimientosUpdate(phoneFromProfile);
+        fetchAllMovimientosUpdate(phoneFromProfile);
       }, 5000);
+    } else {
+      console.log('No phone found in profile');
+      localStorage.removeItem("tm_phone");
     }
     
     return () => {
@@ -124,7 +132,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         clearInterval(pollingIntervalRef.current);
       }
     };
-  }, [phone, currentAccountId]);
+  }, [profile]);
 
   // Listen for changes in showBalance preference
   useEffect(() => {
@@ -148,11 +156,9 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     if (!initialLoadComplete) {
       setLoadingMovimientos(true);
     }
-    if (!currentAccountId) return;
-    
     try {
       const phoneDigits = phoneNumber.replace(/\D/g, "");
-      const { data: gastos, error } = await supabase
+      const { data: gastos, error } = await (supabase as any)
         .from('gastos')
         .select('*')
         .eq('telefono', phoneDigits)
@@ -175,11 +181,9 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
   };
 
   const fetchMovimientosUpdate = async (phoneNumber: string) => {
-    if (!currentAccountId) return;
-    
     try {
       const phoneDigits = phoneNumber.replace(/\D/g, "");
-      const { data: gastos, error } = await supabase
+      const { data: gastos, error } = await (supabase as any)
         .from('gastos')
         .select('*')
         .eq('telefono', phoneDigits)
@@ -201,8 +205,6 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
   };
 
   const fetchAllMovimientos = async (phoneNumber: string) => {
-    if (!currentAccountId) return;
-    
     try {
       const phoneDigits = phoneNumber.replace(/\D/g, "");
       const now = getCurrentDateInSantiago();
@@ -214,7 +216,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         0
       ).toISOString().split('T')[0];
       
-      const { data: gastos, error } = await supabase
+      const { data: gastos, error } = await (supabase as any)
         .from('gastos')
         .select('*')
         .eq('telefono', phoneDigits)
@@ -233,8 +235,6 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
   };
 
   const fetchAllMovimientosUpdate = async (phoneNumber: string) => {
-    if (!currentAccountId) return;
-    
     try {
       const phoneDigits = phoneNumber.replace(/\D/g, "");
       const now = getCurrentDateInSantiago();
@@ -246,7 +246,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         0
       ).toISOString().split('T')[0];
       
-      const { data: gastos, error } = await supabase
+      const { data: gastos, error } = await (supabase as any)
         .from('gastos')
         .select('*')
         .eq('telefono', phoneDigits)
@@ -276,6 +276,16 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     }
   };
 
+  const handleProfileModalClose = () => {
+    // Verificar si ahora hay phone guardado
+    const storedPhone = localStorage.getItem("tm_phone");
+    setPhone(storedPhone);
+    
+    if (storedPhone) {
+      fetchMovimientos(storedPhone);
+      fetchAllMovimientos(storedPhone);
+    }
+  };
 
   return (
     <main className="px-5 py-5 pb-32 space-y-5">
@@ -287,7 +297,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
               {profile?.display_name || profile?.name || 'Usuario'}
             </h1>
             <p className="text-base opacity-90 truncate">
-              {currentAccount?.name || 'Cuenta'}
+              {phone || 'Sin teléfono'}
             </p>
           </div>
           {profile?.plan && profile.plan !== "free" && (
@@ -400,8 +410,17 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
           {!phone ? (
             <Alert className="bg-yellow-50 border-yellow-200 rounded-xl">
               <AlertCircle className="h-5 w-5 text-yellow-600" />
-              <AlertDescription className="text-yellow-900 text-base">
-                Esta cuenta no tiene un número de teléfono configurado.
+              <AlertDescription className="flex flex-col gap-3">
+                <span className="text-yellow-900 text-base">
+                  Confirma tu WhatsApp para ver transacciones
+                </span>
+                <Button
+                  variant="outline"
+                  onClick={onOpenProfileModal}
+                  className="w-full h-11 text-base"
+                >
+                  Añadir ahora
+                </Button>
               </AlertDescription>
             </Alert>
           ) : loadingMovimientos ? (

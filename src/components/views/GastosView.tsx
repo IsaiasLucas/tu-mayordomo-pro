@@ -13,7 +13,6 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import CompleteProfileModal from "@/components/CompleteProfileModal";
 import { supabase } from "@/integrations/supabase/client";
-import { useCurrentAccount } from "@/hooks/useCurrentAccount";
 
 interface Movement {
   id: string;
@@ -31,10 +30,10 @@ interface MonthData {
 }
 
 export default function GastosView() {
-  const { currentAccountId, currentAccount } = useCurrentAccount();
   const [selectedMonth, setSelectedMonth] = useState<string>(
     format(new Date(), "yyyy-MM")
   );
+  const [phone, setPhone] = useState<string | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [data, setData] = useState<MonthData>({ items: [], totalIngresos: 0, totalGastos: 0, saldo: 0 });
   const [loading, setLoading] = useState(false);
@@ -43,10 +42,18 @@ export default function GastosView() {
   const itemsPerPage = 50;
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const phone = currentAccount?.phone;
+  useEffect(() => {
+    const storedPhone = localStorage.getItem("tm_phone");
+    setPhone(storedPhone);
+    
+    // Si no hay phone, mostrar modal
+    if (!storedPhone) {
+      setShowProfileModal(true);
+    }
+  }, []);
 
   useEffect(() => {
-    if (!phone || !currentAccountId) return;
+    if (!phone) return;
 
     const fetchData = async () => {
       if (!initialLoadComplete) {
@@ -61,7 +68,7 @@ export default function GastosView() {
           0
         ).toISOString().split('T')[0];
         
-        const { data: gastos, error } = await supabase
+        const { data: gastos, error } = await (supabase as any)
           .from('gastos')
           .select('*')
           .eq('telefono', phoneDigits)
@@ -113,7 +120,7 @@ export default function GastosView() {
         clearInterval(pollingIntervalRef.current);
       }
     };
-  }, [phone, selectedMonth, currentAccountId]);
+  }, [phone, selectedMonth]);
 
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
@@ -173,6 +180,13 @@ export default function GastosView() {
     doc.save(fileName);
   };
 
+  const handleProfileModalClose = () => {
+    // Verificar si ahora hay phone guardado
+    const storedPhone = localStorage.getItem("tm_phone");
+    setPhone(storedPhone);
+    setShowProfileModal(false);
+  };
+
   if (!phone) {
     return (
       <>
@@ -180,10 +194,14 @@ export default function GastosView() {
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              ⚠️ Esta cuenta no tiene un número de teléfono configurado. Edita la cuenta para agregar uno.
+              ⚠️ Falta confirmar tu WhatsApp para vincular tu cuenta.
             </AlertDescription>
           </Alert>
         </div>
+        <CompleteProfileModal 
+          open={showProfileModal}
+          onClose={handleProfileModalClose}
+        />
       </>
     );
   }

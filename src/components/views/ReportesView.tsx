@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useReportes } from "@/hooks/useReportes";
 import { useAuth } from "@/hooks/useAuth";
-import { useCurrentAccount } from "@/hooks/useCurrentAccount";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,9 +25,8 @@ interface Movimiento {
 }
 
 export default function ReportesView() {
+  const { items, loading } = useReportes();
   const { user, profile } = useAuth();
-  const { currentAccountId, currentAccount } = useCurrentAccount();
-  const { items, loading } = useReportes(currentAccountId);
   const { toast } = useToast();
   const [generating, setGenerating] = useState<string | null>(null);
   const [chartData, setChartData] = useState<any[]>([]);
@@ -42,8 +40,8 @@ export default function ReportesView() {
   const COLORS = ['#4F46E5', '#EC4899', '#10B981', '#F59E0B', '#6366F1', '#8B5CF6', '#14B8A6', '#F97316'];
 
   const fetchMovimientos = async (startDate: Date, endDate: Date): Promise<Movimiento[]> => {
-    const phone = currentAccount?.phone;
-    if (!phone || !currentAccountId) return [];
+    const phone = profile?.phone_personal || profile?.phone_empresa;
+    if (!phone) return [];
 
     try {
       const phoneDigits = phone.replace(/\D/g, "");
@@ -95,7 +93,7 @@ export default function ReportesView() {
 
   useEffect(() => {
     const loadCurrentMonthData = async () => {
-      if (!isPro || !currentAccount?.phone) return;
+      if (!isPro || !profile?.phone_personal) return;
       
       const now = new Date();
       const startDate = startOfMonth(now);
@@ -118,7 +116,7 @@ export default function ReportesView() {
     };
 
     loadCurrentMonthData();
-  }, [isPro, currentAccount]);
+  }, [isPro, profile]);
 
   const generatePDF = (movimientos: Movimiento[], tipo: string, periodo: string) => {
     const doc = new jsPDF();
@@ -193,10 +191,10 @@ export default function ReportesView() {
   const generar = async (
     tipo: "semanal" | "mensual" | "custom" | "semanal_actual" | "mensual_actual"
   ) => {
-    if (!user || !currentAccount?.phone) {
+    if (!user || !profile?.phone_personal) {
       toast({
         title: "Error",
-        description: "Esta cuenta necesita tener un teléfono registrado para generar reportes.",
+        description: "Es necesario tener un teléfono registrado para generar reportes.",
         variant: "destructive",
       });
       return;
@@ -264,8 +262,7 @@ export default function ReportesView() {
         .from('reportes')
         .insert({
           user_id: user.id,
-          account_id: currentAccountId,
-          phone: currentAccount.phone,
+          phone: profile.phone_personal,
           tipo: tipo,
           periodo: periodo,
           data: { movimientos_count: movimientos.length }
