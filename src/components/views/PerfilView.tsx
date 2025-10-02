@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -51,6 +52,7 @@ import {
 const PerfilView = () => {
   const { user, profile, signOut } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [showBalance, setShowBalance] = useState(() => {
     const saved = localStorage.getItem("tm_show_balance");
     return saved === null ? true : saved === "true";
@@ -95,6 +97,20 @@ const PerfilView = () => {
     }).format(amount);
   };
 
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate("/auth");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo cerrar sesión. Intenta nuevamente.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleExportData = async () => {
     try {
@@ -588,7 +604,7 @@ const PerfilView = () => {
                 </Button>
                 <Button 
                   variant="outline" 
-                  onClick={signOut}
+                  onClick={handleSignOut}
                   className="w-full rounded-2xl py-3 justify-start"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
