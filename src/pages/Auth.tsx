@@ -54,6 +54,30 @@ export default function Auth() {
           }
         });
 
+        // Si el usuario ya existe, intentar hacer login automáticamente
+        if (error && error.message === "User already registered") {
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+          
+          if (signInError) {
+            toast({
+              title: "Error",
+              description: "Este correo ya está registrado. Verifica tu contraseña.",
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          toast({
+            title: "Bienvenido de nuevo",
+            description: "Accediendo a tu cuenta",
+          });
+          // El listener onAuthStateChange redireccionará automáticamente
+          return;
+        }
+
         if (error) throw error;
 
         toast({
