@@ -108,6 +108,44 @@ export function useCurrentAccount() {
       if (error) throw error;
 
       if (data) {
+        // Se tem telefone, adicionar também em usuarios
+        if (phone && phone.trim() !== '') {
+          const phoneDigits = phone.replace(/\D/g, "");
+          
+          // Verificar se já existe em usuarios
+          const { data: existingUsuario } = await supabase
+            .from("usuarios")
+            .select("*")
+            .eq("telefono", phoneDigits)
+            .maybeSingle();
+
+          if (!existingUsuario) {
+            // Criar registro em usuarios
+            await supabase
+              .from("usuarios")
+              .insert({
+                telefono: phoneDigits,
+                plan: "free",
+                reporte_semanal: true,
+                reporte_mensual: true,
+              });
+          }
+
+          // Atualizar profiles com o novo telefone se for o primeiro
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("phone_personal, phone_empresa")
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+          if (profile && !profile.phone_personal && !profile.phone_empresa) {
+            await supabase
+              .from("profiles")
+              .update({ phone_personal: phone })
+              .eq("user_id", user.id);
+          }
+        }
+
         setAccounts(prev => [data, ...prev]);
         switchToAccount(data.id);
         return data;
