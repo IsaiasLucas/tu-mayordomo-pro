@@ -188,7 +188,9 @@ export default function ReportesView() {
     return doc;
   };
 
-  const generar = async (tipo: "semanal" | "mensual" | "custom") => {
+  const generar = async (
+    tipo: "semanal" | "mensual" | "custom" | "semanal_actual" | "mensual_actual"
+  ) => {
     if (!user || !profile?.phone_personal) {
       toast({
         title: "Error",
@@ -216,14 +218,27 @@ export default function ReportesView() {
       let periodo: string;
 
       if (tipo === "semanal") {
+        // Semana passada
         startDate = startOfWeek(subWeeks(now, 1), { weekStartsOn: 1 });
         endDate = endOfWeek(subWeeks(now, 1), { weekStartsOn: 1 });
         periodo = `${format(startDate, "dd/MM/yyyy")} - ${format(endDate, "dd/MM/yyyy")}`;
       } else if (tipo === "mensual") {
+        // Mês passado
         startDate = startOfMonth(subMonths(now, 1));
         endDate = endOfMonth(subMonths(now, 1));
         periodo = format(startDate, "MMMM yyyy", { locale: es });
+      } else if (tipo === "semanal_actual") {
+        // Semana atual
+        startDate = startOfWeek(now, { weekStartsOn: 1 });
+        endDate = endOfWeek(now, { weekStartsOn: 1 });
+        periodo = `${format(startDate, "dd/MM/yyyy")} - ${format(endDate, "dd/MM/yyyy")}`;
+      } else if (tipo === "mensual_actual") {
+        // Mês atual
+        startDate = startOfMonth(now);
+        endDate = endOfMonth(now);
+        periodo = format(now, "MMMM yyyy", { locale: es });
       } else {
+        // Personalizado
         startDate = customStartDate!;
         endDate = customEndDate!;
         periodo = `${format(startDate, "dd/MM/yyyy")} - ${format(endDate, "dd/MM/yyyy")}`;
@@ -401,7 +416,31 @@ export default function ReportesView() {
             Genera reportes detallados en PDF con análisis por categoría para enviar a tu contador
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+            <Button 
+              onClick={() => generar("semanal_actual")} 
+              className="rounded-xl flex items-center gap-2"
+              disabled={generating !== null}
+            >
+              {generating === "semanal_actual" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              Semana Atual
+            </Button>
+            <Button 
+              onClick={() => generar("mensual_actual")} 
+              className="rounded-xl flex items-center gap-2"
+              disabled={generating !== null}
+            >
+              {generating === "mensual_actual" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              Mes Atual
+            </Button>
             <Button 
               onClick={() => generar("semanal")} 
               className="rounded-xl flex items-center gap-2"
