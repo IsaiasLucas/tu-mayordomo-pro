@@ -31,11 +31,10 @@ interface MonthData {
 }
 
 export default function GastosView() {
-  const { currentAccountId } = useCurrentAccount();
+  const { currentAccountId, currentAccount } = useCurrentAccount();
   const [selectedMonth, setSelectedMonth] = useState<string>(
     format(new Date(), "yyyy-MM")
   );
-  const [phone, setPhone] = useState<string | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [data, setData] = useState<MonthData>({ items: [], totalIngresos: 0, totalGastos: 0, saldo: 0 });
   const [loading, setLoading] = useState(false);
@@ -44,15 +43,7 @@ export default function GastosView() {
   const itemsPerPage = 50;
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    const storedPhone = localStorage.getItem("tm_phone");
-    setPhone(storedPhone);
-    
-    // Si no hay phone, mostrar modal
-    if (!storedPhone) {
-      setShowProfileModal(true);
-    }
-  }, []);
+  const phone = currentAccount?.phone;
 
   useEffect(() => {
     if (!phone || !currentAccountId) return;
@@ -183,13 +174,6 @@ export default function GastosView() {
     doc.save(fileName);
   };
 
-  const handleProfileModalClose = () => {
-    // Verificar si ahora hay phone guardado
-    const storedPhone = localStorage.getItem("tm_phone");
-    setPhone(storedPhone);
-    setShowProfileModal(false);
-  };
-
   if (!phone) {
     return (
       <>
@@ -197,14 +181,10 @@ export default function GastosView() {
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              ⚠️ Falta confirmar tu WhatsApp para vincular tu cuenta.
+              ⚠️ Esta cuenta no tiene un número de teléfono configurado. Edita la cuenta para agregar uno.
             </AlertDescription>
           </Alert>
         </div>
-        <CompleteProfileModal 
-          open={showProfileModal}
-          onClose={handleProfileModalClose}
-        />
       </>
     );
   }

@@ -28,8 +28,7 @@ interface Movimiento {
 
 const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
   const { profile, loading } = useAuth();
-  const { currentAccountId } = useCurrentAccount();
-  const [phone, setPhone] = useState<string | null>(null);
+  const { currentAccountId, currentAccount } = useCurrentAccount();
   const [movimientos, setMovimientos] = useState<Movimiento[]>(() => {
     const cached = localStorage.getItem('tm_movimientos_cache');
     return cached ? JSON.parse(cached) : [];
@@ -100,18 +99,14 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
 
   const variacionDiaria = calcularVariacionDiaria();
 
+  const phone = currentAccount?.phone;
+
   useEffect(() => {
-    // Check phone from profile (Supabase) first
-    const phoneFromProfile = profile?.phone_personal || profile?.phone_empresa;
-    
     // Check if phone exists and is not empty and currentAccountId is available
-    if (phoneFromProfile && phoneFromProfile.trim() !== '' && currentAccountId) {
-      setPhone(phoneFromProfile);
-      localStorage.setItem("tm_phone", phoneFromProfile);
-      
+    if (phone && phone.trim() !== '' && currentAccountId) {
       // Initial load
-      fetchMovimientos(phoneFromProfile);
-      fetchAllMovimientos(phoneFromProfile);
+      fetchMovimientos(phone);
+      fetchAllMovimientos(phone);
       
       // Setup polling every 5 seconds
       if (pollingIntervalRef.current) {
@@ -119,12 +114,9 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
       }
       
       pollingIntervalRef.current = setInterval(() => {
-        fetchMovimientosUpdate(phoneFromProfile);
-        fetchAllMovimientosUpdate(phoneFromProfile);
+        fetchMovimientosUpdate(phone);
+        fetchAllMovimientosUpdate(phone);
       }, 5000);
-    } else {
-      console.log('No phone or account found');
-      localStorage.removeItem("tm_phone");
     }
     
     return () => {
@@ -132,7 +124,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         clearInterval(pollingIntervalRef.current);
       }
     };
-  }, [profile, currentAccountId]);
+  }, [phone, currentAccountId]);
 
   // Listen for changes in showBalance preference
   useEffect(() => {
@@ -288,16 +280,6 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     }
   };
 
-  const handleProfileModalClose = () => {
-    // Verificar si ahora hay phone guardado
-    const storedPhone = localStorage.getItem("tm_phone");
-    setPhone(storedPhone);
-    
-    if (storedPhone) {
-      fetchMovimientos(storedPhone);
-      fetchAllMovimientos(storedPhone);
-    }
-  };
 
   return (
     <main className="px-5 py-5 pb-32 space-y-5">
@@ -309,7 +291,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
               {profile?.display_name || profile?.name || 'Usuario'}
             </h1>
             <p className="text-base opacity-90 truncate">
-              {phone || 'Sin teléfono'}
+              {currentAccount?.name || 'Cuenta'}
             </p>
           </div>
           {profile?.plan && profile.plan !== "free" && (
@@ -422,17 +404,8 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
           {!phone ? (
             <Alert className="bg-yellow-50 border-yellow-200 rounded-xl">
               <AlertCircle className="h-5 w-5 text-yellow-600" />
-              <AlertDescription className="flex flex-col gap-3">
-                <span className="text-yellow-900 text-base">
-                  Confirma tu WhatsApp para ver transacciones
-                </span>
-                <Button
-                  variant="outline"
-                  onClick={onOpenProfileModal}
-                  className="w-full h-11 text-base"
-                >
-                  Añadir ahora
-                </Button>
+              <AlertDescription className="text-yellow-900 text-base">
+                Esta cuenta no tiene un número de teléfono configurado.
               </AlertDescription>
             </Alert>
           ) : loadingMovimientos ? (

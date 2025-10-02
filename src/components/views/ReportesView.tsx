@@ -27,7 +27,7 @@ interface Movimiento {
 
 export default function ReportesView() {
   const { user, profile } = useAuth();
-  const { currentAccountId } = useCurrentAccount();
+  const { currentAccountId, currentAccount } = useCurrentAccount();
   const { items, loading } = useReportes(currentAccountId);
   const { toast } = useToast();
   const [generating, setGenerating] = useState<string | null>(null);
@@ -42,7 +42,7 @@ export default function ReportesView() {
   const COLORS = ['#4F46E5', '#EC4899', '#10B981', '#F59E0B', '#6366F1', '#8B5CF6', '#14B8A6', '#F97316'];
 
   const fetchMovimientos = async (startDate: Date, endDate: Date): Promise<Movimiento[]> => {
-    const phone = profile?.phone_personal || profile?.phone_empresa;
+    const phone = currentAccount?.phone;
     if (!phone || !currentAccountId) return [];
 
     try {
@@ -95,7 +95,7 @@ export default function ReportesView() {
 
   useEffect(() => {
     const loadCurrentMonthData = async () => {
-      if (!isPro || !profile?.phone_personal) return;
+      if (!isPro || !currentAccount?.phone) return;
       
       const now = new Date();
       const startDate = startOfMonth(now);
@@ -118,7 +118,7 @@ export default function ReportesView() {
     };
 
     loadCurrentMonthData();
-  }, [isPro, profile]);
+  }, [isPro, currentAccount]);
 
   const generatePDF = (movimientos: Movimiento[], tipo: string, periodo: string) => {
     const doc = new jsPDF();
@@ -193,10 +193,10 @@ export default function ReportesView() {
   const generar = async (
     tipo: "semanal" | "mensual" | "custom" | "semanal_actual" | "mensual_actual"
   ) => {
-    if (!user || !profile?.phone_personal) {
+    if (!user || !currentAccount?.phone) {
       toast({
         title: "Error",
-        description: "Es necesario tener un teléfono registrado para generar reportes.",
+        description: "Esta cuenta necesita tener un teléfono registrado para generar reportes.",
         variant: "destructive",
       });
       return;
@@ -264,7 +264,8 @@ export default function ReportesView() {
         .from('reportes')
         .insert({
           user_id: user.id,
-          phone: profile.phone_personal,
+          account_id: currentAccountId,
+          phone: currentAccount.phone,
           tipo: tipo,
           periodo: periodo,
           data: { movimientos_count: movimientos.length }

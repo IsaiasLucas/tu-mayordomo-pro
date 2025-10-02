@@ -144,8 +144,11 @@ export function useCurrentAccount() {
     }
   };
 
+  const currentAccount = accounts.find(acc => acc.id === currentAccountId);
+
   return {
     currentAccountId,
+    currentAccount,
     accounts,
     loading,
     switchToAccount,
