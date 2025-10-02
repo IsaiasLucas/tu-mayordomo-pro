@@ -241,11 +241,7 @@ export default function PlanesView() {
       });
       if (error) throw error;
       if (data?.url) {
-        window.open(data.url, '_blank');
-        toast({
-          title: "Redirecionando...",
-          description: "Você será levado para a página de pagamento do Stripe."
-        });
+        window.location.href = data.url;
       }
     } catch (error: any) {
       console.error("Error creating checkout:", error);
