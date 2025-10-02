@@ -14,17 +14,30 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Check, Plus } from "lucide-react";
+import { Check, Plus, Trash2 } from "lucide-react";
 import { useCurrentAccount } from "@/hooks/useCurrentAccount";
 import { toast } from "@/hooks/use-toast";
 
 export default function AccountSwitcher() {
-  const { currentAccountId, accounts, switchToAccount, addAccount } = useCurrentAccount();
+  const { currentAccountId, accounts, switchToAccount, addAccount, deleteAccount } = useCurrentAccount();
   const [open, setOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [accountToDelete, setAccountToDelete] = useState<string | null>(null);
   const [newAccountName, setNewAccountName] = useState("");
   const [newAccountEmail, setNewAccountEmail] = useState("");
   const [newAccountPhone, setNewAccountPhone] = useState("");
@@ -84,6 +97,23 @@ export default function AccountSwitcher() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!accountToDelete) return;
+
+    await deleteAccount(accountToDelete);
+    
+    toast({
+      title: "Cuenta eliminada",
+      description: "La cuenta fue eliminada exitosamente",
+    });
+    
+    setDeleteDialogOpen(false);
+    setAccountToDelete(null);
+    
+    // Recargar página para actualizar queries
+    setTimeout(() => window.location.reload(), 150);
+  };
+
   const currentAccount = accounts.find(acc => acc.id === currentAccountId);
   const currentName = currentAccount?.name || "U";
   const currentAvatar = currentAccount?.avatar_url;
@@ -116,36 +146,55 @@ export default function AccountSwitcher() {
           {accounts.map((account) => {
             const isActive = account.id === currentAccountId;
             return (
-              <DropdownMenuItem
+              <div
                 key={account.id}
-                onClick={() => handleSwitchAccount(account.id)}
                 className={`
-                  flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer
+                  flex items-center gap-2 px-3 py-3 rounded-xl
                   ${isActive ? "bg-primary/5 border border-primary/20" : "hover:bg-muted/50"}
                 `}
               >
-                <Avatar className="h-9 w-9">
-                  <AvatarImage src={account.avatar_url || undefined} />
-                  <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                    {account.name.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+                <div 
+                  className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
+                  onClick={() => handleSwitchAccount(account.id)}
+                >
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage src={account.avatar_url || undefined} />
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                      {account.name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
 
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">
-                    {account.name}
-                  </p>
-                  {account.email && (
-                    <p className="text-xs text-muted-foreground truncate">
-                      {account.email}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">
+                      {account.name}
                     </p>
+                    {account.email && (
+                      <p className="text-xs text-muted-foreground truncate">
+                        {account.email}
+                      </p>
+                    )}
+                  </div>
+
+                  {isActive && (
+                    <Check className="h-4 w-4 text-primary flex-shrink-0" />
                   )}
                 </div>
 
-                {isActive && (
-                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                {accounts.length > 1 && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 flex-shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setAccountToDelete(account.id);
+                      setDeleteDialogOpen(true);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 )}
-              </DropdownMenuItem>
+              </div>
             );
           })}
 
@@ -211,6 +260,28 @@ export default function AccountSwitcher() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar cuenta?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción eliminará permanentemente la cuenta y todos sus datos asociados (gastos, reportes, etc.). Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setAccountToDelete(null)}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAccount}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
