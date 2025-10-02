@@ -316,28 +316,26 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
 
   return (
     <main className="px-5 py-5 pb-32 space-y-5">
-      {/* Saldo do Mês Card */}
+      {/* Saldo do Mês */}
       <div className="bg-gradient-to-br from-primary to-primary-glow text-primary-foreground rounded-2xl p-6 shadow-card">
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5">
-          <p className="text-sm opacity-75 mb-2">Saldo del Mes</p>
-          <div className="flex items-end justify-between gap-3">
-            <p className="text-3xl font-bold truncate">
-              {showBalance ? fmtCLP(saldoMes||0) : "••••••"}
-            </p>
-            {showBalance && (
-              <span className={`px-3 py-1 rounded-full text-sm font-semibold flex-shrink-0 ${
-                variacionDiaria >= 0 
-                  ? "bg-green-500/30 text-green-100" 
-                  : "bg-red-500/30 text-red-100"
-              }`}>
-                {variacionDiaria > 0 ? '+' : ''}{variacionDiaria}%
-              </span>
-            )}
-          </div>
-          <p className="text-sm opacity-60 mt-2">
-            vs ayer
+        <p className="text-sm opacity-75 mb-2">Saldo del Mes</p>
+        <div className="flex items-end justify-between gap-3">
+          <p className="text-3xl font-bold truncate">
+            {showBalance ? fmtCLP(saldoMes||0) : "••••••"}
           </p>
+          {showBalance && (
+            <span className={`px-3 py-1 rounded-full text-sm font-semibold flex-shrink-0 ${
+              variacionDiaria >= 0 
+                ? "bg-green-500/30 text-green-100" 
+                : "bg-red-500/30 text-red-100"
+            }`}>
+              {variacionDiaria > 0 ? '+' : ''}{variacionDiaria}%
+            </span>
+          )}
         </div>
+        <p className="text-sm opacity-60 mt-2">
+          vs ayer
+        </p>
       </div>
 
       {!loading && profile?.plan === "free" && (
