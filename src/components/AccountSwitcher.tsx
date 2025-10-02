@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,9 +28,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Check, Plus, Trash2 } from "lucide-react";
+import { Check, Plus, Trash2, Camera } from "lucide-react";
 import { useCurrentAccount } from "@/hooks/useCurrentAccount";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AccountSwitcher() {
   const { currentAccountId, accounts, switchToAccount, addAccount, deleteAccount } = useCurrentAccount();
@@ -41,6 +42,9 @@ export default function AccountSwitcher() {
   const [newAccountName, setNewAccountName] = useState("");
   const [newAccountEmail, setNewAccountEmail] = useState("");
   const [newAccountPhone, setNewAccountPhone] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSwitchAccount = (accountId: string) => {
     if (accountId === currentAccountId) {
@@ -59,6 +63,51 @@ export default function AccountSwitcher() {
     setTimeout(() => window.location.reload(), 150);
   };
 
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          title: "Error",
+          description: "La imagen debe ser menor a 2MB",
+          variant: "destructive",
+        });
+        return;
+      }
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadAvatar = async (accountId: string): Promise<string | null> => {
+    if (!avatarFile) return null;
+
+    try {
+      const fileExt = avatarFile.name.split('.').pop();
+      const fileName = `${accountId}-${Date.now()}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('account-avatars')
+        .upload(filePath, avatarFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('account-avatars')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      return null;
+    }
+  };
+
   const handleAddAccount = async () => {
     if (!newAccountName.trim()) {
       toast({
@@ -69,7 +118,6 @@ export default function AccountSwitcher() {
       return;
     }
 
-    // Validar telefone se fornecido
     if (newAccountPhone.trim()) {
       const phoneDigits = newAccountPhone.replace(/\D/g, "");
       if (phoneDigits.length < 8) {
@@ -82,7 +130,6 @@ export default function AccountSwitcher() {
       }
     }
 
-    // Validar email se fornecido
     if (newAccountEmail.trim()) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(newAccountEmail.trim())) {
@@ -102,6 +149,17 @@ export default function AccountSwitcher() {
     );
 
     if (result) {
+      // Upload avatar se fornecido
+      if (avatarFile) {
+        const avatarUrl = await uploadAvatar(result.id);
+        if (avatarUrl) {
+          await supabase
+            .from("accounts")
+            .update({ avatar_url: avatarUrl })
+            .eq("id", result.id);
+        }
+      }
+
       toast({
         title: "Cuenta creada",
         description: `Cuenta "${newAccountName}" creada exitosamente`,
@@ -110,9 +168,10 @@ export default function AccountSwitcher() {
       setNewAccountName("");
       setNewAccountEmail("");
       setNewAccountPhone("");
+      setAvatarFile(null);
+      setAvatarPreview("");
       setOpen(false);
       
-      // Recargar página para actualizar queries
       setTimeout(() => window.location.reload(), 150);
     } else {
       toast({
@@ -250,6 +309,38 @@ export default function AccountSwitcher() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Foto de perfil (opcional)</Label>
+              <div className="flex items-center gap-4">
+                <Avatar className="h-20 w-20">
+                  <AvatarImage src={avatarPreview} />
+                  <AvatarFallback className="bg-primary/10 text-primary text-2xl">
+                    {newAccountName ? newAccountName.charAt(0).toUpperCase() : "?"}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="gap-2"
+                  >
+                    <Camera className="h-4 w-4" />
+                    Seleccionar imagen
+                  </Button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="hidden"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Máximo 2MB
+                  </p>
+                </div>
+              </div>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="name">Nombre *</Label>
               <Input
