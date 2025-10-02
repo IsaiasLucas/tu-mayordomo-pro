@@ -93,7 +93,9 @@ export default function ReportesView() {
 
   useEffect(() => {
     const loadCurrentMonthData = async () => {
-      if (!isPro || !profile?.phone_personal) return;
+      if (!isPro) return;
+      const phone = profile?.phone_personal || profile?.phone_empresa;
+      if (!phone) return;
       
       const now = new Date();
       const startDate = startOfMonth(now);
@@ -245,6 +247,7 @@ export default function ReportesView() {
         periodo = `${format(startDate, "dd/MM/yyyy")} - ${format(endDate, "dd/MM/yyyy")}`;
       }
 
+      const tipoDb = tipo.startsWith("semanal") ? "semanal" : tipo.startsWith("mensual") ? "mensual" : "custom";
       const movimientos = await fetchMovimientos(startDate, endDate);
 
       if (movimientos.length === 0) {
@@ -264,7 +267,7 @@ export default function ReportesView() {
         .insert({
           user_id: user.id,
           phone: phone,
-          tipo: tipo,
+          tipo: tipoDb,
           periodo: periodo,
           data: { movimientos_count: movimientos.length }
         });
