@@ -178,7 +178,7 @@ export default function ReportesView() {
       startY: (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 10 : 130,
       head: [['Fecha', 'Descripción', 'Categoría', 'Tipo', 'Valor']],
       body: movimientos.map(m => [
-        formatInTimeZone(new Date(m.fecha), CHILE_TIMEZONE, "dd/MM/yyyy HH:mm"),
+        formatInTimeZone(new Date((m as any).created_at ?? m.fecha), CHILE_TIMEZONE, "dd/MM/yyyy HH:mm"),
         m.descripcion,
         m.categoria || '-',
         m.tipo,

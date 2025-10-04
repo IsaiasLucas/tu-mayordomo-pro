@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 interface Movement {
   id: string;
   fecha: string;
+  created_at?: string;
   descripcion: string;
   tipo: string;
   monto: number;
@@ -79,7 +80,7 @@ export default function GastosView() {
           .eq('user_id', user.id)
           .gte('fecha', startDate)
           .lte('fecha', endDate)
-          .order('fecha', { ascending: false });
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
 
@@ -149,7 +150,7 @@ export default function GastosView() {
     
     // Tabla de movimientos
     const tableData = (data.items || []).map(mov => [
-      formatInTimeZone(new Date(mov.fecha), CHILE_TIMEZONE, "dd/MM HH:mm"),
+      formatInTimeZone(new Date((mov as any).created_at ?? mov.fecha), CHILE_TIMEZONE, "dd/MM HH:mm"),
       mov.descripcion,
       mov.tipo,
       fmtCLP(mov.monto)
@@ -317,7 +318,7 @@ export default function GastosView() {
                     {paginatedMovements.map((mov) => (
                       <TableRow key={mov.id}>
                         <TableCell className="py-4 whitespace-nowrap text-base">
-                          {formatInTimeZone(new Date(mov.fecha), CHILE_TIMEZONE, "dd/MM HH:mm")}
+                          {formatInTimeZone(new Date((mov as any).created_at ?? mov.fecha), CHILE_TIMEZONE, "dd/MM HH:mm")}
                         </TableCell>
                         <TableCell className="py-4 text-base">{mov.descripcion}</TableCell>
                         <TableCell className="py-4">
