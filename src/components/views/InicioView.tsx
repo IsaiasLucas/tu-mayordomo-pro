@@ -21,6 +21,7 @@ interface InicioViewProps {
 
 interface Movimiento {
   fecha: string;
+  created_at?: string;
   descripcion: string;
   monto: number;
   tipo: string;
@@ -66,14 +67,14 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     const fmtDay = (d: Date | string) => formatInTimeZone(new Date(d), CHILE_TIMEZONE, 'yyyy-MM-dd');
 
     const saldoHoy = allMovimientos
-      .filter(m => fmtDay(m.fecha) === fmtDay(hoy))
+      .filter(m => fmtDay(((m as any).created_at ?? m.fecha) as string) === fmtDay(hoy))
       .reduce((total, m) => {
         const isIngreso = m.tipo.toLowerCase() === 'ingreso' || m.tipo.toLowerCase() === 'receita';
         return total + (isIngreso ? Number(m.monto) : -Number(m.monto));
       }, 0);
 
     const saldoAyer = allMovimientos
-      .filter(m => fmtDay(m.fecha) === fmtDay(ayer))
+      .filter(m => fmtDay(((m as any).created_at ?? m.fecha) as string) === fmtDay(ayer))
       .reduce((total, m) => {
         const isIngreso = m.tipo.toLowerCase() === 'ingreso' || m.tipo.toLowerCase() === 'receita';
         return total + (isIngreso ? Number(m.monto) : -Number(m.monto));
@@ -180,7 +181,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-        .order('fecha', { ascending: false })
+.order('created_at', { ascending: false })
         .limit(5);
 
       if (error) throw error;
@@ -208,7 +209,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-        .order('fecha', { ascending: false })
+.order('created_at', { ascending: false })
         .limit(5);
 
       if (error) throw error;
@@ -244,9 +245,9 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-        .gte('fecha', startDate)
-        .lte('fecha', endDate)
-        .order('fecha', { ascending: false });
+.gte('created_at', startDate)
+.lte('created_at', endDate)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
@@ -277,9 +278,9 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-        .gte('fecha', startDate)
-        .lte('fecha', endDate)
-        .order('fecha', { ascending: false });
+        .gte('created_at', startDate)
+        .lte('created_at', endDate)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
@@ -461,7 +462,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
                       }`}>
-                        {formatMovimientoDate(mov.fecha)}
+                        {formatMovimientoDate(((mov as any).created_at ?? mov.fecha) as string)}
                       </span>
                       {(mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita") ? (
                         <TrendingUp className="w-4 h-4 text-green-600 flex-shrink-0" />

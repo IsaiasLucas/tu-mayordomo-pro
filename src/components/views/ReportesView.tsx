@@ -53,9 +53,9 @@ export default function ReportesView() {
         .from('gastos')
         .select('*')
         .eq('telefono', phoneDigits)
-        .gte('fecha', startDateStr)
-        .lte('fecha', endDateStr)
-        .order('fecha', { ascending: false });
+        .gte('created_at', startDateStr)
+        .lte('created_at', endDateStr)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       return gastos || [];

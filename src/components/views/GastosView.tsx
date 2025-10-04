@@ -78,8 +78,8 @@ export default function GastosView() {
           .from('gastos')
           .select('*')
           .eq('user_id', user.id)
-          .gte('fecha', startDate)
-          .lte('fecha', endDate)
+          .gte('created_at', startDate)
+          .lte('created_at', endDate)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
