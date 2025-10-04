@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { es } from "date-fns/locale";
 import { CHILE_TIMEZONE, chileDateOptions } from "@/lib/date-config";
 import jsPDF from "jspdf";
@@ -177,7 +178,7 @@ export default function ReportesView() {
       startY: (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 10 : 130,
       head: [['Fecha', 'Descripción', 'Categoría', 'Tipo', 'Valor']],
       body: movimientos.map(m => [
-        format(new Date(m.fecha), "dd/MM/yyyy"),
+        formatInTimeZone(new Date(m.fecha), CHILE_TIMEZONE, "dd/MM/yyyy HH:mm"),
         m.descripcion,
         m.categoria || '-',
         m.tipo,

@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Download, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import CompleteProfileModal from "@/components/CompleteProfileModal";
@@ -148,7 +149,7 @@ export default function GastosView() {
     
     // Tabla de movimientos
     const tableData = (data.items || []).map(mov => [
-      format(new Date(mov.fecha), "dd/MM HH:mm"),
+      formatInTimeZone(new Date(mov.fecha), CHILE_TIMEZONE, "dd/MM HH:mm"),
       mov.descripcion,
       mov.tipo,
       fmtCLP(mov.monto)
@@ -316,7 +317,7 @@ export default function GastosView() {
                     {paginatedMovements.map((mov) => (
                       <TableRow key={mov.id}>
                         <TableCell className="py-4 whitespace-nowrap text-base">
-                          {format(new Date(mov.fecha), "dd/MM HH:mm")}
+                          {formatInTimeZone(new Date(mov.fecha), CHILE_TIMEZONE, "dd/MM HH:mm")}
                         </TableCell>
                         <TableCell className="py-4 text-base">{mov.descripcion}</TableCell>
                         <TableCell className="py-4">
