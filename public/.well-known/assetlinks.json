@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.netlify.tumayordomo.twa",
+        "sha256_cert_fingerprints": ["C3:5B:35:A1:01:08:80:99:11:D5:40:62:49:6F:B2:33:80:40:33:95:89:D4:8A:8B:4F:B8:0A:86:E2:04:E2:81"]
+      }
+    }]
