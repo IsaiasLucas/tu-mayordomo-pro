@@ -187,6 +187,18 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
       if (error) throw error;
 
       const newMovimientos = gastos || [];
+      try {
+        const sample = (newMovimientos || []).slice(0, 5).map((m: any) => ({
+          id: m.id,
+          created_at_raw: m.created_at,
+          newDate_toISOString: m?.created_at ? new Date(m.created_at).toISOString() : null,
+          display_scl: formatDisplayInSantiago(m.created_at ?? m.fecha, "dd/MM HH:mm"),
+        }));
+        console.log("[DEBUG Inicio] sample times:", sample);
+      } catch (e) {
+        console.log("[DEBUG Inicio] logging error", e);
+      }
+
       localStorage.setItem('tm_movimientos_cache', JSON.stringify(newMovimientos));
       setMovimientos(newMovimientos);
       setInitialLoadComplete(true);
@@ -215,6 +227,18 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
       if (error) throw error;
 
       const newMovimientos = gastos || [];
+      try {
+        const sample = (newMovimientos || []).slice(0, 5).map((m: any) => ({
+          id: m.id,
+          created_at_raw: m.created_at,
+          newDate_toISOString: m?.created_at ? new Date(m.created_at).toISOString() : null,
+          display_scl: formatDisplayInSantiago(m.created_at ?? m.fecha, "dd/MM HH:mm"),
+        }));
+        console.log("[DEBUG Inicio Update] sample times:", sample);
+      } catch (e) {
+        console.log("[DEBUG Inicio Update] logging error", e);
+      }
+
       const currentCache = localStorage.getItem('tm_movimientos_cache');
       const newCache = JSON.stringify(newMovimientos);
       if (currentCache !== newCache) {
