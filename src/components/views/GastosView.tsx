@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { fmtCLP } from "@/lib/api";
-import { CHILE_TIMEZONE, chileDateOptions } from "@/lib/date-config";
+import { CHILE_TIMEZONE, chileDateOptions, formatDisplayInSantiago } from "@/lib/date-config";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -79,7 +79,7 @@ export default function GastosView() {
           .select('*')
           .eq('user_id', user.id)
           .gte('created_at', startDate)
-          .lte('created_at', endDate)
+          .lte('created_at', `${endDate} 23:59:59`)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -149,12 +149,12 @@ export default function GastosView() {
     doc.text(`Saldo: ${fmtCLP(data.saldo)}`, 20, 69);
     
     // Tabla de movimientos
-    const tableData = (data.items || []).map(mov => [
-      formatInTimeZone(new Date((mov as any).created_at ?? mov.fecha), CHILE_TIMEZONE, "dd/MM HH:mm"),
-      mov.descripcion,
-      mov.tipo,
-      fmtCLP(mov.monto)
-    ]);
+const tableData = (data.items || []).map(mov => [
+  formatDisplayInSantiago((mov as any).created_at || mov.fecha, "dd/MM HH:mm"),
+  mov.descripcion,
+  mov.tipo,
+  fmtCLP(mov.monto)
+]);
     
     autoTable(doc, {
       startY: 80,
@@ -318,7 +318,7 @@ export default function GastosView() {
                     {paginatedMovements.map((mov) => (
                       <TableRow key={mov.id}>
                         <TableCell className="py-4 whitespace-nowrap text-base">
-                          {formatInTimeZone(new Date((mov as any).created_at ?? mov.fecha), CHILE_TIMEZONE, "dd/MM HH:mm")}
+                          {formatDisplayInSantiago((mov as any).created_at || mov.fecha, "dd/MM HH:mm")}
                         </TableCell>
                         <TableCell className="py-4 text-base">{mov.descripcion}</TableCell>
                         <TableCell className="py-4">

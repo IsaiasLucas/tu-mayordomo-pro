@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { es } from "date-fns/locale";
-import { CHILE_TIMEZONE, chileDateOptions } from "@/lib/date-config";
+import { CHILE_TIMEZONE, chileDateOptions, formatDisplayInSantiago } from "@/lib/date-config";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Download, FileText, Loader2, PieChart, Lock, Calendar } from "lucide-react";
@@ -177,13 +177,13 @@ export default function ReportesView() {
     autoTable(doc, {
       startY: (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 10 : 130,
       head: [['Fecha', 'Descripción', 'Categoría', 'Tipo', 'Valor']],
-      body: movimientos.map(m => [
-        formatInTimeZone(new Date((m as any).created_at ?? m.fecha), CHILE_TIMEZONE, "dd/MM/yyyy HH:mm"),
-        m.descripcion,
-        m.categoria || '-',
-        m.tipo,
-        new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(m.monto)
-      ]),
+body: movimientos.map(m => [
+  formatDisplayInSantiago((m as any).created_at || m.fecha, "dd/MM/yyyy HH:mm"),
+  m.descripcion,
+  m.categoria || '-',
+  m.tipo,
+  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(m.monto)
+]),
       styles: { fontSize: 9 },
       headStyles: { fillColor: [79, 70, 229] },
     });

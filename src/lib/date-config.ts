@@ -40,3 +40,16 @@ export const chileDateOptions: Intl.DateTimeFormatOptions = {
   minute: '2-digit',
   hour12: false
 };
+
+// Formato estándar para mostrar fechas basado SIEMPRE en America/Santiago
+export const formatDisplayInSantiago = (
+  date: string | Date,
+  pattern: string = "dd/MM HH:mm"
+): string => {
+  try {
+    return formatInTimeZone(new Date(date), CHILE_TIMEZONE, pattern);
+  } catch (e) {
+    console.warn('formatDisplayInSantiago fallback for value:', date, e);
+    return String(date);
+  }
+};

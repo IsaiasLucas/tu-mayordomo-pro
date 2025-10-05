@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, TrendingUp, TrendingDown, Crown } from "lucide-react";
 import { format } from "date-fns";
-import { getCurrentDateInSantiago, CHILE_TIMEZONE } from "@/lib/date-config";
+import { getCurrentDateInSantiago, CHILE_TIMEZONE, formatDisplayInSantiago } from "@/lib/date-config";
 import { formatInTimeZone } from "date-fns-tz";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -246,7 +246,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         .select('*')
         .eq('user_id', user.id)
 .gte('created_at', startDate)
-.lte('created_at', endDate)
+.lte('created_at', `${endDate} 23:59:59`)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -279,7 +279,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         .select('*')
         .eq('user_id', user.id)
         .gte('created_at', startDate)
-        .lte('created_at', endDate)
+        .lte('created_at', `${endDate} 23:59:59`)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -296,13 +296,9 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     }
   };
 
-  const formatMovimientoDate = (dateString: string) => {
-    try {
-      return formatInTimeZone(new Date(dateString), CHILE_TIMEZONE, "dd/MM HH:mm");
-    } catch {
-      return dateString;
-    }
-  };
+const formatMovimientoDate = (dateString: string) => {
+  return formatDisplayInSantiago(dateString, "dd/MM HH:mm");
+};
 
   const handleProfileModalClose = () => {
     // Verificar si ahora hay phone guardado
