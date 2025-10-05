@@ -1,5 +1,6 @@
 // Configuración de fecha y hora para Chile/Santiago
 import { es } from 'date-fns/locale';
+import { parseISO, isValid } from 'date-fns';
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 
 // Timezone para Chile/Santiago
@@ -47,7 +48,17 @@ export const formatDisplayInSantiago = (
   pattern: string = "dd/MM HH:mm"
 ): string => {
   try {
-    return formatInTimeZone(new Date(date), CHILE_TIMEZONE, pattern);
+    const d = typeof date === 'string'
+      ? (() => {
+          try {
+            const parsed = parseISO(date);
+            return isValid(parsed) ? parsed : new Date(date);
+          } catch {
+            return new Date(date);
+          }
+        })()
+      : date;
+    return formatInTimeZone(d, CHILE_TIMEZONE, pattern);
   } catch (e) {
     console.warn('formatDisplayInSantiago fallback for value:', date, e);
     return String(date);

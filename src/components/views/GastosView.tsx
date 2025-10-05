@@ -145,7 +145,7 @@ export default function GastosView() {
     
     // Tabla de movimientos
 const tableData = (data.items || []).map(mov => [
-  formatDisplayInSantiago((mov as any).created_at || mov.fecha, "dd/MM HH:mm"),
+  formatDisplayInSantiago((mov as any).created_at, "dd/MM HH:mm"),
   mov.descripcion,
   mov.tipo,
   fmtCLP(mov.monto)
@@ -312,9 +312,9 @@ const tableData = (data.items || []).map(mov => [
                   <TableBody>
                     {paginatedMovements.map((mov) => (
                       <TableRow key={mov.id}>
-                        <TableCell className="py-4 whitespace-nowrap text-base">
-                          {formatDisplayInSantiago((mov as any).created_at || mov.fecha, "dd/MM HH:mm")}
-                        </TableCell>
+        <TableCell className="py-4 whitespace-nowrap text-base">
+          {formatDisplayInSantiago((mov as any).created_at, "dd/MM HH:mm")}
+        </TableCell>
                         <TableCell className="py-4 text-base">{mov.descripcion}</TableCell>
                         <TableCell className="py-4">
                           <Badge
