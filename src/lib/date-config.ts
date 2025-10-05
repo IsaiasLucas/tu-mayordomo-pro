@@ -1,6 +1,6 @@
 // Configuración de fecha y hora para Chile/Santiago
 import { es } from 'date-fns/locale';
-import { formatInTimeZone } from 'date-fns-tz';
+import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 
 // Timezone para Chile/Santiago
 export const CHILE_TIMEZONE = 'America/Santiago';
@@ -52,4 +52,17 @@ export const formatDisplayInSantiago = (
     console.warn('formatDisplayInSantiago fallback for value:', date, e);
     return String(date);
   }
+};
+
+// Convierte 'YYYY-MM' a rango UTC exacto basado en America/Santiago
+export const monthRangeUTCFromSantiago = (ym: string) => {
+  const [yStr, mStr] = ym.split('-');
+  const year = parseInt(yStr, 10);
+  const month = parseInt(mStr, 10);
+  const lastDay = new Date(year, month, 0).getDate();
+
+  const startISO = fromZonedTime(`${ym}-01T00:00:00`, CHILE_TIMEZONE).toISOString();
+  const endISO = fromZonedTime(`${ym}-${String(lastDay).padStart(2, '0')}T23:59:59`, CHILE_TIMEZONE).toISOString();
+
+  return { startISO, endISO };
 };

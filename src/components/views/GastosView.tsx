@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { fmtCLP } from "@/lib/api";
-import { CHILE_TIMEZONE, chileDateOptions, formatDisplayInSantiago } from "@/lib/date-config";
+import { CHILE_TIMEZONE, chileDateOptions, formatDisplayInSantiago, monthRangeUTCFromSantiago } from "@/lib/date-config";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -67,19 +67,14 @@ export default function GastosView() {
           return;
         }
 
-        const startDate = `${selectedMonth}-01`;
-        const endDate = new Date(
-          parseInt(selectedMonth.split('-')[0]), 
-          parseInt(selectedMonth.split('-')[1]), 
-          0
-        ).toISOString().split('T')[0];
+        const { startISO, endISO } = monthRangeUTCFromSantiago(selectedMonth);
         
         const { data: gastos, error } = await supabase
           .from('gastos')
           .select('*')
           .eq('user_id', user.id)
-          .gte('created_at', startDate)
-          .lte('created_at', `${endDate} 23:59:59`)
+          .gte('created_at', startISO)
+          .lte('created_at', endISO)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
