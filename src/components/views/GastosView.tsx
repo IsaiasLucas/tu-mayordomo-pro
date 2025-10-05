@@ -88,6 +88,19 @@ export default function GastosView() {
           .filter((m: any) => m.tipo?.toLowerCase() === "egreso" || m.tipo?.toLowerCase() === "gasto")
           .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
 
+        // Debug temporal para investigar huso horário
+        try {
+          const sample = (items || []).slice(0, 5).map((m: any) => ({
+            id: m.id,
+            created_at_raw: m.created_at,
+            newDate_toISOString: m?.created_at ? new Date(m.created_at).toISOString() : null,
+            display_scl: formatDisplayInSantiago(m.created_at, "dd/MM HH:mm"),
+          }));
+          console.log("[DEBUG Gastos] sample times:", sample);
+        } catch (e) {
+          console.log("[DEBUG Gastos] logging error", e);
+        }
+
         setData({
           items,
           totalIngresos,

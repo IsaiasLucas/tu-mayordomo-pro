@@ -48,16 +48,27 @@ export const formatDisplayInSantiago = (
   pattern: string = "dd/MM HH:mm"
 ): string => {
   try {
-    const d = typeof date === 'string'
-      ? (() => {
-          try {
-            const parsed = parseISO(date);
-            return isValid(parsed) ? parsed : new Date(date);
-          } catch {
-            return new Date(date);
-          }
-        })()
-      : date;
+    let d: Date;
+
+    if (typeof date === 'string') {
+      const raw = date.trim();
+      const hasTZ = /[zZ]|[+-]\d{2}:?\d{2}/.test(raw);
+      const hasT = /T/.test(raw);
+
+      // Si NO trae zona horaria (naive), asumimos que la hora guardada está en America/Santiago
+      if (!hasTZ) {
+        // Normalizamos espacio a 'T' para fromZonedTime
+        const normalized = hasT ? raw : raw.replace(' ', 'T');
+        d = fromZonedTime(normalized, CHILE_TIMEZONE);
+      } else {
+        // Tiene zona explicita (ej: Z o +00:00): parseamos como ISO real
+        const parsed = parseISO(raw);
+        d = isValid(parsed) ? parsed : new Date(raw);
+      }
+    } else {
+      d = date;
+    }
+
     return formatInTimeZone(d, CHILE_TIMEZONE, pattern);
   } catch (e) {
     console.warn('formatDisplayInSantiago fallback for value:', date, e);
