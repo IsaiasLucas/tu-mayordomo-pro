@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { monthRangeUTCFromSantiago } from "@/lib/date-config";
 
 export function useGastos(mes?: string) {
   const [items, setItems] = useState<any[]>([]);
@@ -22,15 +23,14 @@ export function useGastos(mes?: string) {
         const ym = mes || `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
         
         // Buscar gastos del mes específico por user_id
-        const startDate = `${ym}-01`;
-        const endDate = new Date(parseInt(ym.split('-')[0]), parseInt(ym.split('-')[1]), 0).toISOString().split('T')[0];
+        const { startISO, endISO } = monthRangeUTCFromSantiago(ym);
         
         const { data, error: fetchError } = await supabase
           .from('gastos')
           .select('*')
           .eq('user_id', user.id)
-          .gte('created_at', startDate)
-          .lte('created_at', endDate)
+          .gte('created_at', startISO)
+          .lte('created_at', endISO)
           .order('created_at', { ascending: false });
 
         if (fetchError) throw fetchError;

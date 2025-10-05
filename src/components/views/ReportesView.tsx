@@ -178,7 +178,7 @@ export default function ReportesView() {
       startY: (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 10 : 130,
       head: [['Fecha', 'Descripción', 'Categoría', 'Tipo', 'Valor']],
 body: movimientos.map(m => [
-  formatDisplayInSantiago((m as any).created_at || m.fecha, "dd/MM/yyyy HH:mm"),
+  formatDisplayInSantiago((m as any).created_at, "dd/MM/yyyy HH:mm"),
   m.descripcion,
   m.categoria || '-',
   m.tipo,

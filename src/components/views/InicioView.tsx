@@ -67,14 +67,14 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     const fmtDay = (d: Date | string) => formatInTimeZone(new Date(d), CHILE_TIMEZONE, 'yyyy-MM-dd');
 
     const saldoHoy = allMovimientos
-      .filter(m => fmtDay(((m as any).created_at ?? m.fecha) as string) === fmtDay(hoy))
+      .filter(m => fmtDay((m as any).created_at as string) === fmtDay(hoy))
       .reduce((total, m) => {
         const isIngreso = m.tipo.toLowerCase() === 'ingreso' || m.tipo.toLowerCase() === 'receita';
         return total + (isIngreso ? Number(m.monto) : -Number(m.monto));
       }, 0);
 
     const saldoAyer = allMovimientos
-      .filter(m => fmtDay(((m as any).created_at ?? m.fecha) as string) === fmtDay(ayer))
+      .filter(m => fmtDay((m as any).created_at as string) === fmtDay(ayer))
       .reduce((total, m) => {
         const isIngreso = m.tipo.toLowerCase() === 'ingreso' || m.tipo.toLowerCase() === 'receita';
         return total + (isIngreso ? Number(m.monto) : -Number(m.monto));
@@ -192,7 +192,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
           id: m.id,
           created_at_raw: m.created_at,
           newDate_toISOString: m?.created_at ? new Date(m.created_at).toISOString() : null,
-          display_scl: formatDisplayInSantiago(m.created_at ?? m.fecha, "dd/MM HH:mm"),
+          display_scl: formatDisplayInSantiago(m.created_at, "dd/MM HH:mm"),
         }));
         console.log("[DEBUG Inicio] sample times:", sample);
       } catch (e) {
@@ -232,7 +232,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
           id: m.id,
           created_at_raw: m.created_at,
           newDate_toISOString: m?.created_at ? new Date(m.created_at).toISOString() : null,
-          display_scl: formatDisplayInSantiago(m.created_at ?? m.fecha, "dd/MM HH:mm"),
+          display_scl: formatDisplayInSantiago(m.created_at, "dd/MM HH:mm"),
         }));
         console.log("[DEBUG Inicio Update] sample times:", sample);
       } catch (e) {
