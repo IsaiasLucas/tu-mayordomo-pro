@@ -8,6 +8,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 interface PlanFeature {
   text: string;
   included: boolean;
@@ -38,6 +41,9 @@ export default function PlanesView() {
   const [cancellingSubscription, setCancellingSubscription] = useState(false);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [showCouponDialog, setShowCouponDialog] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [pendingCheckout, setPendingCheckout] = useState<{priceId: string, planId: string} | null>(null);
   const plans: Plan[] = [{
     id: "free",
     name: "Gratuito",
@@ -224,10 +230,30 @@ export default function PlanesView() {
       return;
     }
 
-    // Proceed with checkout
-    await createCheckout(priceId, planId);
+    // For annual plan, show coupon dialog first
+    if (planId === "anual") {
+      setPendingCheckout({ priceId, planId });
+      setShowCouponDialog(true);
+    } else {
+      // For monthly plan, proceed directly
+      await createCheckout(priceId, planId);
+    }
   };
-  const createCheckout = async (priceId: string, planId: string) => {
+
+  const handleCouponDialogConfirm = async () => {
+    if (!pendingCheckout) return;
+    setShowCouponDialog(false);
+    await createCheckout(pendingCheckout.priceId, pendingCheckout.planId, couponCode.trim());
+    setCouponCode("");
+    setPendingCheckout(null);
+  };
+
+  const handleCouponDialogCancel = () => {
+    setShowCouponDialog(false);
+    setCouponCode("");
+    setPendingCheckout(null);
+  };
+  const createCheckout = async (priceId: string, planId: string, coupon?: string) => {
     setSelectedPlan(planId);
     try {
       const {
@@ -236,7 +262,8 @@ export default function PlanesView() {
       } = await supabase.functions.invoke("create-checkout", {
         body: {
           priceId,
-          planId
+          planId,
+          ...(coupon && { couponCode: coupon })
         }
       });
       if (error) throw error;
@@ -516,5 +543,35 @@ export default function PlanesView() {
         </p>
       </div>
 
+      {/* Coupon Dialog */}
+      <Dialog open={showCouponDialog} onOpenChange={setShowCouponDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>¿Tienes un cupón de descuento?</DialogTitle>
+            <DialogDescription>
+              Ingresa tu código de cupón para aplicar descuentos al Plan Pro Anual.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="coupon">Código de Cupón (opcional)</Label>
+              <Input
+                id="coupon"
+                placeholder="Ej: DESCUENTO2025"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCouponDialogCancel}>
+              Cancelar
+            </Button>
+            <Button onClick={handleCouponDialogConfirm} disabled={selectedPlan !== null}>
+              {couponCode ? "Aplicar y Continuar" : "Continuar sin cupón"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>;
 }
