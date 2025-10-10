@@ -37,11 +37,11 @@ serve(async (req) => {
     
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const { priceId, planId, couponCode } = await req.json();
+    const { priceId, planId } = await req.json();
     
     if (!priceId) throw new Error("Price ID is required");
     
-    logStep("Received request", { priceId, planId, couponCode: couponCode ? "provided" : "none" });
+    logStep("Received request", { priceId, planId });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -65,7 +65,7 @@ serve(async (req) => {
     }
 
     // Create checkout session
-    const sessionParams: any = {
+    const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: [
         {
@@ -76,21 +76,12 @@ serve(async (req) => {
       mode: "subscription",
       success_url: `${req.headers.get("origin")}/inicio?checkout=success`,
       cancel_url: `${req.headers.get("origin")}/planes?checkout=canceled`,
+      allow_promotion_codes: true,
       metadata: {
         user_id: user.id,
         plan_id: planId || "unknown",
       },
-    };
-
-    // Add coupon if provided
-    if (couponCode) {
-      sessionParams.discounts = [{
-        coupon: couponCode,
-      }];
-      logStep("Coupon code applied", { couponCode });
-    }
-
-    const session = await stripe.checkout.sessions.create(sessionParams);
+    });
 
     logStep("Checkout session created", { sessionId: session.id, url: session.url });
 
