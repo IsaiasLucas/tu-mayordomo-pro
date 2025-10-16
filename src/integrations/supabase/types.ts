@@ -138,6 +138,27 @@ export type Database = {
           },
         ]
       }
+      invitation_codes: {
+        Row: {
+          code: string
+          created_at: string
+          empresa_id: string
+          id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          empresa_id: string
+          id?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          empresa_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

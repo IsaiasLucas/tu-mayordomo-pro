@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -46,7 +46,10 @@ import {
   Receipt,
   PiggyBank,
   Camera,
-  Upload
+  Upload,
+  Copy,
+  Plus,
+  MessageCircle
 } from "lucide-react";
 
 const PerfilView = () => {
@@ -67,8 +70,16 @@ const PerfilView = () => {
   const [editName, setEditName] = useState("");
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [invitationCodes, setInvitationCodes] = useState<any[]>([]);
+  const [showInvitationCodeDialog, setShowInvitationCodeDialog] = useState(false);
+  const [generatedCode, setGeneratedCode] = useState<any>(null);
+  const [generatingCode, setGeneratingCode] = useState(false);
+  const [showDeleteCodeDialog, setShowDeleteCodeDialog] = useState(false);
+  const [codeToDelete, setCodeToDelete] = useState<any>(null);
+  const [deletingCode, setDeletingCode] = useState(false);
 
   const isPro = profile?.plan === 'pro' || profile?.plan === 'premium';
+  const isEmpresa = profile?.entidad === 'empresa';
   
 
   const userProfile = {
@@ -83,6 +94,27 @@ const PerfilView = () => {
     planType: profile?.plan || "free",
     totalTransactions: 0,
     monthsActive: Math.ceil((new Date().getTime() - new Date(user?.created_at || new Date()).getTime()) / (1000 * 60 * 60 * 24 * 30))
+  };
+
+  useEffect(() => {
+    if (isEmpresa && user?.id) {
+      fetchInvitationCodes();
+    }
+  }, [isEmpresa, user?.id]);
+
+  const fetchInvitationCodes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('invitation_codes')
+        .select('*')
+        .eq('empresa_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setInvitationCodes(data || []);
+    } catch (error) {
+      console.error('Error fetching invitation codes:', error);
+    }
   };
 
   if (!user) {
@@ -413,6 +445,99 @@ const PerfilView = () => {
     }
   };
 
+  const handleGenerateInvitationCode = async () => {
+    setGeneratingCode(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Error",
+          description: "Sesión expirada",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('generate-invitation-code', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      setGeneratedCode(data.code);
+      setShowInvitationCodeDialog(true);
+      await fetchInvitationCodes();
+
+      toast({
+        title: "✅ Código generado correctamente",
+        description: "Puedes compartirlo con tus empleados.",
+      });
+    } catch (error: any) {
+      console.error('Error generating code:', error);
+      toast({
+        title: "❌ Error al generar el código",
+        description: error.message || "Intenta más tarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingCode(false);
+    }
+  };
+
+  const handleDeleteInvitationCode = async () => {
+    if (!codeToDelete) return;
+
+    setDeletingCode(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Error",
+          description: "Sesión expirada",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase.functions.invoke('delete-invitation-code', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: { codeId: codeToDelete.id },
+      });
+
+      if (error) throw error;
+
+      await fetchInvitationCodes();
+      setShowDeleteCodeDialog(false);
+      setCodeToDelete(null);
+
+      toast({
+        title: "Código eliminado",
+        description: "El código de invitación ha sido eliminado.",
+      });
+    } catch (error: any) {
+      console.error('Error deleting code:', error);
+      toast({
+        title: "Error al eliminar",
+        description: error.message || "Intenta más tarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingCode(false);
+    }
+  };
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copiado",
+      description: `${label} copiado al portapapeles.`,
+    });
+  };
+
   const stats = [
     { label: "Meses activo", value: userProfile.monthsActive, icon: Calendar },
   ];
@@ -654,6 +779,61 @@ const PerfilView = () => {
         </div>
       </Card>
 
+      {/* Invitation Codes - Only for Empresa accounts */}
+      {isEmpresa && (
+        <Card className="bg-white shadow-sm rounded-3xl p-6">
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Códigos de Invitación</h3>
+                <p className="text-sm text-gray-600">Genera códigos para invitar empleados a tu empresa</p>
+              </div>
+              <Button
+                onClick={handleGenerateInvitationCode}
+                disabled={generatingCode}
+                className="rounded-2xl px-6 w-full sm:w-auto bg-purple-600 hover:bg-purple-700"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {generatingCode ? "Generando..." : "Generar código de invitación"}
+              </Button>
+            </div>
+
+            {invitationCodes.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-medium text-sm text-gray-700">Códigos activos</h4>
+                <div className="space-y-2">
+                  {invitationCodes.map((code) => (
+                    <div
+                      key={code.id}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-xl gap-3"
+                    >
+                      <div className="flex-1">
+                        <p className="font-mono font-semibold text-lg text-purple-600">{code.code}</p>
+                        <p className="text-xs text-gray-500">
+                          Creado: {new Date(code.created_at).toLocaleDateString('es-CL')}
+                        </p>
+                      </div>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => {
+                          setCodeToDelete(code);
+                          setShowDeleteCodeDialog(true);
+                        }}
+                        className="rounded-xl w-full sm:w-auto"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Eliminar
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </Card>
+      )}
+
       {/* Cancel Plan Dialog */}
       <AlertDialog open={showCancelPlanDialog} onOpenChange={setShowCancelPlanDialog}>
         <AlertDialogContent className="max-w-[90vw] sm:max-w-md">
@@ -723,6 +903,83 @@ const PerfilView = () => {
               className="rounded-xl bg-red-600 hover:bg-red-700"
             >
               {loading ? "Eliminando..." : "Eliminar Cuenta"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Invitation Code Generated Dialog */}
+      <Dialog open={showInvitationCodeDialog} onOpenChange={setShowInvitationCodeDialog}>
+        <DialogContent className="max-w-[90vw] sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Código de invitación generado</DialogTitle>
+            <DialogDescription>
+              Comparte este código con tus empleados para que se unan a tu empresa.
+            </DialogDescription>
+          </DialogHeader>
+
+          {generatedCode && (
+            <div className="space-y-4 py-4">
+              <div className="p-4 bg-purple-50 rounded-xl text-center">
+                <p className="text-xs text-gray-600 mb-1">Código de invitación</p>
+                <p className="text-2xl font-mono font-bold text-purple-600">{generatedCode.code}</p>
+              </div>
+
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  onClick={() => copyToClipboard(generatedCode.code, "Código")}
+                  className="w-full rounded-xl"
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copiar código
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const whatsappLink = `https://wa.me/56955264713?text=ALTA%20${generatedCode.code}`;
+                    copyToClipboard(whatsappLink, "Link de WhatsApp");
+                  }}
+                  className="w-full rounded-xl"
+                >
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Copiar link de invitación (WhatsApp)
+                </Button>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              onClick={() => {
+                setShowInvitationCodeDialog(false);
+                setGeneratedCode(null);
+              }}
+              className="rounded-xl w-full"
+            >
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Invitation Code Confirmation Dialog */}
+      <AlertDialog open={showDeleteCodeDialog} onOpenChange={setShowDeleteCodeDialog}>
+        <AlertDialogContent className="max-w-[90vw] sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar código de invitación?</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro? Esto invalidará las invitaciones que ya fueron enviadas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel className="rounded-xl">Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteInvitationCode}
+              disabled={deletingCode}
+              className="rounded-xl bg-red-600 hover:bg-red-700"
+            >
+              {deletingCode ? "Eliminando..." : "Sí, eliminar"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
