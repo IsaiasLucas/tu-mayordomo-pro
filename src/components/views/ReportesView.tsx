@@ -405,32 +405,32 @@ export default function ReportesView() {
       <Card className="shadow-card border-0">
         <CardContent className="p-4">
           <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <Button
                 variant={selectedPeriod === "week" ? "default" : "outline"}
                 onClick={() => setSelectedPeriod("week")}
-                className="flex-1 sm:flex-none"
+                className="h-11 text-sm"
               >
                 Semana Actual
               </Button>
               <Button
                 variant={selectedPeriod === "month" ? "default" : "outline"}
                 onClick={() => setSelectedPeriod("month")}
-                className="flex-1 sm:flex-none"
+                className="h-11 text-sm"
               >
                 Mes Actual
               </Button>
               <Button
                 variant={selectedPeriod === "lastMonth" ? "default" : "outline"}
                 onClick={() => setSelectedPeriod("lastMonth")}
-                className="flex-1 sm:flex-none"
+                className="h-11 text-sm"
               >
                 Mes Pasado
               </Button>
               <Button
                 variant={selectedPeriod === "custom" ? "default" : "outline"}
                 onClick={() => setSelectedPeriod("custom")}
-                className="flex-1 sm:flex-none"
+                className="h-11 text-sm"
               >
                 Personalizado
               </Button>
@@ -736,11 +736,11 @@ export default function ReportesView() {
             Descarga reportes detallados en PDF con análisis por categoría
           </p>
           
-          <div className="flex flex-wrap gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <Button 
               onClick={() => generar("semanal_actual")} 
               disabled={generating !== null}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 h-11"
             >
               {generating === "semanal_actual" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -752,7 +752,7 @@ export default function ReportesView() {
             <Button 
               onClick={() => generar("mensual_actual")} 
               disabled={generating !== null}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 h-11"
             >
               {generating === "mensual_actual" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -764,7 +764,7 @@ export default function ReportesView() {
             <Button 
               onClick={() => generar("semanal")} 
               disabled={generating !== null}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 h-11"
             >
               {generating === "semanal" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -776,7 +776,7 @@ export default function ReportesView() {
             <Button 
               onClick={() => generar("mensual")} 
               disabled={generating !== null}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 h-11"
             >
               {generating === "mensual" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
