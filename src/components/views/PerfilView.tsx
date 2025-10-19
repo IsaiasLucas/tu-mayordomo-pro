@@ -107,7 +107,7 @@ const PerfilView = () => {
       const { data, error } = await supabase
         .from('invitation_codes')
         .select('*')
-        .eq('empresa_id', user?.id)
+        .eq('company_id', user?.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
