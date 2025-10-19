@@ -506,113 +506,125 @@ const formatMovimientoDate = (dateString: string) => {
 
       {/* Modal de detalhes */}
       <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Detalle de la Transacción</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-w-md overflow-hidden p-0">
           {selectedMovimiento && (
-            <div className="space-y-4">
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-accent/30">
-                <div className={`p-2 rounded-full ${
-                  (selectedMovimiento.tipo?.toLowerCase() === "ingreso" || selectedMovimiento.tipo?.toLowerCase() === "receita")
-                    ? "bg-green-100"
-                    : "bg-red-100"
-                }`}>
-                  {(selectedMovimiento.tipo?.toLowerCase() === "ingreso" || selectedMovimiento.tipo?.toLowerCase() === "receita") ? (
-                    <TrendingUp className="w-5 h-5 text-green-600" />
-                  ) : (
-                    <TrendingDown className="w-5 h-5 text-red-600" />
+            <div className="space-y-0">
+              {/* Header com gradiente */}
+              <div className={`relative px-6 pt-6 pb-8 ${
+                (selectedMovimiento.tipo?.toLowerCase() === "ingreso" || selectedMovimiento.tipo?.toLowerCase() === "receita")
+                  ? "bg-gradient-to-br from-green-500 to-emerald-600"
+                  : "bg-gradient-to-br from-red-500 to-rose-600"
+              }`}>
+                <div className="absolute inset-0 bg-black/5"></div>
+                <div className="relative">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
+                      {(selectedMovimiento.tipo?.toLowerCase() === "ingreso" || selectedMovimiento.tipo?.toLowerCase() === "receita") ? (
+                        <TrendingUp className="w-6 h-6 text-white" />
+                      ) : (
+                        <TrendingDown className="w-6 h-6 text-white" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white/80 text-sm font-medium">
+                        {(selectedMovimiento.tipo?.toLowerCase() === "ingreso" || selectedMovimiento.tipo?.toLowerCase() === "receita") ? "Ingreso" : "Egreso"}
+                      </p>
+                      <p className="text-white text-3xl font-bold">
+                        {(selectedMovimiento.tipo?.toLowerCase() === "ingreso" || selectedMovimiento.tipo?.toLowerCase() === "receita") ? "+" : "-"}
+                        {fmtCLP(Math.abs(Number(selectedMovimiento.monto)))}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 text-white/90">
+                    <Calendar className="w-4 h-4" />
+                    <span className="text-sm font-medium">
+                      {formatDisplayInSantiago(selectedMovimiento.created_at || selectedMovimiento.fecha, "dd 'de' MMMM, yyyy")}
+                    </span>
+                    <span className="mx-1">•</span>
+                    <Clock className="w-4 h-4" />
+                    <span className="text-sm font-medium">
+                      {formatDisplayInSantiago(selectedMovimiento.created_at || selectedMovimiento.fecha, "HH:mm")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Conteúdo */}
+              <div className="px-6 py-6 space-y-4">
+                {/* Descripción destaque */}
+                <div className="p-4 rounded-xl bg-accent/30 border border-border/50">
+                  <div className="flex items-start gap-3">
+                    <FileText className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium mb-1">Descripción</p>
+                      <p className="font-semibold text-base leading-relaxed break-words">
+                        {selectedMovimiento.descripcion || "Sin descripción"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Informações adicionais em grid */}
+                <div className="grid gap-3">
+                  {selectedMovimiento.telefono && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+                      <div className="p-2 rounded-lg bg-primary/10">
+                        <Phone className="w-4 h-4 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-muted-foreground font-medium">Registrado desde</p>
+                        <p className="font-medium truncate">{selectedMovimiento.telefono}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedMovimiento.categoria && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+                      <div className="p-2 rounded-lg bg-primary/10">
+                        <Tag className="w-4 h-4 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-muted-foreground font-medium">Categoría</p>
+                        <p className="font-medium truncate">{selectedMovimiento.categoria}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedMovimiento.subtipo && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+                      <div className="p-2 rounded-lg bg-primary/10">
+                        <Tag className="w-4 h-4 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-muted-foreground font-medium">Subtipo</p>
+                        <p className="font-medium truncate">{selectedMovimiento.subtipo}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedMovimiento.detalles && (
+                    <div className="p-4 rounded-lg bg-muted/50 border border-border/50">
+                      <div className="flex items-start gap-2 mb-2">
+                        <FileText className="w-4 h-4 text-primary mt-0.5" />
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Detalles adicionales</p>
+                      </div>
+                      <p className="text-sm leading-relaxed break-words pl-6">{selectedMovimiento.detalles}</p>
+                    </div>
                   )}
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm text-muted-foreground">Monto</p>
-                  <p className={`text-2xl font-bold ${
-                    (selectedMovimiento.tipo?.toLowerCase() === "ingreso" || selectedMovimiento.tipo?.toLowerCase() === "receita")
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}>
-                    {(selectedMovimiento.tipo?.toLowerCase() === "ingreso" || selectedMovimiento.tipo?.toLowerCase() === "receita") ? "+" : "-"}
-                    {fmtCLP(Math.abs(Number(selectedMovimiento.monto)))}
-                  </p>
-                </div>
               </div>
 
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-muted-foreground mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-sm text-muted-foreground">Fecha</p>
-                    <p className="font-medium">
-                      {formatDisplayInSantiago(selectedMovimiento.created_at || selectedMovimiento.fecha, "dd/MM/yyyy")}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <Clock className="w-5 h-5 text-muted-foreground mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-sm text-muted-foreground">Hora</p>
-                    <p className="font-medium">
-                      {formatDisplayInSantiago(selectedMovimiento.created_at || selectedMovimiento.fecha, "HH:mm:ss")}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <FileText className="w-5 h-5 text-muted-foreground mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-sm text-muted-foreground">Descripción</p>
-                    <p className="font-medium">{selectedMovimiento.descripcion || "Sin descripción"}</p>
-                  </div>
-                </div>
-
-                {selectedMovimiento.telefono && (
-                  <div className="flex items-start gap-3">
-                    <Phone className="w-5 h-5 text-muted-foreground mt-0.5" />
-                    <div className="flex-1">
-                      <p className="text-sm text-muted-foreground">Registrado desde</p>
-                      <p className="font-medium">{selectedMovimiento.telefono}</p>
-                    </div>
-                  </div>
-                )}
-
-                {selectedMovimiento.categoria && (
-                  <div className="flex items-start gap-3">
-                    <Tag className="w-5 h-5 text-muted-foreground mt-0.5" />
-                    <div className="flex-1">
-                      <p className="text-sm text-muted-foreground">Categoría</p>
-                      <p className="font-medium">{selectedMovimiento.categoria}</p>
-                    </div>
-                  </div>
-                )}
-
-                {selectedMovimiento.subtipo && (
-                  <div className="flex items-start gap-3">
-                    <Tag className="w-5 h-5 text-muted-foreground mt-0.5" />
-                    <div className="flex-1">
-                      <p className="text-sm text-muted-foreground">Subtipo</p>
-                      <p className="font-medium">{selectedMovimiento.subtipo}</p>
-                    </div>
-                  </div>
-                )}
-
-                {selectedMovimiento.detalles && (
-                  <div className="flex items-start gap-3">
-                    <FileText className="w-5 h-5 text-muted-foreground mt-0.5" />
-                    <div className="flex-1">
-                      <p className="text-sm text-muted-foreground">Detalles adicionales</p>
-                      <p className="font-medium">{selectedMovimiento.detalles}</p>
-                    </div>
-                  </div>
-                )}
+              {/* Footer com botão */}
+              <div className="px-6 pb-6">
+                <Button 
+                  onClick={() => setShowDetailsModal(false)}
+                  className="w-full h-11 font-medium"
+                  size="lg"
+                >
+                  Cerrar
+                </Button>
               </div>
-
-              <Button 
-                onClick={() => setShowDetailsModal(false)}
-                className="w-full"
-              >
-                Cerrar
-              </Button>
             </div>
           )}
         </DialogContent>
