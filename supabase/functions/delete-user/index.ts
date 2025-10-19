@@ -47,7 +47,69 @@ serve(async (req) => {
       .eq('user_id', user.id)
       .single();
 
-    // Delete from usuarios table if phone exists
+    // Delete all related data before deleting the user
+    
+    // 1. Delete gastos (expenses)
+    const { error: gastosError } = await supabaseAdmin
+      .from('gastos')
+      .delete()
+      .eq('user_id', user.id);
+
+    if (gastosError) {
+      console.error('Error deleting gastos:', gastosError);
+    }
+
+    // 2. Delete reportes (reports)
+    const { error: reportesError } = await supabaseAdmin
+      .from('reportes')
+      .delete()
+      .eq('user_id', user.id);
+
+    if (reportesError) {
+      console.error('Error deleting reportes:', reportesError);
+    }
+
+    // 3. Delete entities
+    const { error: entitiesError } = await supabaseAdmin
+      .from('entities')
+      .delete()
+      .eq('user_id', user.id);
+
+    if (entitiesError) {
+      console.error('Error deleting entities:', entitiesError);
+    }
+
+    // 4. Delete student verifications
+    const { error: verificationsError } = await supabaseAdmin
+      .from('student_verifications')
+      .delete()
+      .eq('user_id', user.id);
+
+    if (verificationsError) {
+      console.error('Error deleting student_verifications:', verificationsError);
+    }
+
+    // 5. Delete invitation codes (if user is empresa)
+    const { error: invitationsError } = await supabaseAdmin
+      .from('invitation_codes')
+      .delete()
+      .eq('company_id', user.id);
+
+    if (invitationsError) {
+      console.error('Error deleting invitation_codes:', invitationsError);
+    }
+
+    // 6. Delete accounts
+    const { error: accountsError } = await supabaseAdmin
+      .from('accounts')
+      .delete()
+      .eq('user_id', user.id);
+
+    if (accountsError) {
+      console.error('Error deleting accounts:', accountsError);
+    }
+
+    // 7. Delete from usuarios table if phone exists
     if (profile) {
       const phone = profile.phone_personal || profile.phone_empresa;
       if (phone) {
@@ -61,12 +123,11 @@ serve(async (req) => {
 
         if (usuariosError) {
           console.error('Error deleting from usuarios:', usuariosError);
-          // Continue anyway
         }
       }
     }
 
-    // Delete user profile (this will cascade delete related data if foreign keys are set up)
+    // 8. Delete user profile
     const { error: profileError } = await supabaseAdmin
       .from('profiles')
       .delete()
