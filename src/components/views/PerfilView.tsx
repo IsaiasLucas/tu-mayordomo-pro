@@ -890,19 +890,33 @@ const PerfilView = () => {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent className="max-w-[90vw] sm:max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>Eliminar Cuenta</AlertDialogTitle>
-            <AlertDialogDescription>
-              ¿Estás seguro? Esta acción no se puede deshacer. Todos tus datos serán eliminados permanentemente.
+            <AlertDialogTitle className="text-red-600 font-bold">⚠️ Eliminar Cuenta</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3 text-base">
+              <p className="font-semibold text-gray-900">
+                ¿Estás completamente seguro de que deseas eliminar tu cuenta?
+              </p>
+              <p className="text-gray-700">
+                Esta acción es <span className="font-bold text-red-600">IRREVERSIBLE</span> y resultará en:
+              </p>
+              <ul className="list-disc pl-5 space-y-2 text-gray-700">
+                <li>La eliminación permanente de <strong>todos tus registros de gastos</strong></li>
+                <li>La pérdida de <strong>toda tu información personal</strong></li>
+                <li>La eliminación completa de tu <strong>base de datos</strong></li>
+                <li>La cancelación de tu plan actual</li>
+              </ul>
+              <p className="text-red-600 font-semibold mt-4">
+                No podrás recuperar ninguna información después de confirmar esta acción.
+              </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-            <AlertDialogCancel className="rounded-xl">Cancelar</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-xl">No, mantener mi cuenta</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDeleteAccount}
               disabled={loading}
-              className="rounded-xl bg-red-600 hover:bg-red-700"
+              className="rounded-xl bg-red-600 hover:bg-red-700 font-bold"
             >
-              {loading ? "Eliminando..." : "Eliminar Cuenta"}
+              {loading ? "Eliminando..." : "Sí, eliminar todo"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
