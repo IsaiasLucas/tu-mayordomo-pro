@@ -409,28 +409,28 @@ export default function ReportesView() {
               <Button
                 variant={selectedPeriod === "week" ? "default" : "outline"}
                 onClick={() => setSelectedPeriod("week")}
-                className="h-11 text-sm"
+                className="h-11 text-xs sm:text-sm px-2"
               >
                 Semana Actual
               </Button>
               <Button
                 variant={selectedPeriod === "month" ? "default" : "outline"}
                 onClick={() => setSelectedPeriod("month")}
-                className="h-11 text-sm"
+                className="h-11 text-xs sm:text-sm px-2"
               >
                 Mes Actual
               </Button>
               <Button
                 variant={selectedPeriod === "lastMonth" ? "default" : "outline"}
                 onClick={() => setSelectedPeriod("lastMonth")}
-                className="h-11 text-sm"
+                className="h-11 text-xs sm:text-sm px-2"
               >
                 Mes Pasado
               </Button>
               <Button
                 variant={selectedPeriod === "custom" ? "default" : "outline"}
                 onClick={() => setSelectedPeriod("custom")}
-                className="h-11 text-sm"
+                className="h-11 text-xs sm:text-sm px-2"
               >
                 Personalizado
               </Button>
@@ -740,50 +740,50 @@ export default function ReportesView() {
             <Button 
               onClick={() => generar("semanal_actual")} 
               disabled={generating !== null}
-              className="flex items-center justify-center gap-2 h-11"
+              className="flex items-center justify-center gap-2 h-11 text-xs sm:text-sm px-3"
             >
               {generating === "semanal_actual" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              Semana Actual
+              <span className="truncate">Semana Actual</span>
             </Button>
             <Button 
               onClick={() => generar("mensual_actual")} 
               disabled={generating !== null}
-              className="flex items-center justify-center gap-2 h-11"
+              className="flex items-center justify-center gap-2 h-11 text-xs sm:text-sm px-3"
             >
               {generating === "mensual_actual" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              Mes Actual
+              <span className="truncate">Mes Actual</span>
             </Button>
             <Button 
               onClick={() => generar("semanal")} 
               disabled={generating !== null}
-              className="flex items-center justify-center gap-2 h-11"
+              className="flex items-center justify-center gap-2 h-11 text-xs sm:text-sm px-3"
             >
               {generating === "semanal" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              Semana Pasada
+              <span className="truncate">Semana Pasada</span>
             </Button>
             <Button 
               onClick={() => generar("mensual")} 
               disabled={generating !== null}
-              className="flex items-center justify-center gap-2 h-11"
+              className="flex items-center justify-center gap-2 h-11 text-xs sm:text-sm px-3"
             >
               {generating === "mensual" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              Mes Pasado
+              <span className="truncate">Mes Pasado</span>
             </Button>
           </div>
 
