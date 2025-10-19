@@ -39,10 +39,8 @@ export default function GastosView() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [data, setData] = useState<MonthData>({ items: [], totalIngresos: 0, totalGastos: 0, saldo: 0 });
   const [loading, setLoading] = useState(false);
-  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 50;
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const storedPhone = localStorage.getItem("tm_phone");
@@ -56,9 +54,7 @@ export default function GastosView() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!initialLoadComplete) {
-        setLoading(true);
-      }
+      setLoading(true);
       try {
         // Get authenticated user
         const { data: { user } } = await supabase.auth.getUser();
@@ -107,32 +103,78 @@ export default function GastosView() {
           totalGastos,
           saldo: totalIngresos - totalGastos
         });
-        setInitialLoadComplete(true);
       } catch (error) {
         console.error("Error fetching month data:", error);
       } finally {
-        if (!initialLoadComplete) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
 
     // Initial fetch
     fetchData();
     
-    // Setup polling
-    if (pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current);
-    }
+    // Setup Realtime subscription
+    const { startISO, endISO } = monthRangeUTCFromSantiago(selectedMonth);
     
-    pollingIntervalRef.current = setInterval(() => {
-      fetchData();
-    }, 5000);
+    const channel = supabase
+      .channel('gastos-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to INSERT, UPDATE, DELETE
+          schema: 'public',
+          table: 'gastos'
+        },
+        async (payload) => {
+          console.log('[Realtime] Change received:', payload);
+          
+          // Get current user
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
+          
+          // Check if the change is within the selected month and for current user
+          const changeDate = (payload.new as any)?.created_at || (payload.old as any)?.created_at;
+          if (changeDate >= startISO && changeDate <= endISO) {
+            // Only refetch if the change is for the current user
+            if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
+              // Silently refetch data without showing loading state
+              try {
+                const { data: gastos, error } = await supabase
+                  .from('gastos')
+                  .select('*')
+                  .eq('user_id', user.id)
+                  .gte('created_at', startISO)
+                  .lte('created_at', endISO)
+                  .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const items = gastos || [];
+                const totalIngresos = items
+                  .filter((m: any) => m.tipo?.toLowerCase() === "ingreso")
+                  .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
+                
+                const totalGastos = items
+                  .filter((m: any) => m.tipo?.toLowerCase() === "egreso" || m.tipo?.toLowerCase() === "gasto")
+                  .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
+
+                setData({
+                  items,
+                  totalIngresos,
+                  totalGastos,
+                  saldo: totalIngresos - totalGastos
+                });
+              } catch (error) {
+                console.error("Error refreshing data:", error);
+              }
+            }
+          }
+        }
+      )
+      .subscribe();
 
     return () => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-      }
+      supabase.removeChannel(channel);
     };
   }, [selectedMonth]);
 
