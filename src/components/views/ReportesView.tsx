@@ -10,7 +10,7 @@ import { es } from "date-fns/locale";
 import { CHILE_TIMEZONE, chileDateOptions, formatDisplayInSantiago } from "@/lib/date-config";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { Download, FileText, Loader2, PieChart, Lock, Calendar, TrendingUp, TrendingDown, Activity, BarChart3, DollarSign } from "lucide-react";
+import { Download, FileText, Loader2, PieChart, Lock, Calendar, TrendingUp, TrendingDown, Activity, BarChart3, DollarSign, Receipt } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   PieChart as RechartsPieChart, 
@@ -32,6 +32,8 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import FacturasBoletasSection from "@/components/FacturasBoletasSection";
 
 interface Movimiento {
   fecha: string;
@@ -397,9 +399,25 @@ export default function ReportesView() {
           Reportes Pro
         </h1>
         <p className="text-muted-foreground">
-          Análisis detallado de tus finanzas
+          Análisis detallado de tus finanzas y documentos
         </p>
       </div>
+
+      {/* Tabs para organizar las secciones */}
+      <Tabs defaultValue="analisis" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 h-12 mb-6">
+          <TabsTrigger value="analisis" className="h-10 data-[state=active]:shadow-elegant">
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Análisis Financiero
+          </TabsTrigger>
+          <TabsTrigger value="facturas" className="h-10 data-[state=active]:shadow-elegant">
+            <Receipt className="h-4 w-4 mr-2" />
+            Facturas y Boletas
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Tab de Análisis Financiero */}
+        <TabsContent value="analisis" className="space-y-6 animate-fade-in">{/* ... keep existing code (filtros, KPIs, gráficos, generar PDFs, movimientos recientes) */}
 
       {/* Filtros de periodo */}
       <Card className="shadow-card border-0">
@@ -829,7 +847,7 @@ export default function ReportesView() {
                           : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
                       )}>
                         {formatDisplayInSantiago((mov as any).created_at || mov.fecha, "dd/MM HH:mm")}
-                      </span>
+                       </span>
                       {mov.categoria && (
                         <span className="text-xs text-muted-foreground">• {mov.categoria}</span>
                       )}
@@ -851,6 +869,13 @@ export default function ReportesView() {
           </CardContent>
         </Card>
       )}
+        </TabsContent>
+
+        {/* Tab de Facturas y Boletas */}
+        <TabsContent value="facturas" className="animate-fade-in">
+          <FacturasBoletasSection />
+        </TabsContent>
+      </Tabs>
     </main>
   );
 }
