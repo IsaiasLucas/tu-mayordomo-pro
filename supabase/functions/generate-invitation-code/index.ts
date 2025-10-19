@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
       .from('invitation_codes')
       .insert({
         code,
-        empresa_id: user.id,
+        company_id: user.id,
       })
       .select()
       .single();

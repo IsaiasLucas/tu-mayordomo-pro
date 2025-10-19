@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
       .from('invitation_codes')
       .select('*')
       .eq('id', codeId)
-      .eq('empresa_id', user.id)
+      .eq('company_id', user.id)
       .single();
 
     if (fetchError || !code) {
