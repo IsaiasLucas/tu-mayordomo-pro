@@ -8,11 +8,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, TrendingUp, TrendingDown, Crown } from "lucide-react";
+import { AlertCircle, TrendingUp, TrendingDown, Crown, Calendar, Clock, Phone, Tag, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { getCurrentDateInSantiago, CHILE_TIMEZONE, formatDisplayInSantiago, monthRangeUTCFromSantiago } from "@/lib/date-config";
 import { formatInTimeZone } from "date-fns-tz";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface InicioViewProps {
   onOpenProfileModal: () => void;
@@ -40,12 +47,12 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     return cached ? JSON.parse(cached) : [];
   });
   const [loadingMovimientos, setLoadingMovimientos] = useState(false);
-  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [showBalance, setShowBalance] = useState(() => {
     const saved = localStorage.getItem("tm_show_balance");
     return saved === null ? true : saved === "true";
   });
+  const [selectedMovimiento, setSelectedMovimiento] = useState<any>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   // Calculate from ALL movimientos of the month
   const ingresos = allMovimientos
@@ -125,15 +132,58 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
       fetchMovimientos();
       fetchAllMovimientos();
       
-      // Setup polling every 5 seconds
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-      }
+      // Setup Realtime subscriptions for recent and all movements
+      const recentChannel = supabase
+        .channel('inicio-gastos-recent')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'gastos'
+          },
+          async (payload) => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+            
+            if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
+              fetchMovimientosUpdate();
+            }
+          }
+        )
+        .subscribe();
+
+      const now = getCurrentDateInSantiago();
+      const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const { startISO, endISO } = monthRangeUTCFromSantiago(mes);
+
+      const allChannel = supabase
+        .channel('inicio-gastos-all')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'gastos'
+          },
+          async (payload) => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+            
+            const changeDate = (payload.new as any)?.created_at || (payload.old as any)?.created_at;
+            if (changeDate >= startISO && changeDate <= endISO) {
+              if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
+                fetchAllMovimientosUpdate();
+              }
+            }
+          }
+        )
+        .subscribe();
       
-      pollingIntervalRef.current = setInterval(() => {
-        fetchMovimientosUpdate();
-        fetchAllMovimientosUpdate();
-      }, 5000);
+      return () => {
+        supabase.removeChannel(recentChannel);
+        supabase.removeChannel(allChannel);
+      };
     } else {
       console.log('No phone found in profile');
       localStorage.removeItem("tm_phone");
@@ -142,12 +192,6 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
       setMovimientos([]);
       setAllMovimientos([]);
     }
-    
-    return () => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-      }
-    };
   }, [profile]);
 
   // Listen for changes in showBalance preference
@@ -169,9 +213,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
   }, []);
 
   const fetchMovimientos = async () => {
-    if (!initialLoadComplete) {
-      setLoadingMovimientos(true);
-    }
+    setLoadingMovimientos(true);
     try {
       // Get authenticated user
       const { data: { user } } = await supabase.auth.getUser();
@@ -181,33 +223,18 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-.order('created_at', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(5);
 
       if (error) throw error;
 
       const newMovimientos = gastos || [];
-      try {
-        const sample = (newMovimientos || []).slice(0, 5).map((m: any) => ({
-          id: m.id,
-          created_at_raw: m.created_at,
-          newDate_toISOString: m?.created_at ? new Date(m.created_at).toISOString() : null,
-          display_scl: formatDisplayInSantiago(m.created_at, "dd/MM HH:mm"),
-        }));
-        console.log("[DEBUG Inicio] sample times:", sample);
-      } catch (e) {
-        console.log("[DEBUG Inicio] logging error", e);
-      }
-
       localStorage.setItem('tm_movimientos_cache', JSON.stringify(newMovimientos));
       setMovimientos(newMovimientos);
-      setInitialLoadComplete(true);
     } catch (error) {
       console.error("Error al cargar movimientos:", error);
     } finally {
-      if (!initialLoadComplete) {
-        setLoadingMovimientos(false);
-      }
+      setLoadingMovimientos(false);
     }
   };
 
@@ -221,24 +248,12 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-.order('created_at', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(5);
 
       if (error) throw error;
 
       const newMovimientos = gastos || [];
-      try {
-        const sample = (newMovimientos || []).slice(0, 5).map((m: any) => ({
-          id: m.id,
-          created_at_raw: m.created_at,
-          newDate_toISOString: m?.created_at ? new Date(m.created_at).toISOString() : null,
-          display_scl: formatDisplayInSantiago(m.created_at, "dd/MM HH:mm"),
-        }));
-        console.log("[DEBUG Inicio Update] sample times:", sample);
-      } catch (e) {
-        console.log("[DEBUG Inicio Update] logging error", e);
-      }
-
       const currentCache = localStorage.getItem('tm_movimientos_cache');
       const newCache = JSON.stringify(newMovimientos);
       if (currentCache !== newCache) {
@@ -449,7 +464,11 @@ const formatMovimientoDate = (dateString: string) => {
               {movimientos.map((mov, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/50 transition-colors gap-3"
+                  onClick={() => {
+                    setSelectedMovimiento(mov);
+                    setShowDetailsModal(true);
+                  }}
+                  className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/50 transition-colors gap-3 cursor-pointer"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1.5 flex-wrap">
@@ -484,6 +503,120 @@ const formatMovimientoDate = (dateString: string) => {
           )}
         </CardContent>
       </Card>
+
+      {/* Modal de detalhes */}
+      <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Detalle de la Transacción</DialogTitle>
+          </DialogHeader>
+          {selectedMovimiento && (
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 p-4 rounded-lg bg-accent/30">
+                <div className={`p-2 rounded-full ${
+                  (selectedMovimiento.tipo?.toLowerCase() === "ingreso" || selectedMovimiento.tipo?.toLowerCase() === "receita")
+                    ? "bg-green-100"
+                    : "bg-red-100"
+                }`}>
+                  {(selectedMovimiento.tipo?.toLowerCase() === "ingreso" || selectedMovimiento.tipo?.toLowerCase() === "receita") ? (
+                    <TrendingUp className="w-5 h-5 text-green-600" />
+                  ) : (
+                    <TrendingDown className="w-5 h-5 text-red-600" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-muted-foreground">Monto</p>
+                  <p className={`text-2xl font-bold ${
+                    (selectedMovimiento.tipo?.toLowerCase() === "ingreso" || selectedMovimiento.tipo?.toLowerCase() === "receita")
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}>
+                    {(selectedMovimiento.tipo?.toLowerCase() === "ingreso" || selectedMovimiento.tipo?.toLowerCase() === "receita") ? "+" : "-"}
+                    {fmtCLP(Math.abs(Number(selectedMovimiento.monto)))}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <Calendar className="w-5 h-5 text-muted-foreground mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm text-muted-foreground">Fecha</p>
+                    <p className="font-medium">
+                      {formatDisplayInSantiago(selectedMovimiento.created_at || selectedMovimiento.fecha, "dd/MM/yyyy")}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Clock className="w-5 h-5 text-muted-foreground mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm text-muted-foreground">Hora</p>
+                    <p className="font-medium">
+                      {formatDisplayInSantiago(selectedMovimiento.created_at || selectedMovimiento.fecha, "HH:mm:ss")}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <FileText className="w-5 h-5 text-muted-foreground mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm text-muted-foreground">Descripción</p>
+                    <p className="font-medium">{selectedMovimiento.descripcion || "Sin descripción"}</p>
+                  </div>
+                </div>
+
+                {selectedMovimiento.telefono && (
+                  <div className="flex items-start gap-3">
+                    <Phone className="w-5 h-5 text-muted-foreground mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm text-muted-foreground">Registrado desde</p>
+                      <p className="font-medium">{selectedMovimiento.telefono}</p>
+                    </div>
+                  </div>
+                )}
+
+                {selectedMovimiento.categoria && (
+                  <div className="flex items-start gap-3">
+                    <Tag className="w-5 h-5 text-muted-foreground mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm text-muted-foreground">Categoría</p>
+                      <p className="font-medium">{selectedMovimiento.categoria}</p>
+                    </div>
+                  </div>
+                )}
+
+                {selectedMovimiento.subtipo && (
+                  <div className="flex items-start gap-3">
+                    <Tag className="w-5 h-5 text-muted-foreground mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm text-muted-foreground">Subtipo</p>
+                      <p className="font-medium">{selectedMovimiento.subtipo}</p>
+                    </div>
+                  </div>
+                )}
+
+                {selectedMovimiento.detalles && (
+                  <div className="flex items-start gap-3">
+                    <FileText className="w-5 h-5 text-muted-foreground mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm text-muted-foreground">Detalles adicionales</p>
+                      <p className="font-medium">{selectedMovimiento.detalles}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <Button 
+                onClick={() => setShowDetailsModal(false)}
+                className="w-full"
+              >
+                Cerrar
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </main>
   );
 };
