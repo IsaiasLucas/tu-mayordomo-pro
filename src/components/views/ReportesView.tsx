@@ -4,15 +4,31 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from "date-fns";
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths, eachDayOfInterval, parseISO } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { es } from "date-fns/locale";
 import { CHILE_TIMEZONE, chileDateOptions, formatDisplayInSantiago } from "@/lib/date-config";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { Download, FileText, Loader2, PieChart, Lock, Calendar } from "lucide-react";
+import { Download, FileText, Loader2, PieChart, Lock, Calendar, TrendingUp, TrendingDown, Activity, BarChart3, DollarSign } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import { 
+  PieChart as RechartsPieChart, 
+  Pie, 
+  Cell, 
+  ResponsiveContainer, 
+  Legend, 
+  Tooltip, 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid,
+  LineChart,
+  Line,
+  Area,
+  AreaChart
+} from "recharts";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
@@ -31,14 +47,18 @@ export default function ReportesView() {
   const { toast } = useToast();
   const [generating, setGenerating] = useState<string | null>(null);
   const [chartData, setChartData] = useState<any[]>([]);
+  const [timelineData, setTimelineData] = useState<any[]>([]);
   const [totalIngresos, setTotalIngresos] = useState(0);
   const [totalEgresos, setTotalEgresos] = useState(0);
+  const [totalMovimientos, setTotalMovimientos] = useState(0);
   const [customStartDate, setCustomStartDate] = useState<Date>();
   const [customEndDate, setCustomEndDate] = useState<Date>();
+  const [selectedPeriod, setSelectedPeriod] = useState<"week" | "month" | "lastMonth" | "custom">("month");
+  const [recentMovimientos, setRecentMovimientos] = useState<Movimiento[]>([]);
   
   const isPro = profile?.plan === "pro" || profile?.plan === "mensal" || profile?.plan === "anual";
 
-  const COLORS = ['#4F46E5', '#EC4899', '#10B981', '#F59E0B', '#6366F1', '#8B5CF6', '#14B8A6', '#F97316'];
+  const COLORS = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#6366F1', '#14B8A6', '#F97316', '#EF4444'];
 
   const fetchMovimientos = async (startDate: Date, endDate: Date): Promise<Movimiento[]> => {
     const phone = profile?.phone_personal || profile?.phone_empresa;
@@ -92,19 +112,66 @@ export default function ReportesView() {
     return data.sort((a, b) => b.value - a.value);
   };
 
+  const processTimelineData = (movimientos: Movimiento[], startDate: Date, endDate: Date) => {
+    const days = eachDayOfInterval({ start: startDate, end: endDate });
+    const timeline = days.map(day => {
+      const dayStr = format(day, 'yyyy-MM-dd');
+      const dayMovs = movimientos.filter(m => {
+        const movDate = format(parseISO((m as any).created_at || m.fecha), 'yyyy-MM-dd');
+        return movDate === dayStr;
+      });
+
+      const ingresos = dayMovs
+        .filter(m => m.tipo.toLowerCase() === "ingreso" || m.tipo.toLowerCase() === "receita")
+        .reduce((sum, m) => sum + Number(m.monto || 0), 0);
+      
+      const egresos = dayMovs
+        .filter(m => m.tipo.toLowerCase() === "egreso" || m.tipo.toLowerCase() === "despesa" || m.tipo.toLowerCase() === "gasto")
+        .reduce((sum, m) => sum + Number(m.monto || 0), 0);
+
+      return {
+        fecha: format(day, 'dd/MM', { locale: es }),
+        ingresos,
+        egresos,
+        saldo: ingresos - egresos
+      };
+    });
+
+    return timeline;
+  };
+
   useEffect(() => {
-    const loadCurrentMonthData = async () => {
+    const loadPeriodData = async () => {
       if (!isPro) return;
       const phone = profile?.phone_personal || profile?.phone_empresa;
       if (!phone) return;
       
       const now = new Date();
-      const startDate = startOfMonth(now);
-      const endDate = endOfMonth(now);
+      let startDate: Date;
+      let endDate: Date;
+
+      if (selectedPeriod === "week") {
+        startDate = startOfWeek(now, { weekStartsOn: 1 });
+        endDate = endOfWeek(now, { weekStartsOn: 1 });
+      } else if (selectedPeriod === "month") {
+        startDate = startOfMonth(now);
+        endDate = endOfMonth(now);
+      } else if (selectedPeriod === "lastMonth") {
+        startDate = startOfMonth(subMonths(now, 1));
+        endDate = endOfMonth(subMonths(now, 1));
+      } else if (selectedPeriod === "custom" && customStartDate && customEndDate) {
+        startDate = customStartDate;
+        endDate = customEndDate;
+      } else {
+        return;
+      }
       
       const movimientos = await fetchMovimientos(startDate, endDate);
       const data = processChartData(movimientos);
       setChartData(data);
+
+      const timeline = processTimelineData(movimientos, startDate, endDate);
+      setTimelineData(timeline);
 
       const ingresos = movimientos
         .filter(m => m.tipo.toLowerCase() === "ingreso" || m.tipo.toLowerCase() === "receita")
@@ -116,10 +183,12 @@ export default function ReportesView() {
 
       setTotalIngresos(ingresos);
       setTotalEgresos(egresos);
+      setTotalMovimientos(movimientos.length);
+      setRecentMovimientos(movimientos.slice(0, 10));
     };
 
-    loadCurrentMonthData();
-  }, [isPro, profile]);
+    loadPeriodData();
+  }, [isPro, profile, selectedPeriod, customStartDate, customEndDate]);
 
   const generatePDF = (movimientos: Movimiento[], tipo: string, periodo: string) => {
     const doc = new jsPDF();
@@ -169,7 +238,7 @@ export default function ReportesView() {
           `${c.percentage.toFixed(1)}%`
         ]),
         styles: { fontSize: 9 },
-        headStyles: { fillColor: [79, 70, 229] },
+        headStyles: { fillColor: [139, 92, 246] },
       });
     }
 
@@ -177,15 +246,15 @@ export default function ReportesView() {
     autoTable(doc, {
       startY: (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 10 : 130,
       head: [['Fecha', 'Descripción', 'Categoría', 'Tipo', 'Valor']],
-body: movimientos.map(m => [
-  formatDisplayInSantiago((m as any).created_at, "dd/MM/yyyy HH:mm"),
-  m.descripcion,
-  m.categoria || '-',
-  m.tipo,
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(m.monto)
-]),
+      body: movimientos.map(m => [
+        formatDisplayInSantiago((m as any).created_at, "dd/MM/yyyy HH:mm"),
+        m.descripcion,
+        m.categoria || '-',
+        m.tipo,
+        new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(m.monto)
+      ]),
       styles: { fontSize: 9 },
-      headStyles: { fillColor: [79, 70, 229] },
+      headStyles: { fillColor: [139, 92, 246] },
     });
 
     return doc;
@@ -222,27 +291,22 @@ body: movimientos.map(m => [
       let periodo: string;
 
       if (tipo === "semanal") {
-        // Semana passada
         startDate = startOfWeek(subWeeks(now, 1), { weekStartsOn: 1 });
         endDate = endOfWeek(subWeeks(now, 1), { weekStartsOn: 1 });
         periodo = `${format(startDate, "dd/MM/yyyy")} - ${format(endDate, "dd/MM/yyyy")}`;
       } else if (tipo === "mensual") {
-        // Mês passado
         startDate = startOfMonth(subMonths(now, 1));
         endDate = endOfMonth(subMonths(now, 1));
         periodo = format(startDate, "MMMM yyyy", { locale: es });
       } else if (tipo === "semanal_actual") {
-        // Semana atual
         startDate = startOfWeek(now, { weekStartsOn: 1 });
         endDate = endOfWeek(now, { weekStartsOn: 1 });
         periodo = `${format(startDate, "dd/MM/yyyy")} - ${format(endDate, "dd/MM/yyyy")}`;
       } else if (tipo === "mensual_actual") {
-        // Mês atual
         startDate = startOfMonth(now);
         endDate = endOfMonth(now);
         periodo = format(now, "MMMM yyyy", { locale: es });
       } else {
-        // Personalizado
         startDate = customStartDate!;
         endDate = customEndDate!;
         periodo = `${format(startDate, "dd/MM/yyyy")} - ${format(endDate, "dd/MM/yyyy")}`;
@@ -275,7 +339,6 @@ body: movimientos.map(m => [
 
       if (error) throw error;
 
-      // Descargar PDF
       doc.save(`reporte-${tipo}-${format(now, "yyyy-MM-dd")}.pdf`);
 
       toast({
@@ -294,19 +357,30 @@ body: movimientos.map(m => [
     }
   };
 
+  const fmtCLP = (value: number) => {
+    return new Intl.NumberFormat('es-CL', { 
+      style: 'currency', 
+      currency: 'CLP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(value);
+  };
+
   if (!isPro) {
     return (
-      <main className="p-4">
-        <Card className="rounded-[24px] shadow-lg border-0">
+      <main className="px-4 py-5">
+        <Card className="shadow-card border-0">
           <CardContent className="p-8 sm:p-12 text-center">
-            <div className="flex justify-center mb-4">
-              <Lock className="h-16 w-16 text-muted-foreground" />
+            <div className="flex justify-center mb-6">
+              <div className="p-6 rounded-full bg-primary/10">
+                <Lock className="h-12 w-12 text-primary" />
+              </div>
             </div>
-            <h2 className="text-2xl font-bold mb-2">Recurso Pro</h2>
-            <p className="text-muted-foreground mb-6 text-sm sm:text-base">
-              Los reportes con análisis detallado y gráficos son exclusivos para usuarios Pro.
+            <h2 className="text-2xl font-bold mb-3">Reportes Pro</h2>
+            <p className="text-muted-foreground mb-6 text-base max-w-md mx-auto">
+              Los reportes con análisis detallado, gráficos y exportación PDF son exclusivos para usuarios Pro.
             </p>
-            <Button size="lg" className="rounded-xl">
+            <Button size="lg" className="h-12 px-8">
               Upgrade a Pro
             </Button>
           </CardContent>
@@ -316,40 +390,226 @@ body: movimientos.map(m => [
   }
 
   return (
-    <main className="p-4 space-y-4 pb-24">
-      {/* Gráficos de Análisis */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="rounded-[24px] shadow border-0">
+    <main className="px-4 py-5 space-y-6 pb-24 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+          Reportes Pro
+        </h1>
+        <p className="text-muted-foreground">
+          Análisis detallado de tus finanzas
+        </p>
+      </div>
+
+      {/* Filtros de periodo */}
+      <Card className="shadow-card border-0">
+        <CardContent className="p-4">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={selectedPeriod === "week" ? "default" : "outline"}
+                onClick={() => setSelectedPeriod("week")}
+                className="flex-1 sm:flex-none"
+              >
+                Semana Actual
+              </Button>
+              <Button
+                variant={selectedPeriod === "month" ? "default" : "outline"}
+                onClick={() => setSelectedPeriod("month")}
+                className="flex-1 sm:flex-none"
+              >
+                Mes Actual
+              </Button>
+              <Button
+                variant={selectedPeriod === "lastMonth" ? "default" : "outline"}
+                onClick={() => setSelectedPeriod("lastMonth")}
+                className="flex-1 sm:flex-none"
+              >
+                Mes Pasado
+              </Button>
+              <Button
+                variant={selectedPeriod === "custom" ? "default" : "outline"}
+                onClick={() => setSelectedPeriod("custom")}
+                className="flex-1 sm:flex-none"
+              >
+                Personalizado
+              </Button>
+            </div>
+
+            {selectedPeriod === "custom" && (
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="flex-1">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      {customStartDate ? format(customStartDate, "dd/MM/yyyy") : "Fecha Inicio"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={customStartDate}
+                      onSelect={setCustomStartDate}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="flex-1">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      {customEndDate ? format(customEndDate, "dd/MM/yyyy") : "Fecha Fin"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={customEndDate}
+                      onSelect={setCustomEndDate}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* KPIs Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Ingresos */}
+        <Card className="shadow-card border-0 overflow-hidden animate-fade-in">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-3 rounded-xl bg-green-100 dark:bg-green-900/20">
+                <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground font-medium">Ingresos</p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400 truncate">
+                {fmtCLP(totalIngresos)}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Egresos */}
+        <Card className="shadow-card border-0 overflow-hidden animate-fade-in" style={{ animationDelay: '0.1s' }}>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-3 rounded-xl bg-red-100 dark:bg-red-900/20">
+                <TrendingDown className="w-5 h-5 text-red-600 dark:text-red-400" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground font-medium">Egresos</p>
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400 truncate">
+                {fmtCLP(totalEgresos)}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Saldo */}
+        <Card className="shadow-card border-0 overflow-hidden animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className={cn(
+                "p-3 rounded-xl",
+                totalIngresos - totalEgresos >= 0 
+                  ? "bg-primary/10" 
+                  : "bg-orange-100 dark:bg-orange-900/20"
+              )}>
+                <DollarSign className={cn(
+                  "w-5 h-5",
+                  totalIngresos - totalEgresos >= 0 
+                    ? "text-primary" 
+                    : "text-orange-600 dark:text-orange-400"
+                )} />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground font-medium">Saldo</p>
+              <p className={cn(
+                "text-2xl font-bold truncate",
+                totalIngresos - totalEgresos >= 0 
+                  ? "text-primary" 
+                  : "text-orange-600 dark:text-orange-400"
+              )}>
+                {fmtCLP(totalIngresos - totalEgresos)}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Movimientos */}
+        <Card className="shadow-card border-0 overflow-hidden animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-3 rounded-xl bg-blue-100 dark:bg-blue-900/20">
+                <Activity className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground font-medium">Movimientos</p>
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                {totalMovimientos}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Gráficos */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Donut Chart - Gastos por Categoría */}
+        <Card className="shadow-card border-0">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <PieChart className="h-5 w-5" />
-              Gastos por Categoría (Mes Actual)
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <PieChart className="h-5 w-5 text-primary" />
+              Gastos por Categoría
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-4">
+          <CardContent className="pb-6">
             {chartData.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Sin datos para mostrar
+              <div className="text-center py-12 text-muted-foreground">
+                <BarChart3 className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                <p>Sin datos para mostrar</p>
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height={350}>
+              <ResponsiveContainer width="100%" height={300}>
                 <RechartsPieChart>
                   <Pie
                     data={chartData}
                     cx="50%"
                     cy="50%"
-                    labelLine={true}
-                    label={({ name, percentage }) => `${name}: ${percentage.toFixed(0)}%`}
-                    outerRadius={70}
+                    innerRadius={60}
+                    outerRadius={100}
                     fill="#8884d8"
                     dataKey="value"
+                    label={({ percentage }) => `${percentage.toFixed(0)}%`}
                   >
                     {chartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip 
-                    formatter={(value: number) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(value)}
+                    formatter={(value: number) => fmtCLP(value)}
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--card))', 
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px'
+                    }}
+                  />
+                  <Legend 
+                    verticalAlign="bottom" 
+                    height={36}
+                    formatter={(value) => <span className="text-sm">{value}</span>}
                   />
                 </RechartsPieChart>
               </ResponsiveContainer>
@@ -357,99 +617,154 @@ body: movimientos.map(m => [
           </CardContent>
         </Card>
 
-        <Card className="rounded-[24px] shadow border-0">
+        {/* Top Categorías - Barras horizontales */}
+        <Card className="shadow-card border-0">
           <CardHeader>
-            <CardTitle>Gastos por Categoría (Detalle)</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <BarChart3 className="h-5 w-5 text-primary" />
+              Top Categorías
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-6">
             {chartData.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Sin datos para mostrar
+              <div className="text-center py-12 text-muted-foreground">
+                <BarChart3 className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                <p>Sin datos para mostrar</p>
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
-                  <YAxis />
-                  <Tooltip 
-                    formatter={(value: number) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(value)}
-                  />
-                  <Bar dataKey="value" fill="#4F46E5" />
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="space-y-4">
+                {chartData.slice(0, 5).map((cat, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium truncate flex-1">{cat.name}</span>
+                      <span className="text-muted-foreground ml-2">{cat.percentage.toFixed(1)}%</span>
+                    </div>
+                    <div className="h-3 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ 
+                          width: `${cat.percentage}%`,
+                          backgroundColor: COLORS[index % COLORS.length]
+                        }}
+                      />
+                    </div>
+                    <p className="text-sm font-semibold" style={{ color: COLORS[index % COLORS.length] }}>
+                      {fmtCLP(cat.value)}
+                    </p>
+                  </div>
+                ))}
+              </div>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Resumen Mensual */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="rounded-[24px] shadow border-0">
-          <CardContent className="p-4 sm:p-6">
-            <div className="text-sm text-muted-foreground">Ingresos (Mes Actual)</div>
-            <div className="text-xl sm:text-2xl font-bold text-green-600">
-              {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(totalIngresos)}
-            </div>
+      {/* Timeline Chart */}
+      {timelineData.length > 0 && (
+        <Card className="shadow-card border-0">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Activity className="h-5 w-5 text-primary" />
+              Evolución Temporal
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pb-6">
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={timelineData}>
+                <defs>
+                  <linearGradient id="colorIngresos" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorEgresos" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#EF4444" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#EF4444" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis 
+                  dataKey="fecha" 
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                />
+                <YAxis 
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                />
+                <Tooltip 
+                  formatter={(value: number) => fmtCLP(value)}
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px'
+                  }}
+                />
+                <Legend />
+                <Area 
+                  type="monotone" 
+                  dataKey="ingresos" 
+                  stroke="#10B981" 
+                  fillOpacity={1} 
+                  fill="url(#colorIngresos)"
+                  name="Ingresos"
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="egresos" 
+                  stroke="#EF4444" 
+                  fillOpacity={1} 
+                  fill="url(#colorEgresos)"
+                  name="Egresos"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
-        <Card className="rounded-[24px] shadow border-0">
-          <CardContent className="p-4 sm:p-6">
-            <div className="text-sm text-muted-foreground">Egresos (Mes Actual)</div>
-            <div className="text-xl sm:text-2xl font-bold text-red-600">
-              {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(totalEgresos)}
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="rounded-[24px] shadow border-0">
-          <CardContent className="p-4 sm:p-6">
-            <div className="text-sm text-muted-foreground">Saldo</div>
-            <div className={cn("text-xl sm:text-2xl font-bold", totalIngresos - totalEgresos >= 0 ? "text-green-600" : "text-red-600")}>
-              {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(totalIngresos - totalEgresos)}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      )}
 
-      {/* Generar Reportes */}
-      <Card className="rounded-[24px] shadow border-0">
+      {/* Generar PDFs */}
+      <Card className="shadow-card border-0">
         <CardHeader>
-          <CardTitle>Generar Reportes PDF</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Download className="h-5 w-5 text-primary" />
+            Generar Reportes PDF
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-muted-foreground text-sm sm:text-base">
-            Genera reportes detallados en PDF con análisis por categoría para enviar a tu contador
+          <p className="text-muted-foreground text-sm">
+            Descarga reportes detallados en PDF con análisis por categoría
           </p>
           
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3">
             <Button 
               onClick={() => generar("semanal_actual")} 
-              className="rounded-xl flex items-center gap-2"
               disabled={generating !== null}
+              className="flex items-center gap-2"
             >
               {generating === "semanal_actual" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              Semana Atual
+              Semana Actual
             </Button>
             <Button 
               onClick={() => generar("mensual_actual")} 
-              className="rounded-xl flex items-center gap-2"
               disabled={generating !== null}
+              className="flex items-center gap-2"
             >
               {generating === "mensual_actual" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              Mes Atual
+              Mes Actual
             </Button>
             <Button 
               onClick={() => generar("semanal")} 
-              className="rounded-xl flex items-center gap-2"
               disabled={generating !== null}
+              className="flex items-center gap-2"
             >
               {generating === "semanal" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -460,8 +775,8 @@ body: movimientos.map(m => [
             </Button>
             <Button 
               onClick={() => generar("mensual")} 
-              className="rounded-xl flex items-center gap-2"
               disabled={generating !== null}
+              className="flex items-center gap-2"
             >
               {generating === "mensual" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -471,104 +786,71 @@ body: movimientos.map(m => [
               Mes Pasado
             </Button>
           </div>
-          
-          <div className="flex flex-col sm:flex-row gap-2 items-stretch">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="rounded-xl">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  {customStartDate ? format(customStartDate, "dd/MM/yyyy") : "Fecha Inicio"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <CalendarComponent
-                  mode="single"
-                  selected={customStartDate}
-                  onSelect={setCustomStartDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
 
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="rounded-xl">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  {customEndDate ? format(customEndDate, "dd/MM/yyyy") : "Fecha Fin"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <CalendarComponent
-                  mode="single"
-                  selected={customEndDate}
-                  onSelect={setCustomEndDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-
+          {selectedPeriod === "custom" && customStartDate && customEndDate && (
             <Button 
               onClick={() => generar("custom")} 
-              className="rounded-xl flex items-center gap-2"
-              disabled={generating !== null || !customStartDate || !customEndDate}
+              disabled={generating !== null}
+              className="w-full sm:w-auto flex items-center gap-2"
             >
               {generating === "custom" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              Generar
+              Generar Reporte Personalizado
             </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Historial de Reportes */}
-      <Card className="rounded-[24px] shadow border-0">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Historial de Reportes
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="text-center py-8 text-muted-foreground">Cargando...</div>
-          ) : items.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Ningún reporte generado aún. Haz clic en los botones de arriba para generar tu primer reporte.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {items.map((r: any) => (
-                <div
-                  key={r.id}
-                  className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
-                >
-                  <div>
-                    <div className="font-medium capitalize">{r.tipo} · {r.periodo}</div>
-                    <div className="text-sm text-muted-foreground">
-                      Generado el {new Date(r.created_at).toLocaleString('es-CL', { 
-                        ...chileDateOptions,
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </div>
-                    {r.data?.movimientos_count && (
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {r.data.movimientos_count} movimientos
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
           )}
         </CardContent>
       </Card>
+
+      {/* Movimientos recientes */}
+      {recentMovimientos.length > 0 && (
+        <Card className="shadow-card border-0">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <FileText className="h-5 w-5 text-primary" />
+              Movimientos del Periodo
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {recentMovimientos.map((mov, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/50 transition-colors"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={cn(
+                        "text-xs px-2 py-1 rounded font-medium",
+                        (mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita")
+                          ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                          : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+                      )}>
+                        {formatDisplayInSantiago((mov as any).created_at || mov.fecha, "dd/MM HH:mm")}
+                      </span>
+                      {mov.categoria && (
+                        <span className="text-xs text-muted-foreground">• {mov.categoria}</span>
+                      )}
+                    </div>
+                    <p className="font-medium truncate">{mov.descripcion}</p>
+                  </div>
+                  <span className={cn(
+                    "font-bold text-lg ml-3 flex-shrink-0",
+                    (mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita")
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-red-600 dark:text-red-400"
+                  )}>
+                    {(mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita") ? "+" : "-"}
+                    {fmtCLP(Math.abs(Number(mov.monto)))}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </main>
   );
 }
