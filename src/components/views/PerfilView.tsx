@@ -1009,8 +1009,8 @@ const PerfilView = () => {
 
       {/* Edit Profile Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="max-w-[95vw] sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="text-center">
+        <DialogContent className="max-w-[90vw] sm:max-w-[550px]">
+          <DialogHeader className="text-center pb-2">
             <DialogTitle className="text-2xl font-bold">Editar Perfil</DialogTitle>
             <DialogDescription className="text-base">
               Actualiza tu información personal y foto de perfil.
