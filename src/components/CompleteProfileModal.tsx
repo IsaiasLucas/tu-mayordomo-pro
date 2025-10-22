@@ -84,13 +84,14 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
       // Extract only digits for usuarios table
       const phoneDigits = whatsapp.replace(/\D/g, "");
 
-      // Save to Supabase profile with phone_personal
+      // Save to Supabase profile with phone_personal or phone_empresa based on tipo
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
           display_name: nombre,
-          phone_personal: whatsapp,
-          entidad: "personal",
+          phone_personal: tipo === "Personal" ? whatsapp : null,
+          phone_empresa: tipo === "Empresa" ? whatsapp : null,
+          entidad: tipo.toLowerCase(),
           whatsapp_configured: true
         })
         .eq('user_id', user.id);
@@ -137,8 +138,8 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleCancel}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleCancel()}>
+      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-primary/10 rounded-lg">
@@ -146,10 +147,10 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
             </div>
             <div>
               <DialogTitle className="text-xl">
-                Configura tu WhatsApp
+                Completa tu Perfil
               </DialogTitle>
               <DialogDescription className="text-sm text-muted-foreground mt-1">
-                Conecta tu WhatsApp una sola vez para comenzar a gestionar tus gastos
+                Configura tu cuenta para comenzar a gestionar tus gastos
               </DialogDescription>
             </div>
           </div>
@@ -260,18 +261,11 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
 
         <div className="flex gap-3 justify-end">
           <Button
-            variant="outline"
-            onClick={handleCancel}
-            disabled={loading}
-          >
-            Cancelar
-          </Button>
-          <Button
             onClick={handleSave}
             disabled={loading || phoneValid !== true || !nombre.trim() || !tipo}
-            className="min-w-[120px]"
+            className="w-full min-w-[120px]"
           >
-            {loading ? "Guardando..." : "Guardar"}
+            {loading ? "Guardando..." : "Completar Perfil"}
           </Button>
         </div>
       </DialogContent>

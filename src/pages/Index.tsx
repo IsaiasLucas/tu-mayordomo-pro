@@ -28,13 +28,11 @@ const Index = () => {
   // Check if user needs to complete profile after login
   useEffect(() => {
     if (isAuthenticated && !authLoading && profile) {
-      // Check if phone exists in Supabase profile OR if WhatsApp has been configured
-      const phoneFromProfile = profile?.phone_personal || profile?.phone_empresa;
-      const hasValidPhone = phoneFromProfile && phoneFromProfile.trim() !== '';
+      // Only show modal if WhatsApp hasn't been configured yet
       const isWhatsAppConfigured = profile?.whatsapp_configured === true;
       
-      // Only show modal if user doesn't have a phone AND hasn't configured WhatsApp
-      if (!hasValidPhone && !isWhatsAppConfigured) {
+      // Show modal for first-time setup (when whatsapp_configured is false/null)
+      if (!isWhatsAppConfigured) {
         setShowProfileModal(true);
       }
     }
