@@ -47,7 +47,8 @@ export default function Ingresar() {
   };
 
   return (
-    <main className="p-4 sm:p-6 space-y-4 max-w-md mx-auto">
+    <div className="h-full w-full overflow-y-auto bg-background">
+      <main className="p-4 sm:p-6 space-y-4 max-w-md mx-auto min-h-full flex flex-col justify-center">
       <h1 className="text-2xl font-semibold">Ingresar</h1>
       <p className="text-sm sm:text-base">Escribe tu número (solo dígitos, Chile 56...)</p>
       <input
@@ -73,6 +74,7 @@ export default function Ingresar() {
           Crear cuenta con email
         </button>
       </div>
-    </main>
+      </main>
+    </div>
   );
 }

@@ -49,7 +49,7 @@ const Index = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="h-full w-full bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
           <p>Cargando...</p>
@@ -100,7 +100,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-full w-full bg-background overflow-y-auto overflow-x-hidden">
       <Navigation
         currentView={currentView}
         onViewChange={handleViewChange}
