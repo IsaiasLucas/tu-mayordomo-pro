@@ -562,52 +562,52 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
   return (
     <div className="space-y-6 pb-20">
       {/* Profile Header */}
-      <Card className="bg-gradient-to-br from-purple-600 via-purple-500 to-blue-600 text-white shadow-2xl rounded-3xl overflow-hidden">
+      <Card className="bg-gradient-to-br from-purple-600 via-purple-500 to-blue-600 text-white shadow-xl rounded-2xl overflow-hidden">
         {/* Header Content */}
-        <div className="p-6 sm:p-8">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
+        <div className="p-4 sm:p-5">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
             {/* Profile Info */}
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 flex-1 min-w-0">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 flex-1 min-w-0">
               <div className="relative group">
-                <Avatar className="h-28 w-28 sm:h-32 sm:w-32 border-4 border-white/30 shadow-2xl ring-4 ring-white/10 transition-transform group-hover:scale-105">
+                <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-3 border-white/30 shadow-lg ring-2 ring-white/10 transition-transform group-hover:scale-105">
                   <AvatarImage src={avatarUrl || profile?.avatar_url || undefined} className="object-cover" />
-                  <AvatarFallback className="bg-white/20 text-white text-4xl backdrop-blur">
+                  <AvatarFallback className="bg-white/20 text-white text-2xl backdrop-blur">
                     {userProfile.name.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <button 
                   onClick={handleEditProfile}
-                  className="absolute -bottom-1 -right-1 bg-white text-purple-600 p-3 rounded-full shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-300 active:scale-95"
+                  className="absolute -bottom-0.5 -right-0.5 bg-white text-purple-600 p-2 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 active:scale-95"
                   aria-label="Editar foto"
                 >
-                  <Camera className="h-5 w-5" />
+                  <Camera className="h-4 w-4" />
                 </button>
               </div>
               
               <div className="flex-1 min-w-0 text-center sm:text-left">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
-                  <h1 className="text-2xl sm:text-3xl font-bold truncate">{userProfile.name}</h1>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 mb-1">
+                  <h1 className="text-xl sm:text-2xl font-bold truncate">{userProfile.name}</h1>
                   {isPro && (
-                    <Badge className="bg-yellow-400 text-black px-3 py-1 rounded-full font-semibold w-fit mx-auto sm:mx-0 animate-pulse shadow-lg">
+                    <Badge className="bg-yellow-400 text-black px-2 py-0.5 rounded-full font-semibold w-fit mx-auto sm:mx-0 animate-pulse shadow-md text-xs">
                       <Crown className="h-3 w-3 mr-1" />
                       PRO
                     </Badge>
                   )}
                 </div>
-                <p className="text-white/90 text-base sm:text-lg mb-3 truncate">{userProfile.email}</p>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-white/80">
-                  <span className="flex items-center justify-center sm:justify-start gap-1.5">
-                    <Phone className="h-4 w-4 flex-shrink-0" />
+                <p className="text-white/90 text-sm sm:text-base mb-2 truncate">{userProfile.email}</p>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 text-xs sm:text-sm text-white/80">
+                  <span className="flex items-center justify-center sm:justify-start gap-1">
+                    <Phone className="h-3.5 w-3.5 flex-shrink-0" />
                     <span className="truncate">{userProfile.phone}</span>
                   </span>
                   <span className="hidden sm:inline text-white/50">•</span>
-                  <span className="flex items-center justify-center sm:justify-start gap-1.5">
-                    <MapPin className="h-4 w-4 flex-shrink-0" />
+                  <span className="flex items-center justify-center sm:justify-start gap-1">
+                    <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
                     {userProfile.location}
                   </span>
                   <span className="hidden sm:inline text-white/50">•</span>
-                  <span className="flex items-center justify-center sm:justify-start gap-1.5">
-                    <Calendar className="h-4 w-4 flex-shrink-0" />
+                  <span className="flex items-center justify-center sm:justify-start gap-1">
+                    <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
                     {userProfile.joinDate}
                   </span>
                 </div>
@@ -617,10 +617,10 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
             {/* Edit Button */}
             <Button 
               variant="ghost" 
-              className="text-white hover:bg-white/20 rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base border-2 border-white/30 hover:border-white/50 transition-all hover:scale-105 shadow-lg backdrop-blur-sm w-full sm:w-auto touch-manipulation font-semibold"
+              className="text-white hover:bg-white/20 rounded-xl px-3 sm:px-4 py-2 text-sm border-2 border-white/30 hover:border-white/50 transition-all hover:scale-105 shadow-md backdrop-blur-sm w-full sm:w-auto touch-manipulation font-semibold"
               onClick={handleEditProfile}
             >
-              <Edit3 className="h-4 w-4 mr-2" />
+              <Edit3 className="h-4 w-4 mr-1.5" />
               Editar Perfil
             </Button>
           </div>
@@ -632,15 +632,15 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
               return (
                 <div 
                   key={index} 
-                  className="bg-white/15 backdrop-blur-md rounded-2xl p-5 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-xl group w-full max-w-xs"
+                  className="bg-white/15 backdrop-blur-md rounded-xl p-3 sm:p-4 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-lg group w-full max-w-xs"
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="bg-white/20 p-2 rounded-xl group-hover:bg-white/30 transition-colors">
-                      <IconComponent className="h-5 w-5" />
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="bg-white/20 p-1.5 rounded-lg group-hover:bg-white/30 transition-colors">
+                      <IconComponent className="h-4 w-4" />
                     </div>
-                    <span className="text-sm font-medium text-white/90">{stat.label}</span>
+                    <span className="text-xs sm:text-sm font-medium text-white/90">{stat.label}</span>
                   </div>
-                  <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
+                  <p className="text-2xl sm:text-3xl font-bold tracking-tight">{stat.value}</p>
                 </div>
               );
             })}
