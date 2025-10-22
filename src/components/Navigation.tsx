@@ -58,7 +58,7 @@ const Navigation = ({
                 onClick={handleClick}
                 className={cn(
                   "flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ease-out touch-manipulation relative",
-                  "min-w-[66px] px-3.5 py-2.5",
+                  "min-w-[69px] px-3.5 py-2.5",
                   isActive 
                     ? "bg-gradient-to-br from-primary via-primary-glow to-primary rounded-2xl shadow-glow scale-105" 
                     : "hover:scale-105 active:scale-95",
@@ -67,13 +67,13 @@ const Navigation = ({
               >
                 <Icon 
                   className={cn(
-                    "w-5 h-5 transition-all duration-300",
+                    "w-[22px] h-[22px] transition-all duration-300",
                     isActive ? "text-primary-foreground" : "text-foreground"
                   )} 
                 />
                 <span 
                   className={cn(
-                    "text-[11px] font-semibold leading-none whitespace-nowrap transition-colors duration-300",
+                    "text-[11.5px] font-semibold leading-none whitespace-nowrap transition-colors duration-300",
                     isActive ? "text-primary-foreground" : "text-foreground"
                   )}
                 >
