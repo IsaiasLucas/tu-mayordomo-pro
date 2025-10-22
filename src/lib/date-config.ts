@@ -10,7 +10,7 @@ export const CHILE_TIMEZONE = 'America/Santiago';
 export const chileLocale = es;
 
 // Función para obtener la fecha actual en hora de Santiago
-export const getCurrentDateInSantiago = (): Date => {
+export function getCurrentDateInSantiago(): Date {
   const now = new Date();
   const santiagoNow = toZonedTime(now, CHILE_TIMEZONE);
   
@@ -22,12 +22,12 @@ export const getCurrentDateInSantiago = (): Date => {
   });
   
   return santiagoNow;
-};
+}
 
 // Función para formatear fecha en hora de Santiago
-export const formatDateInSantiago = (date: Date): string => {
+export function formatDateInSantiago(date: Date): string {
   return new Date(date.toLocaleString('en-US', { timeZone: CHILE_TIMEZONE })).toISOString();
-};
+}
 
 // Opciones de formato para Chile
 export const chileDateOptions: Intl.DateTimeFormatOptions = {
@@ -41,10 +41,10 @@ export const chileDateOptions: Intl.DateTimeFormatOptions = {
 };
 
 // Formato para exibir a data EXATAMENTE como está no banco (sem conversão)
-export const formatDatabaseDate = (
+export function formatDatabaseDate(
   date: string | Date,
   pattern: string = "dd/MM HH:mm"
-): string => {
+): string {
   try {
     if (typeof date === 'string') {
       const raw = date.trim();
@@ -97,10 +97,10 @@ export const formatDatabaseDate = (
     console.warn('formatDatabaseDate error:', date, e);
     return String(date);
   }
-};
+}
 
 // Convierte 'YYYY-MM' a rango UTC exacto basado en America/Santiago
-export const monthRangeUTCFromSantiago = (ym: string) => {
+export function monthRangeUTCFromSantiago(ym: string) {
   const [yStr, mStr] = ym.split('-');
   const year = parseInt(yStr, 10);
   const month = parseInt(mStr, 10);
@@ -110,4 +110,4 @@ export const monthRangeUTCFromSantiago = (ym: string) => {
   const endISO = fromZonedTime(`${ym}-${String(lastDay).padStart(2, '0')}T23:59:59`, CHILE_TIMEZONE).toISOString();
 
   return { startISO, endISO };
-};
+}
