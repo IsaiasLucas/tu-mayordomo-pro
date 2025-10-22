@@ -100,7 +100,7 @@ const Index = () => {
   };
 
   return (
-    <div className="h-full w-full bg-background overflow-y-auto overflow-x-hidden">
+    <div className="min-h-screen w-full bg-background overflow-y-auto overflow-x-hidden">
       <Navigation
         currentView={currentView}
         onViewChange={handleViewChange}
