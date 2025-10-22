@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { Shield, MessageCircle, CheckCircle2, AlertCircle, Building2, User } from "lucide-react";
+import { Shield, MessageCircle, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { cn } from "@/lib/utils";
 
 interface CompleteProfileModalProps {
   open: boolean;
@@ -16,7 +15,6 @@ interface CompleteProfileModalProps {
 export default function CompleteProfileModal({ open, onClose }: CompleteProfileModalProps) {
   const [nombre, setNombre] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
-  const [tipo, setTipo] = useState("");
   const [loading, setLoading] = useState(false);
   const [phoneValid, setPhoneValid] = useState<boolean | null>(null);
 
@@ -66,15 +64,6 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
       return;
     }
 
-    if (!tipo) {
-      toast({
-        title: "Error",
-        description: "Debes seleccionar un tipo de cuenta",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setLoading(true);
 
     try {
@@ -85,21 +74,20 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
       // Extract only digits for usuarios table
       const phoneDigits = whatsapp.replace(/\D/g, "");
 
-      // Save to Supabase profile
-      const phoneField = tipo === "Empresa" ? "phone_empresa" : "phone_personal";
+      // Save to Supabase profile with phone_personal
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
           display_name: nombre,
-          [phoneField]: whatsapp,
-          entidad: tipo === "Empresa" ? "empresa" : "personal",
+          phone_personal: whatsapp,
+          entidad: "personal",
           whatsapp_configured: true
         })
         .eq('user_id', user.id);
 
       if (profileError) throw profileError;
 
-      // Update usuarios table (record was created by trigger)
+      // Update usuarios table with telefono
       const { error: usuariosError } = await supabase
         .from('usuarios')
         .update({
@@ -107,14 +95,11 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
         })
         .eq('user_id', user.id);
 
-      if (usuariosError) {
-        console.error('Error updating usuarios:', usuariosError);
-        throw usuariosError;
-      }
+      if (usuariosError) throw usuariosError;
 
       toast({
         title: "✅ Perfil completado",
-        description: "Tus datos han sido guardados correctamente.",
+        description: "Tu WhatsApp ha sido configurado correctamente.",
       });
 
       // Force page reload to update profile state
@@ -160,7 +145,7 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="nombre">Nombre *</Label>
+            <Label htmlFor="nombre">Nombre completo *</Label>
             <Input
               id="nombre"
               placeholder="Tu nombre completo"
@@ -204,65 +189,6 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
               Introduce tu número chileno (debe comenzar con 9)
             </p>
           </div>
-
-          <div className="space-y-3">
-            <Label>Tipo de cuenta *</Label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setTipo("Personal")}
-                disabled={loading}
-                className={cn(
-                  "flex flex-col items-center justify-center gap-3 p-6 rounded-xl border-2 transition-all duration-200 touch-manipulation",
-                  "hover:shadow-lg active:scale-95",
-                  tipo === "Personal" 
-                    ? "border-primary bg-primary/10 shadow-md" 
-                    : "border-border bg-card hover:border-primary/50"
-                )}
-              >
-                <User className={cn(
-                  "w-8 h-8 transition-colors",
-                  tipo === "Personal" ? "text-primary" : "text-muted-foreground"
-                )} />
-                <span className={cn(
-                  "text-sm font-medium",
-                  tipo === "Personal" ? "text-primary" : "text-foreground"
-                )}>
-                  Personal
-                </span>
-                {tipo === "Personal" && (
-                  <CheckCircle2 className="w-5 h-5 text-primary absolute top-2 right-2" />
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setTipo("Empresa")}
-                disabled={loading}
-                className={cn(
-                  "flex flex-col items-center justify-center gap-3 p-6 rounded-xl border-2 transition-all duration-200 relative touch-manipulation",
-                  "hover:shadow-lg active:scale-95",
-                  tipo === "Empresa" 
-                    ? "border-primary bg-primary/10 shadow-md" 
-                    : "border-border bg-card hover:border-primary/50"
-                )}
-              >
-                <Building2 className={cn(
-                  "w-8 h-8 transition-colors",
-                  tipo === "Empresa" ? "text-primary" : "text-muted-foreground"
-                )} />
-                <span className={cn(
-                  "text-sm font-medium",
-                  tipo === "Empresa" ? "text-primary" : "text-foreground"
-                )}>
-                  Empresa
-                </span>
-                {tipo === "Empresa" && (
-                  <CheckCircle2 className="w-5 h-5 text-primary absolute top-2 right-2" />
-                )}
-              </button>
-            </div>
-          </div>
         </div>
 
         <div className="flex gap-3 justify-end">
@@ -275,7 +201,7 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
           </Button>
           <Button
             onClick={handleSave}
-            disabled={loading || phoneValid !== true || !nombre.trim() || !tipo}
+            disabled={loading || phoneValid !== true || !nombre.trim()}
             className="min-w-[120px]"
           >
             {loading ? "Guardando..." : "Guardar"}
