@@ -1,11 +1,11 @@
-import React from "react";
+import { ReactNode } from "react";
 
 interface ViewTransitionProps {
-  children: React.ReactNode;
+  children: ReactNode;
   viewKey: string;
 }
 
-export const ViewTransition = React.memo(({ children, viewKey }: ViewTransitionProps) => {
+export function ViewTransition({ children, viewKey }: ViewTransitionProps) {
   return (
     <div 
       key={viewKey} 
@@ -19,6 +19,4 @@ export const ViewTransition = React.memo(({ children, viewKey }: ViewTransitionP
       {children}
     </div>
   );
-});
-
-ViewTransition.displayName = "ViewTransition";
+}
