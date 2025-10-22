@@ -31,9 +31,9 @@ const HeroOverview = ({ total, varPct, title }: HeroOverviewProps) => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-600 to-purple-700 text-white rounded-[24px] p-7 shadow-lg">
-      <h2 className="text-xl font-medium mb-3">{title}</h2>
-      <span className="text-4xl font-bold">
+    <div className="bg-gradient-to-br from-blue-600 to-purple-700 text-white rounded-2xl sm:rounded-[24px] p-5 sm:p-7 shadow-lg">
+      <h2 className="text-lg sm:text-xl font-medium mb-2 sm:mb-3">{title}</h2>
+      <span className="text-3xl sm:text-4xl font-bold">
         {showBalance ? formatCLP(total) : "••••••"}
       </span>
     </div>

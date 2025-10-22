@@ -58,10 +58,10 @@ const Navigation = ({
               }
             };
             
-            return <Button key={item.id} variant={isActive ? "default" : "ghost"} size="sm" onClick={handleClick} className={cn("flex flex-col items-center gap-1.5 h-auto py-4 px-4 rounded-full transition-all min-w-0 flex-1 touch-manipulation", isActive && "bg-primary text-primary-foreground shadow-md", isLocked && "opacity-50", "hover:scale-105 active:scale-95")}>
-                  <Icon className="w-6 h-6 flex-shrink-0" />
-                  <span className="text-xs font-medium leading-none">{item.label}</span>
-                  {item.requiresPro && !isPro && <Badge variant="secondary" className="absolute -top-1 -right-1 text-xs w-4 h-4 p-0 flex items-center justify-center">
+            return <Button key={item.id} variant={isActive ? "default" : "ghost"} size="sm" onClick={handleClick} className={cn("flex flex-col items-center gap-1.5 h-auto py-3 sm:py-4 px-3 sm:px-4 rounded-full transition-all min-w-0 flex-1 touch-manipulation", isActive && "bg-primary text-primary-foreground shadow-md", isLocked && "opacity-50", "hover:scale-105 active:scale-95")}>
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
+                  <span className="text-[11px] sm:text-xs font-semibold leading-none">{item.label}</span>
+                  {item.requiresPro && !isPro && <Badge variant="secondary" className="absolute -top-1 -right-1 text-[9px] sm:text-xs w-3.5 h-3.5 sm:w-4 sm:h-4 p-0 flex items-center justify-center">
               </Badge>}
                 </Button>;
           })}

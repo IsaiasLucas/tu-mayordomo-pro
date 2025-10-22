@@ -600,7 +600,7 @@ const PerfilView = () => {
             {/* Edit Button */}
             <Button 
               variant="ghost" 
-              className="text-white hover:bg-white/20 rounded-2xl px-6 py-3 border-2 border-white/30 hover:border-white/50 transition-all hover:scale-105 shadow-lg backdrop-blur-sm w-full sm:w-auto"
+              className="text-white hover:bg-white/20 rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base border-2 border-white/30 hover:border-white/50 transition-all hover:scale-105 shadow-lg backdrop-blur-sm w-full sm:w-auto touch-manipulation font-semibold"
               onClick={handleEditProfile}
             >
               <Edit3 className="h-4 w-4 mr-2" />
@@ -703,17 +703,17 @@ const PerfilView = () => {
                 <Button 
                   variant="outline" 
                   onClick={handleExportData}
-                  className="w-full rounded-2xl py-3 justify-start"
+                  className="w-full h-11 sm:h-12 rounded-2xl text-sm sm:text-base font-semibold justify-start touch-manipulation"
                 >
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className="h-4 w-4 mr-2 flex-shrink-0" />
                   Exportar mis datos
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => setShowPasswordDialog(true)}
-                  className="w-full rounded-2xl py-3 justify-start"
+                  className="w-full h-11 sm:h-12 rounded-2xl text-sm sm:text-base font-semibold justify-start touch-manipulation"
                 >
-                  <Shield className="h-4 w-4 mr-2" />
+                  <Shield className="h-4 w-4 mr-2 flex-shrink-0" />
                   Cambiar contraseña
                 </Button>
               </div>
@@ -725,18 +725,18 @@ const PerfilView = () => {
                 <Button 
                   variant="outline" 
                   onClick={() => setShowDeleteDialog(true)}
-                  className="w-full rounded-2xl py-3 justify-start text-red-600 border-red-300 hover:bg-red-50"
+                  className="w-full h-11 sm:h-12 rounded-2xl text-sm sm:text-base font-semibold justify-start text-red-600 border-red-300 hover:bg-red-50 touch-manipulation"
                 >
-                  <Trash2 className="h-4 w-4 mr-2" />
+                  <Trash2 className="h-4 w-4 mr-2 flex-shrink-0" />
                   Eliminar cuenta
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={handleSignOut}
                   disabled={loading}
-                  className="w-full rounded-2xl py-3 justify-start"
+                  className="w-full h-11 sm:h-12 rounded-2xl text-sm sm:text-base font-semibold justify-start touch-manipulation"
                 >
-                  <LogOut className="h-4 w-4 mr-2" />
+                  <LogOut className="h-4 w-4 mr-2 flex-shrink-0" />
                   {loading ? "Cerrando sesión..." : "Salir"}
                 </Button>
               </div>
@@ -771,7 +771,7 @@ const PerfilView = () => {
             <Button 
               onClick={() => setShowCancelPlanDialog(true)}
               variant="destructive"
-              className="rounded-2xl px-6 w-full sm:w-auto"
+              className="rounded-2xl h-11 sm:h-12 text-sm sm:text-base font-semibold px-4 sm:px-6 w-full sm:w-auto touch-manipulation"
             >
               Cancelar Plan
             </Button>
@@ -791,10 +791,10 @@ const PerfilView = () => {
               <Button
                 onClick={handleGenerateInvitationCode}
                 disabled={generatingCode}
-                className="rounded-2xl px-6 w-full sm:w-auto bg-purple-600 hover:bg-purple-700"
+                className="rounded-2xl h-11 sm:h-12 text-sm sm:text-base font-semibold px-4 sm:px-6 w-full sm:w-auto bg-purple-600 hover:bg-purple-700 touch-manipulation"
               >
-                <Plus className="h-4 w-4 mr-2" />
-                {generatingCode ? "Generando..." : "Generar código de invitación"}
+                <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
+                {generatingCode ? "Generando..." : "Generar código"}
               </Button>
             </div>
 

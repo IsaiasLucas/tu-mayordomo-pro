@@ -267,10 +267,10 @@ export default function PlanesView() {
           Elige tu Plan
         </h1>
         
-        {isProPlan && <div className="flex gap-3 justify-center items-center mt-4">
+          {isProPlan && <div className="flex gap-2 sm:gap-3 justify-center items-center mt-4">
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="destructive" className="rounded-xl" disabled={cancellingSubscription}>
+                <Button variant="destructive" className="rounded-xl h-10 sm:h-11 text-sm sm:text-base font-semibold touch-manipulation" disabled={cancellingSubscription}>
                   {cancellingSubscription ? <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       Cancelando...
@@ -475,7 +475,7 @@ export default function PlanesView() {
                   </CardContent>
 
                   <CardFooter className="relative z-10 pt-6 mt-auto">
-                    <Button variant={plan.popular ? "default" : "outline"} className="w-full rounded-xl font-semibold transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg" onClick={() => handleSelectPlan(plan.id, plan.priceId)} disabled={isCurrent || isSelecting}>
+                    <Button variant={plan.popular ? "default" : "outline"} className="w-full h-11 sm:h-12 rounded-xl text-sm sm:text-base font-bold transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg touch-manipulation" onClick={() => handleSelectPlan(plan.id, plan.priceId)} disabled={isCurrent || isSelecting}>
                       {isCurrent ? "Plan Actual" : isSelecting ? <span className="flex items-center gap-2">
                           <Loader2 className="h-4 w-4 animate-spin" />
                           Procesando...
