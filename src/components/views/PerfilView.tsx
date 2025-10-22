@@ -568,21 +568,12 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
             {/* Profile Info */}
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 flex-1 min-w-0">
-              <div className="relative group">
-                <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-3 border-white/30 shadow-lg ring-2 ring-white/10 transition-transform group-hover:scale-105">
-                  <AvatarImage src={avatarUrl || profile?.avatar_url || undefined} className="object-cover" />
-                  <AvatarFallback className="bg-white/20 text-white text-2xl backdrop-blur">
-                    {userProfile.name.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <button 
-                  onClick={handleEditProfile}
-                  className="absolute bottom-0 right-0 bg-white text-purple-600 p-1.5 rounded-full shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 active:scale-95 opacity-90 hover:opacity-100"
-                  aria-label="Editar foto"
-                >
-                  <Camera className="h-3.5 w-3.5" />
-                </button>
-              </div>
+              <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-3 border-white/30 shadow-lg ring-2 ring-white/10 transition-transform group-hover:scale-105">
+                <AvatarImage src={avatarUrl || profile?.avatar_url || undefined} className="object-cover" />
+                <AvatarFallback className="bg-white/20 text-white text-2xl backdrop-blur">
+                  {userProfile.name.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
               
               <div className="flex-1 min-w-0 text-center sm:text-left">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 mb-1">
