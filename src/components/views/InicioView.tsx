@@ -491,15 +491,15 @@ const formatMovimientoDate = (dateString: string) => {
 
       <div className="grid grid-cols-2 gap-4 sm:gap-5">
         <Card className="shadow-card rounded-xl sm:rounded-2xl border-0">
-          <CardContent className="p-5 sm:p-6">
-            <p className="text-sm sm:text-base text-muted-foreground mb-2 sm:mb-2.5">Ingresos</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 truncate">{fmtCLP(ingresos)}</p>
+          <CardContent className="p-6 sm:p-7">
+            <p className="text-base sm:text-lg text-muted-foreground mb-2.5 sm:mb-3">Ingresos</p>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-green-600 truncate">{fmtCLP(ingresos)}</p>
           </CardContent>
         </Card>
         <Card className="shadow-card rounded-xl sm:rounded-2xl border-0">
-          <CardContent className="p-5 sm:p-6">
-            <p className="text-sm sm:text-base text-muted-foreground mb-2 sm:mb-2.5">Gastos</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-red-600 truncate">{fmtCLP(egresos)}</p>
+          <CardContent className="p-6 sm:p-7">
+            <p className="text-base sm:text-lg text-muted-foreground mb-2.5 sm:mb-3">Gastos</p>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-red-600 truncate">{fmtCLP(egresos)}</p>
           </CardContent>
         </Card>
       </div>
@@ -526,23 +526,23 @@ const formatMovimientoDate = (dateString: string) => {
               </AlertDescription>
             </Alert>
           ) : loadingMovimientos ? (
-            <div className="space-y-2 sm:space-y-3">
+            <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center justify-between p-3 sm:p-4 rounded-lg sm:rounded-xl border">
-                  <div className="flex-1 space-y-1.5 sm:space-y-2">
-                    <Skeleton className="h-3 sm:h-4 w-20 sm:w-24" />
-                    <Skeleton className="h-4 sm:h-5 w-28 sm:w-36" />
+                <div key={i} className="flex items-center justify-between p-4 sm:p-5 rounded-lg sm:rounded-xl border">
+                  <div className="flex-1 space-y-2 sm:space-y-2.5">
+                    <Skeleton className="h-4 sm:h-5 w-24 sm:w-28" />
+                    <Skeleton className="h-5 sm:h-6 w-36 sm:w-44" />
                   </div>
-                  <Skeleton className="h-5 sm:h-6 w-16 sm:w-20" />
+                  <Skeleton className="h-6 sm:h-7 w-20 sm:w-24" />
                 </div>
               ))}
             </div>
           ) : movimientos.length === 0 ? (
-            <div className="text-center py-6 sm:py-8 text-muted-foreground text-sm sm:text-base">
+            <div className="text-center py-8 sm:py-10 text-muted-foreground text-base sm:text-lg">
               No hay movimientos recientes
             </div>
           ) : (
-            <div className="space-y-2 sm:space-y-3">
+            <div className="space-y-3 sm:space-y-4">
               {movimientos.map((mov, index) => (
                 <div
                   key={index}
@@ -550,11 +550,11 @@ const formatMovimientoDate = (dateString: string) => {
                     setSelectedMovimiento(mov);
                     setShowDetailsModal(true);
                   }}
-                  className="flex items-center justify-between p-3 sm:p-4 rounded-lg sm:rounded-xl border bg-card hover:bg-accent/50 active:bg-accent/70 transition-colors gap-2 sm:gap-3 cursor-pointer touch-manipulation"
+                  className="flex items-center justify-between p-4 sm:p-5 rounded-lg sm:rounded-xl border bg-card hover:bg-accent/50 active:bg-accent/70 transition-colors gap-3 sm:gap-4 cursor-pointer touch-manipulation"
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5 flex-wrap">
-                      <span className={`text-xs sm:text-sm px-1.5 sm:px-2 py-0.5 sm:py-1 rounded font-medium ${
+                    <div className="flex items-center gap-2 sm:gap-2.5 mb-1.5 sm:mb-2 flex-wrap">
+                      <span className={`text-sm sm:text-base px-2 sm:px-2.5 py-1 sm:py-1.5 rounded font-medium ${
                         (mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita")
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
@@ -562,16 +562,16 @@ const formatMovimientoDate = (dateString: string) => {
                         {formatMovimientoDate(((mov as any).created_at ?? mov.fecha) as string)}
                       </span>
                       {(mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita") ? (
-                        <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600 flex-shrink-0" />
+                        <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
                       ) : (
-                        <TrendingDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600 flex-shrink-0" />
+                        <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 flex-shrink-0" />
                       )}
                     </div>
-                    <p className="text-sm sm:text-base font-medium truncate leading-tight">
+                    <p className="text-base sm:text-lg font-medium truncate leading-tight">
                       {mov.descripcion}
                     </p>
                   </div>
-                  <span className={`font-bold text-base sm:text-lg flex-shrink-0 ${
+                  <span className={`font-bold text-lg sm:text-xl flex-shrink-0 ${
                     (mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita")
                       ? "text-green-600"
                       : "text-red-600"

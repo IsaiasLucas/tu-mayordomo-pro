@@ -38,7 +38,7 @@ const Navigation = ({
       style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}
     >
       <nav className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-[1.5rem] shadow-2xl transition-all duration-300 ease-out">
-        <div className="flex items-center justify-center gap-1.5 px-4 py-2.5">
+        <div className="flex items-center justify-center gap-2 px-5 py-3">
           {navigationItems.map(item => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
@@ -57,8 +57,8 @@ const Navigation = ({
                 key={item.id}
                 onClick={handleClick}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 transition-all duration-300 ease-out touch-manipulation relative",
-                  "min-w-[60px] px-3 py-2.5",
+                  "flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ease-out touch-manipulation relative",
+                  "min-w-[70px] px-4 py-3",
                   isActive 
                     ? "bg-gradient-to-br from-primary via-primary-glow to-primary rounded-2xl shadow-glow scale-105" 
                     : "hover:scale-105 active:scale-95",
@@ -67,13 +67,13 @@ const Navigation = ({
               >
                 <Icon 
                   className={cn(
-                    "w-5 h-5 transition-all duration-300",
+                    "w-6 h-6 transition-all duration-300",
                     isActive ? "text-primary-foreground" : "text-foreground"
                   )} 
                 />
                 <span 
                   className={cn(
-                    "text-[10px] font-semibold leading-none whitespace-nowrap transition-colors duration-300",
+                    "text-xs font-semibold leading-none whitespace-nowrap transition-colors duration-300",
                     isActive ? "text-primary-foreground" : "text-foreground"
                   )}
                 >
