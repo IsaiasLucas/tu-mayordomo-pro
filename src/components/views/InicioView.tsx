@@ -64,7 +64,7 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
       if (sessionStorage.getItem('profilePopupShown')) return;
 
       // Only show popup if profile is not complete (new account)
-      const showPopup = profile.profile_complete === false;
+      const showPopup = profile.usuario_profile_complete === false || !profile.telefono;
 
       if (showPopup) {
         onOpenProfileModal();

@@ -10,6 +10,7 @@ interface ProfileData {
   phone_empresa: string | null;
   display_name: string | null;
   entidad: string;
+  usuario_profile_complete: boolean;
 }
 
 let cachedProfile: ProfileData | null = null;
@@ -57,7 +58,7 @@ export const useProfile = () => {
           .maybeSingle(),
         supabase
           .from('usuarios')
-          .select('telefono')
+          .select('telefono, profile_complete')
           .eq('user_id', user.id)
           .maybeSingle()
       ]);
@@ -78,7 +79,8 @@ export const useProfile = () => {
         phone_personal: profileData?.phone_personal || null,
         phone_empresa: profileData?.phone_empresa || null,
         display_name: profileData?.display_name || null,
-        entidad: profileData?.entidad || 'personal'
+        entidad: profileData?.entidad || 'personal',
+        usuario_profile_complete: usuarioData?.profile_complete || false
       };
     } catch (error) {
       console.error('Error in fetchProfile:', error);

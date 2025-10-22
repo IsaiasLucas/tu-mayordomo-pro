@@ -352,6 +352,7 @@ export type Database = {
           nombre: string | null
           plan: string | null
           plan_expires_at: string | null
+          profile_complete: boolean | null
           reporte_mensual: boolean | null
           reporte_semanal: boolean | null
           telefono: string
@@ -366,6 +367,7 @@ export type Database = {
           nombre?: string | null
           plan?: string | null
           plan_expires_at?: string | null
+          profile_complete?: boolean | null
           reporte_mensual?: boolean | null
           reporte_semanal?: boolean | null
           telefono: string
@@ -380,6 +382,7 @@ export type Database = {
           nombre?: string | null
           plan?: string | null
           plan_expires_at?: string | null
+          profile_complete?: boolean | null
           reporte_mensual?: boolean | null
           reporte_semanal?: boolean | null
           telefono?: string

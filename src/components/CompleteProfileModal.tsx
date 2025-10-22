@@ -84,13 +84,14 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
       // Extract only digits for usuarios table
       const phoneDigits = whatsapp.replace(/\D/g, "");
 
-      // Update usuarios table with telefono, nombre, and tipo_cuenta
+      // Update usuarios table with telefono, nombre, tipo_cuenta, and profile_complete
       const { error: usuariosError } = await supabase
         .from('usuarios')
         .update({
           telefono: phoneDigits,
           nombre: nombre,
-          tipo_cuenta: tipo.toLowerCase()
+          tipo_cuenta: tipo.toLowerCase(),
+          profile_complete: true
         })
         .eq('user_id', user.id);
 
