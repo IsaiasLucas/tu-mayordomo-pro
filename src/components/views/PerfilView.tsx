@@ -552,18 +552,18 @@ const PerfilView = () => {
             {/* Profile Info */}
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 flex-1 min-w-0">
               <div className="relative group">
-                <Avatar className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-white/30 shadow-xl transition-transform group-hover:scale-105">
+                <Avatar className="h-28 w-28 sm:h-32 sm:w-32 border-4 border-white/30 shadow-2xl ring-4 ring-white/10 transition-transform group-hover:scale-105">
                   <AvatarImage src={avatarUrl || profile?.avatar_url || undefined} className="object-cover" />
-                  <AvatarFallback className="bg-white/20 text-white text-3xl backdrop-blur">
+                  <AvatarFallback className="bg-white/20 text-white text-4xl backdrop-blur">
                     {userProfile.name.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <button 
                   onClick={handleEditProfile}
-                  className="absolute -bottom-2 -right-2 bg-white text-purple-600 p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
+                  className="absolute -bottom-1 -right-1 bg-white text-purple-600 p-3 rounded-full shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-300 active:scale-95"
                   aria-label="Editar foto"
                 >
-                  <Camera className="h-4 w-4" />
+                  <Camera className="h-5 w-5" />
                 </button>
               </div>
               
@@ -1019,35 +1019,41 @@ const PerfilView = () => {
           
           <div className="space-y-6 py-4">
             {/* Avatar Upload */}
-            <div className="flex flex-col items-center space-y-4">
-              <Avatar className="h-32 w-32 border-4 border-gray-200">
-                <AvatarImage src={avatarUrl || profile?.avatar_url || undefined} className="object-cover" />
-                <AvatarFallback className="text-3xl bg-purple-100 text-purple-600">
-                  {editName.charAt(0).toUpperCase() || userProfile.name.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+            <div className="flex flex-col items-center">
+              {/* Background gradient container */}
+              <div className="w-full bg-gradient-to-br from-purple-600 to-blue-600 rounded-3xl py-12 px-6 mb-6 flex justify-center items-center">
+                <div className="relative group">
+                  <Avatar className="h-36 w-36 border-4 border-white/30 shadow-2xl ring-4 ring-white/10 transition-transform group-hover:scale-105">
+                    <AvatarImage src={avatarUrl || profile?.avatar_url || undefined} className="object-cover" />
+                    <AvatarFallback className="text-5xl bg-white/20 text-white backdrop-blur">
+                      {editName.charAt(0).toUpperCase() || userProfile.name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  <Label 
+                    htmlFor="avatar-upload" 
+                    className="absolute bottom-0 right-0 cursor-pointer flex items-center justify-center h-12 w-12 rounded-full bg-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95"
+                  >
+                    {uploading ? (
+                      <div className="animate-spin h-5 w-5 border-2 border-purple-600 border-t-transparent rounded-full" />
+                    ) : (
+                      <Camera className="h-6 w-6 text-purple-600" />
+                    )}
+                  </Label>
+                  <Input
+                    id="avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                </div>
+              </div>
               
-              <Label 
-                htmlFor="avatar-upload" 
-                className="cursor-pointer inline-flex items-center justify-center rounded-xl bg-purple-600 text-white px-4 py-2 hover:bg-purple-700 transition-colors"
-              >
-                {uploading ? (
-                  "Carregando..."
-                ) : (
-                  <>
-                    <Camera className="h-4 w-4 mr-2" />
-                    Alterar Foto
-                  </>
-                )}
-              </Label>
-              <Input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarUpload}
-                disabled={uploading}
-                className="hidden"
-              />
+              <p className="text-sm text-muted-foreground text-center mb-6">
+                Clique no ícone da câmera para alterar sua foto
+              </p>
             </div>
 
             {/* Name Input */}
