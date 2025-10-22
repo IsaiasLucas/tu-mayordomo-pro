@@ -12,6 +12,8 @@ html {
   width: 100%;
   height: 100%;
   height: calc(var(--vh, 1vh) * 100);
+  margin: 0;
+  padding: 0;
   overflow: hidden;
   position: fixed;
   overscroll-behavior: none;
@@ -23,25 +25,28 @@ body {
   width: 100%;
   height: 100%;
   height: calc(var(--vh, 1vh) * 100);
+  margin: 0;
+  padding: 0;
   overflow: hidden;
   position: fixed;
-  margin: 0;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
-  /* Safe area for devices with notch */
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
 }
 
 #root {
   width: 100%;
   height: 100%;
+  height: calc(var(--vh, 1vh) * 100);
+  min-height: calc(var(--vh, 1vh) * 100);
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
   overscroll-behavior-y: contain;
+  /* Safe area for devices with notch - apply to root instead of body */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 /* Prevent pull-to-refresh on mobile */
@@ -202,38 +207,38 @@ All colors MUST be HSL.
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.3s ease, color 0.3s ease;
-    /* Mobile-friendly base font size */
-    font-size: clamp(16px, 2.2vw, 20px);
+    /* Mobile-friendly base font size - larger for better readability */
+    font-size: clamp(16px, 2.5vw, 20px);
   }
   
   /* Refined typography - larger for mobile */
   h1 {
     @apply font-semibold tracking-tight;
-    font-size: clamp(28px, 6vw, 36px);
+    font-size: clamp(22px, 5vw, 30px);
   }
   
   h2 {
     @apply font-semibold tracking-tight;
-    font-size: clamp(24px, 5vw, 30px);
+    font-size: clamp(20px, 4.5vw, 26px);
   }
   
   h3 {
     @apply font-semibold tracking-tight;
-    font-size: clamp(20px, 4vw, 24px);
+    font-size: clamp(18px, 4vw, 22px);
   }
   
   h4, h5, h6 {
     @apply font-semibold tracking-tight;
-    font-size: clamp(18px, 3.5vw, 20px);
+    font-size: clamp(16px, 3.5vw, 20px);
   }
   
   /* Larger, more tappable buttons for mobile */
   button {
     @apply transition-all duration-200 ease-in-out;
-    font-size: clamp(16px, 2.4vw, 22px);
-    padding: clamp(12px, 3vw, 18px) clamp(16px, 4vw, 24px);
+    font-size: clamp(17px, 3vw, 22px);
+    padding: clamp(14px, 3.2vw, 18px) clamp(18px, 4vw, 24px);
     border-radius: 12px;
-    min-height: 48px;
+    min-height: 52px;
   }
   
   /* Smooth transitions for better UX and dark mode */
@@ -243,9 +248,9 @@ All colors MUST be HSL.
   
   /* Larger input fields for better mobile UX */
   input, textarea, select {
-    font-size: clamp(16px, 2.2vw, 20px);
-    padding: clamp(10px, 2.5vw, 14px) clamp(12px, 3vw, 16px);
-    min-height: 48px;
+    font-size: clamp(16px, 2.5vw, 20px);
+    padding: clamp(12px, 2.8vw, 16px) clamp(14px, 3.2vw, 18px);
+    min-height: 52px;
   }
   
   /* Professional scrollbar with dark mode */
@@ -289,8 +294,8 @@ All colors MUST be HSL.
   
   /* PWA Specific Styles */
   @media (display-mode: standalone) {
-    body {
-      /* Add padding for iOS safe areas when installed as PWA */
+    #root {
+      /* Ensure safe areas are respected when installed as PWA */
       padding-top: env(safe-area-inset-top);
       padding-bottom: env(safe-area-inset-bottom);
       padding-left: env(safe-area-inset-left);
@@ -302,8 +307,8 @@ All colors MUST be HSL.
   @media (max-width: 768px) {
     /* Better touch targets - larger for easier tapping */
     button, a {
-      min-height: 48px;
-      min-width: 48px;
+      min-height: 52px;
+      min-width: 52px;
     }
     
     /* Prevent text selection on buttons */
@@ -313,19 +318,9 @@ All colors MUST be HSL.
       -webkit-tap-highlight-color: transparent;
     }
     
-    /* Ensure full viewport usage */
-    body {
-      width: 100vw;
-      height: calc(var(--vh, 1vh) * 100);
-      margin: 0;
-      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-    }
-    
-    #root {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
+    /* Ensure inputs are at least 16px to prevent iOS zoom */
+    input, textarea, select {
+      font-size: 16px !important;
     }
   }
   

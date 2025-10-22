@@ -15,9 +15,17 @@ export const initMobileViewport = () => {
   // Also update on load
   window.addEventListener('load', setVH);
 
+  // Handle visual viewport changes (for iOS Safari address bar)
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', setVH);
+  }
+
   return () => {
     window.removeEventListener('resize', setVH);
     window.removeEventListener('orientationchange', setVH);
     window.removeEventListener('load', setVH);
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', setVH);
+    }
   };
 };
