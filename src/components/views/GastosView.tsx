@@ -302,82 +302,82 @@ const tableData = (data.items || []).map(mov => [
   const totalPages = Math.ceil((data.items || []).length / itemsPerPage);
 
   return (
-    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 pb-20">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl sm:text-3xl font-bold">Gastos</h1>
-        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full sm:w-auto">
+    <div className="p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-4 md:space-y-6 pb-20 sm:pb-24">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Gastos</h1>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center w-full sm:w-auto">
           <input
             type="month"
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
-            className="px-3 py-2 border rounded-md w-full sm:w-auto text-base"
+            className="px-3 py-2 border rounded-lg w-full sm:w-auto text-sm sm:text-base h-10 sm:h-11 touch-manipulation"
           />
-          <Button onClick={handleDownloadPDF} className="w-full sm:w-auto">
-            <Download className="w-4 h-4 mr-2" />
+          <Button onClick={handleDownloadPDF} className="w-full sm:w-auto h-10 sm:h-11 text-sm sm:text-base touch-manipulation">
+            <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2" />
             Descargar PDF
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Ingresos</CardTitle>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <Card className="rounded-xl sm:rounded-2xl">
+          <CardHeader className="pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Ingresos</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <div className="text-xl sm:text-2xl font-bold text-green-600">
               {fmtCLP(data.totalIngresos)}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Gastos</CardTitle>
+        <Card className="rounded-xl sm:rounded-2xl">
+          <CardHeader className="pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Gastos</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <div className="text-xl sm:text-2xl font-bold text-red-600">
               {fmtCLP(data.totalGastos)}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Saldo</CardTitle>
+        <Card className="rounded-xl sm:rounded-2xl">
+          <CardHeader className="pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Saldo</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${data.saldo >= 0 ? 'text-primary' : 'text-red-600'}`}>
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <div className={`text-xl sm:text-2xl font-bold ${data.saldo >= 0 ? 'text-primary' : 'text-red-600'}`}>
               {fmtCLP(data.saldo)}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Movimientos del mes</CardTitle>
+      <Card className="rounded-xl sm:rounded-2xl">
+        <CardHeader className="px-4 sm:px-6">
+          <CardTitle className="text-lg sm:text-xl">Movimientos del mes</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 sm:px-6">
           {loading ? (
             <div className="space-y-3">
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-base py-4">Fecha</TableHead>
-                      <TableHead className="text-base py-4">Descripción</TableHead>
-                      <TableHead className="text-base py-4">Tipo</TableHead>
-                      <TableHead className="text-right text-base py-4">Monto</TableHead>
+                      <TableHead className="text-xs sm:text-sm md:text-base py-3 sm:py-4 whitespace-nowrap">Fecha</TableHead>
+                      <TableHead className="text-xs sm:text-sm md:text-base py-3 sm:py-4">Descripción</TableHead>
+                      <TableHead className="text-xs sm:text-sm md:text-base py-3 sm:py-4 whitespace-nowrap">Tipo</TableHead>
+                      <TableHead className="text-right text-xs sm:text-sm md:text-base py-3 sm:py-4 whitespace-nowrap">Monto</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                       <TableRow key={i}>
-                        <TableCell className="py-4"><Skeleton className="h-5 w-24" /></TableCell>
-                        <TableCell className="py-4"><Skeleton className="h-5 w-40" /></TableCell>
-                        <TableCell className="py-4"><Skeleton className="h-6 w-20" /></TableCell>
-                        <TableCell className="text-right py-4"><Skeleton className="h-5 w-20 ml-auto" /></TableCell>
+                        <TableCell className="py-3 sm:py-4"><Skeleton className="h-4 sm:h-5 w-20 sm:w-24" /></TableCell>
+                        <TableCell className="py-3 sm:py-4"><Skeleton className="h-4 sm:h-5 w-32 sm:w-40" /></TableCell>
+                        <TableCell className="py-3 sm:py-4"><Skeleton className="h-5 sm:h-6 w-16 sm:w-20" /></TableCell>
+                        <TableCell className="text-right py-3 sm:py-4"><Skeleton className="h-4 sm:h-5 w-16 sm:w-20 ml-auto" /></TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -386,24 +386,24 @@ const tableData = (data.items || []).map(mov => [
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-base py-4 whitespace-nowrap">Fecha</TableHead>
-                      <TableHead className="text-base py-4">Descripción</TableHead>
-                      <TableHead className="text-base py-4 whitespace-nowrap">Tipo</TableHead>
-                      <TableHead className="text-right text-base py-4 whitespace-nowrap">Monto</TableHead>
+                      <TableHead className="text-xs sm:text-sm md:text-base py-3 sm:py-4 whitespace-nowrap">Fecha</TableHead>
+                      <TableHead className="text-xs sm:text-sm md:text-base py-3 sm:py-4">Descripción</TableHead>
+                      <TableHead className="text-xs sm:text-sm md:text-base py-3 sm:py-4 whitespace-nowrap">Tipo</TableHead>
+                      <TableHead className="text-right text-xs sm:text-sm md:text-base py-3 sm:py-4 whitespace-nowrap">Monto</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {paginatedMovements.map((mov) => (
                       <TableRow key={mov.id}>
-        <TableCell className="py-4 whitespace-nowrap text-base">
+        <TableCell className="py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm md:text-base">
           {formatDisplayInSantiago((mov as any).created_at, "dd/MM HH:mm")}
         </TableCell>
-                        <TableCell className="py-4 text-base">{mov.descripcion}</TableCell>
-                        <TableCell className="py-4">
+                        <TableCell className="py-3 sm:py-4 text-xs sm:text-sm md:text-base">{mov.descripcion}</TableCell>
+                        <TableCell className="py-3 sm:py-4">
                           <Badge
                             variant={
                               mov.tipo.toLowerCase().includes("ingreso") || 
@@ -411,12 +411,12 @@ const tableData = (data.items || []).map(mov => [
                                 ? "default"
                                 : "destructive"
                             }
-                            className="text-sm whitespace-nowrap"
+                            className="text-xs sm:text-sm whitespace-nowrap"
                           >
                             {mov.tipo}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right font-medium py-4 whitespace-nowrap text-base">
+                        <TableCell className="text-right font-medium py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm md:text-base">
                           {fmtCLP(mov.monto)}
                         </TableCell>
                       </TableRow>
@@ -426,27 +426,29 @@ const tableData = (data.items || []).map(mov => [
               </div>
 
               {paginatedMovements.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className="text-center py-6 sm:py-8 text-muted-foreground text-sm sm:text-base">
                   Sin movimientos en este mes.
                 </div>
               )}
 
               {totalPages > 1 && (
-                <div className="flex justify-center gap-2 mt-4">
+                <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-3 mt-4">
                   <Button
                     variant="outline"
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
+                    className="w-full sm:w-auto h-10 text-sm sm:text-base touch-manipulation"
                   >
                     Anterior
                   </Button>
-                  <span className="px-4 py-2">
+                  <span className="px-3 sm:px-4 py-2 text-sm sm:text-base">
                     Página {currentPage} de {totalPages}
                   </span>
                   <Button
                     variant="outline"
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
+                    className="w-full sm:w-auto h-10 text-sm sm:text-base touch-manipulation"
                   >
                     Siguiente
                   </Button>

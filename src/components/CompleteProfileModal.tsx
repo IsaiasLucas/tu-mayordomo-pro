@@ -139,38 +139,39 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleCancel()}>
-      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
         <DialogHeader>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Shield className="w-6 h-6 text-primary" />
+          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+            <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg flex-shrink-0">
+              <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
             </div>
-            <div>
-              <DialogTitle className="text-xl">
+            <div className="min-w-0">
+              <DialogTitle className="text-lg sm:text-xl leading-tight">
                 Completa tu Perfil
               </DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground mt-1">
+              <DialogDescription className="text-xs sm:text-sm text-muted-foreground mt-1 leading-tight">
                 Configura tu cuenta para comenzar a gestionar tus gastos
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="nombre">Nombre *</Label>
+        <div className="space-y-3 sm:space-y-4 py-3 sm:py-4">
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="nombre" className="text-sm sm:text-base">Nombre *</Label>
             <Input
               id="nombre"
               placeholder="Tu nombre"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               disabled={loading}
+              className="h-11 sm:h-12 text-base"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="whatsapp" className="flex items-center gap-2">
-              <MessageCircle className="w-4 h-4 text-green-600" />
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="whatsapp" className="flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base">
+              <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600 flex-shrink-0" />
               Número de WhatsApp *
             </Label>
             <div className="relative">
@@ -182,7 +183,7 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
                 onChange={handlePhoneChange}
                 disabled={loading}
                 maxLength={17}
-                className={`pr-10 ${
+                className={`h-11 sm:h-12 pr-10 sm:pr-12 text-base ${
                   phoneValid === true 
                     ? "border-green-500 focus-visible:ring-green-500" 
                     : phoneValid === false 
@@ -191,43 +192,43 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
                 }`}
               />
               {phoneValid === true && (
-                <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-600" />
+                <CheckCircle2 className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
               )}
               {phoneValid === false && (
-                <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-600" />
+                <AlertCircle className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
               )}
             </div>
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <MessageCircle className="w-3 h-3" />
+            <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
+              <MessageCircle className="w-3 h-3 flex-shrink-0" />
               Introduce tu número chileno (debe comenzar con 9)
             </p>
           </div>
 
-          <div className="space-y-3">
-            <Label>Tipo de cuenta *</Label>
-            <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-2 sm:space-y-3">
+            <Label className="text-sm sm:text-base">Tipo de cuenta *</Label>
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => setTipo("Personal")}
                 disabled={loading}
-                className={`flex flex-col items-center justify-center gap-3 p-6 rounded-xl border-2 transition-all duration-200 relative ${
+                className={`flex flex-col items-center justify-center gap-2 sm:gap-3 p-4 sm:p-6 rounded-xl border-2 transition-all duration-200 relative touch-manipulation ${
                   tipo === "Personal" 
                     ? "border-primary bg-primary/10 shadow-md" 
-                    : "border-border bg-card hover:border-primary/50"
+                    : "border-border bg-card hover:border-primary/50 active:scale-95"
                 }`}
               >
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center ${
                   tipo === "Personal" ? "bg-primary/20" : "bg-muted"
                 }`}>
-                  <span className="text-2xl">👤</span>
+                  <span className="text-xl sm:text-2xl">👤</span>
                 </div>
-                <span className={`text-sm font-medium ${
+                <span className={`text-xs sm:text-sm font-medium ${
                   tipo === "Personal" ? "text-primary" : "text-foreground"
                 }`}>
                   Personal
                 </span>
                 {tipo === "Personal" && (
-                  <CheckCircle2 className="w-5 h-5 text-primary absolute top-2 right-2" />
+                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary absolute top-1.5 sm:top-2 right-1.5 sm:right-2" />
                 )}
               </button>
 
@@ -235,35 +236,35 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
                 type="button"
                 onClick={() => setTipo("Empresa")}
                 disabled={loading}
-                className={`flex flex-col items-center justify-center gap-3 p-6 rounded-xl border-2 transition-all duration-200 relative ${
+                className={`flex flex-col items-center justify-center gap-2 sm:gap-3 p-4 sm:p-6 rounded-xl border-2 transition-all duration-200 relative touch-manipulation ${
                   tipo === "Empresa" 
                     ? "border-primary bg-primary/10 shadow-md" 
-                    : "border-border bg-card hover:border-primary/50"
+                    : "border-border bg-card hover:border-primary/50 active:scale-95"
                 }`}
               >
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center ${
                   tipo === "Empresa" ? "bg-primary/20" : "bg-muted"
                 }`}>
-                  <span className="text-2xl">🏢</span>
+                  <span className="text-xl sm:text-2xl">🏢</span>
                 </div>
-                <span className={`text-sm font-medium ${
+                <span className={`text-xs sm:text-sm font-medium ${
                   tipo === "Empresa" ? "text-primary" : "text-foreground"
                 }`}>
                   Empresa
                 </span>
                 {tipo === "Empresa" && (
-                  <CheckCircle2 className="w-5 h-5 text-primary absolute top-2 right-2" />
+                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary absolute top-1.5 sm:top-2 right-1.5 sm:right-2" />
                 )}
               </button>
             </div>
           </div>
         </div>
 
-        <div className="flex gap-3 justify-end">
+        <div className="flex gap-2 sm:gap-3 justify-end pt-2">
           <Button
             onClick={handleSave}
             disabled={loading || phoneValid !== true || !nombre.trim() || !tipo}
-            className="w-full min-w-[120px]"
+            className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold touch-manipulation"
           >
             {loading ? "Guardando..." : "Completar Perfil"}
           </Button>
