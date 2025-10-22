@@ -743,7 +743,7 @@ const PerfilView = () => {
                   className="w-full h-11 sm:h-12 rounded-2xl text-sm sm:text-base font-semibold justify-start touch-manipulation border-purple-300 hover:bg-purple-50"
                 >
                   <MessageCircle className="h-4 w-4 mr-2 flex-shrink-0" />
-                  Ajuda
+                  Ayuda
                 </Button>
               </div>
             </div>
