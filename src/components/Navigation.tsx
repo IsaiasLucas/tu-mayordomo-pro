@@ -43,7 +43,7 @@ const Navigation = ({
   return <>
       {/* Bottom floating navigation */}
       <div className="fixed left-1/2 transform -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md" style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}>
-        <div className="bg-background/95 backdrop-blur-lg border rounded-full shadow-xl px-4 py-4">
+        <div className="bg-background/95 backdrop-blur-lg border rounded-full shadow-xl px-4 py-4 transition-all duration-300 ease-out">
           <div className="flex items-center justify-around gap-2">
             {navigationItems.map(item => {
             const Icon = item.icon;
@@ -58,8 +58,8 @@ const Navigation = ({
               }
             };
             
-            return <Button key={item.id} variant={isActive ? "default" : "ghost"} size="sm" onClick={handleClick} className={cn("flex flex-col items-center gap-1.5 h-auto py-3 sm:py-4 px-3 sm:px-4 rounded-full transition-all min-w-0 flex-1 touch-manipulation", isActive && "bg-primary text-primary-foreground shadow-md", isLocked && "opacity-50", "hover:scale-105 active:scale-95")}>
-                  <Icon className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
+            return <Button key={item.id} variant={isActive ? "default" : "ghost"} size="sm" onClick={handleClick} className={cn("flex flex-col items-center gap-1.5 h-auto py-3 sm:py-4 px-3 sm:px-4 rounded-full min-w-0 flex-1 touch-manipulation transition-all duration-300 ease-out", isActive && "bg-primary text-primary-foreground shadow-md scale-105", isLocked && "opacity-50", !isActive && "hover:scale-105 active:scale-95")}>
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 transition-transform duration-300" />
                   <span className="text-[11px] sm:text-xs font-semibold leading-none">{item.label}</span>
                   {item.requiresPro && !isPro && <Badge variant="secondary" className="absolute -top-1 -right-1 text-[9px] sm:text-xs w-3.5 h-3.5 sm:w-4 sm:h-4 p-0 flex items-center justify-center">
               </Badge>}

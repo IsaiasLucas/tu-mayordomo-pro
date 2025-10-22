@@ -10,6 +10,7 @@ import PlanesView from "@/components/views/PlanesView";
 import PerfilView from "@/components/views/PerfilView";
 import CompleteProfileModal from "@/components/CompleteProfileModal";
 import InstallPrompt from "@/components/InstallPrompt";
+import { ViewTransition } from "@/components/ViewTransition";
 import { toast } from "@/hooks/use-toast";
 
 const Index = () => {
@@ -99,17 +100,41 @@ const Index = () => {
   const renderCurrentView = () => {
     switch (currentView) {
       case "inicio":
-        return <InicioView onOpenProfileModal={() => setShowProfileModal(true)} onViewChange={handleViewChange} />;
+        return (
+          <ViewTransition viewKey="inicio">
+            <InicioView onOpenProfileModal={() => setShowProfileModal(true)} onViewChange={handleViewChange} />
+          </ViewTransition>
+        );
       case "gastos":
-        return <GastosView />;
+        return (
+          <ViewTransition viewKey="gastos">
+            <GastosView />
+          </ViewTransition>
+        );
       case "reportes":
-        return <ReportesView />;
+        return (
+          <ViewTransition viewKey="reportes">
+            <ReportesView />
+          </ViewTransition>
+        );
       case "planes":
-        return <PlanesView />;
+        return (
+          <ViewTransition viewKey="planes">
+            <PlanesView />
+          </ViewTransition>
+        );
       case "perfil":
-        return <PerfilView />;
+        return (
+          <ViewTransition viewKey="perfil">
+            <PerfilView />
+          </ViewTransition>
+        );
       default:
-        return <InicioView onOpenProfileModal={() => setShowProfileModal(true)} onViewChange={handleViewChange} />;
+        return (
+          <ViewTransition viewKey="inicio">
+            <InicioView onOpenProfileModal={() => setShowProfileModal(true)} onViewChange={handleViewChange} />
+          </ViewTransition>
+        );
     }
   };
 
