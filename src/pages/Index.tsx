@@ -115,7 +115,7 @@ const Index = () => {
       case "perfil":
         return (
           <ViewTransition viewKey="perfil">
-            <PerfilView />
+            <PerfilView onViewChange={handleViewChange} />
           </ViewTransition>
         );
       default:

@@ -52,7 +52,11 @@ import {
   MessageCircle
 } from "lucide-react";
 
-const PerfilView = () => {
+interface PerfilViewProps {
+  onViewChange?: (view: string) => void;
+}
+
+const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
   const { user, profile, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -739,7 +743,17 @@ const PerfilView = () => {
                 </Button>
                 <Button 
                   variant="outline" 
-                  onClick={() => window.open('https://ig.me/m/tumayordomoapp', '_blank')}
+                  onClick={() => {
+                    window.open('https://ig.me/m/tumayordomoapp', '_blank');
+                    // When user returns to app, redirect to inicio
+                    const handleVisibilityChange = () => {
+                      if (!document.hidden && onViewChange) {
+                        onViewChange('inicio');
+                        document.removeEventListener('visibilitychange', handleVisibilityChange);
+                      }
+                    };
+                    document.addEventListener('visibilitychange', handleVisibilityChange);
+                  }}
                   className="w-full h-11 sm:h-12 rounded-2xl text-sm sm:text-base font-semibold justify-start touch-manipulation border-purple-300 hover:bg-purple-50"
                 >
                   <MessageCircle className="h-4 w-4 mr-2 flex-shrink-0" />
