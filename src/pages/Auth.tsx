@@ -154,16 +154,16 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden font-['Inter']" style={{ background: 'var(--gradient-hero)' }}>
+    <div className="h-full w-full relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ background: 'var(--gradient-hero)' }}>
       {/* Premium animated mesh background */}
-      <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'var(--gradient-mesh)' }} />
+      <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: 'var(--gradient-mesh)' }} />
       
       {/* Floating orbs with glow effect */}
-      <div className="absolute top-20 left-20 w-96 h-96 bg-primary-glow/30 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s', filter: 'blur(80px)' }} />
-      <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-accent/25 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s', filter: 'blur(100px)' }} />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-lilac/20 rounded-full blur-3xl" style={{ filter: 'blur(120px)' }} />
+      <div className="absolute top-20 left-20 w-96 h-96 bg-primary-glow/30 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '4s', filter: 'blur(80px)' }} />
+      <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-accent/25 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '6s', animationDelay: '1s', filter: 'blur(100px)' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-lilac/20 rounded-full blur-3xl pointer-events-none" style={{ filter: 'blur(120px)' }} />
       
-      <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center p-4 sm:p-6 lg:p-12 relative z-10 gap-8 lg:gap-12">
+      <div className="min-h-full flex flex-col lg:flex-row items-center justify-center p-4 sm:p-6 lg:p-12 relative z-10 gap-8 lg:gap-12">
         <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           {/* Left side - Hero & Branding */}
           <div className="flex flex-col space-y-6 lg:space-y-8 text-white">
