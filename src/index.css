@@ -278,6 +278,11 @@ All colors MUST be HSL.
       user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
+    
+    /* Responsive font scaling */
+    html {
+      font-size: clamp(14px, 2.5vw, 16px);
+    }
   }
   
   /* iOS specific fixes */

@@ -49,7 +49,7 @@ const Index = () => {
 
   if (authLoading) {
     return (
-      <div className="h-full w-full bg-background flex items-center justify-center">
+      <div className="w-full bg-background flex items-center justify-center" style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
           <p>Cargando...</p>
@@ -100,7 +100,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-background overflow-y-auto overflow-x-hidden">
+    <div className="w-full bg-background overflow-y-auto overflow-x-hidden" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)' }}>
       <Navigation
         currentView={currentView}
         onViewChange={handleViewChange}
