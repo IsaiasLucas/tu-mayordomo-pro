@@ -383,14 +383,14 @@ const formatMovimientoDate = (dateString: string) => {
   // Skeleton loading state
   if (!perfilLoaded) {
     return (
-      <main className="px-5 py-5 pb-32 space-y-5">
-        <Skeleton className="h-32 w-full rounded-2xl" />
-        <Skeleton className="h-24 w-full rounded-2xl" />
-        <div className="grid grid-cols-2 gap-4">
-          <Skeleton className="h-24 w-full rounded-2xl" />
-          <Skeleton className="h-24 w-full rounded-2xl" />
+      <main className="px-6 py-6 pb-32 space-y-6">
+        <Skeleton className="h-36 w-full rounded-2xl" />
+        <Skeleton className="h-28 w-full rounded-2xl" />
+        <div className="grid grid-cols-2 gap-5">
+          <Skeleton className="h-28 w-full rounded-2xl" />
+          <Skeleton className="h-28 w-full rounded-2xl" />
         </div>
-        <Skeleton className="h-48 w-full rounded-2xl" />
+        <Skeleton className="h-56 w-full rounded-2xl" />
       </main>
     );
   }
@@ -398,21 +398,21 @@ const formatMovimientoDate = (dateString: string) => {
   // WhatsApp configuration card
   if (showWhatsappCard) {
     return (
-      <main className="px-5 py-5 pb-32 space-y-5">
+      <main className="px-6 py-6 pb-32 space-y-6">
         <Card className="shadow-card rounded-2xl border-2 border-primary">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Phone className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Phone className="w-6 h-6" />
               Configura tu WhatsApp
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               Para comenzar a usar Tu Mayordomo, necesitas configurar tu número de WhatsApp
             </p>
             <Button 
               onClick={onOpenProfileModal}
-              className="w-full"
+              className="w-full h-12 text-base"
             >
               Completar Perfil
             </Button>
@@ -423,30 +423,30 @@ const formatMovimientoDate = (dateString: string) => {
   }
 
   return (
-    <main className="px-5 py-5 pb-32 space-y-5">
+    <main className="px-6 py-6 pb-32 space-y-6">
       {/* Saldo do Mês */}
-      <div className="bg-gradient-to-br from-primary to-primary-glow text-primary-foreground rounded-2xl p-6 shadow-card">
-        <p className="text-sm opacity-75 mb-2">Saldo del Mes</p>
-        <p className="text-3xl font-bold truncate">
+      <div className="bg-gradient-to-br from-primary to-primary-glow text-primary-foreground rounded-2xl p-7 shadow-card">
+        <p className="text-base opacity-75 mb-2">Saldo del Mes</p>
+        <p className="text-4xl font-bold truncate">
           {showBalance ? fmtCLP(saldoMes||0) : "••••••"}
         </p>
       </div>
 
       {!loading && profile?.plan === "free" && (
         <Card className="shadow-card rounded-xl sm:rounded-2xl border-2 border-primary/20">
-          <CardContent className="p-4 sm:p-5">
-            <div className="flex flex-col gap-3 sm:gap-4">
+          <CardContent className="p-5 sm:p-6">
+            <div className="flex flex-col gap-4 sm:gap-5">
               <div>
-                <p className="font-semibold text-sm sm:text-base mb-1">Plan Gratuito</p>
-                <p className="text-xs sm:text-sm text-muted-foreground">
+                <p className="font-semibold text-base sm:text-lg mb-1.5">Plan Gratuito</p>
+                <p className="text-sm sm:text-base text-muted-foreground">
                   Actualiza a Pro para más funciones
                 </p>
               </div>
               <Button
                 onClick={() => onViewChange("planes")}
-                className="w-full bg-gradient-to-r from-primary to-primary-glow h-10 sm:h-11 text-sm sm:text-base touch-manipulation"
+                className="w-full bg-gradient-to-r from-primary to-primary-glow h-12 sm:h-13 text-base sm:text-lg touch-manipulation"
               >
-                <Crown className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                <Crown className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
                 Ver Planes
               </Button>
             </div>
@@ -456,14 +456,14 @@ const formatMovimientoDate = (dateString: string) => {
 
       {!loading && profile?.plan && profile.plan !== "free" && (
         <Card className="shadow-card rounded-xl sm:rounded-2xl border-2 border-primary bg-primary/5">
-          <CardContent className="p-4 sm:p-5">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="bg-primary text-primary-foreground rounded-full p-2.5 sm:p-3 flex-shrink-0">
-                <Crown className="w-4 h-4 sm:w-5 sm:h-5" />
+          <CardContent className="p-5 sm:p-6">
+            <div className="flex items-center gap-4 sm:gap-5">
+              <div className="bg-primary text-primary-foreground rounded-full p-3 sm:p-4 flex-shrink-0">
+                <Crown className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm sm:text-base">Plan Activo</p>
-                <p className="text-xs sm:text-sm text-muted-foreground">
+                <p className="font-semibold text-base sm:text-lg">Plan Activo</p>
+                <p className="text-sm sm:text-base text-muted-foreground">
                   Todas las funciones Pro
                 </p>
               </div>
@@ -489,17 +489,17 @@ const formatMovimientoDate = (dateString: string) => {
         </div>
       </a>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 gap-4 sm:gap-5">
         <Card className="shadow-card rounded-xl sm:rounded-2xl border-0">
-          <CardContent className="p-4 sm:p-5">
-            <p className="text-xs sm:text-sm text-muted-foreground mb-1.5 sm:mb-2">Ingresos</p>
-            <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-600 truncate">{fmtCLP(ingresos)}</p>
+          <CardContent className="p-5 sm:p-6">
+            <p className="text-sm sm:text-base text-muted-foreground mb-2 sm:mb-2.5">Ingresos</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 truncate">{fmtCLP(ingresos)}</p>
           </CardContent>
         </Card>
         <Card className="shadow-card rounded-xl sm:rounded-2xl border-0">
-          <CardContent className="p-4 sm:p-5">
-            <p className="text-xs sm:text-sm text-muted-foreground mb-1.5 sm:mb-2">Gastos</p>
-            <p className="text-lg sm:text-xl md:text-2xl font-bold text-red-600 truncate">{fmtCLP(egresos)}</p>
+          <CardContent className="p-5 sm:p-6">
+            <p className="text-sm sm:text-base text-muted-foreground mb-2 sm:mb-2.5">Gastos</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-red-600 truncate">{fmtCLP(egresos)}</p>
           </CardContent>
         </Card>
       </div>

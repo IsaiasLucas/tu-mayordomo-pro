@@ -37,8 +37,8 @@ const Navigation = ({
       className="fixed left-0 right-0 z-50 flex justify-center items-center px-4"
       style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}
     >
-      <nav className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-[2rem] shadow-2xl transition-all duration-300 ease-out">
-        <div className="flex items-center justify-center gap-2 px-6 py-4">
+      <nav className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-[1.5rem] shadow-2xl transition-all duration-300 ease-out">
+        <div className="flex items-center justify-center gap-1.5 px-4 py-2.5">
           {navigationItems.map(item => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
@@ -57,31 +57,31 @@ const Navigation = ({
                 key={item.id}
                 onClick={handleClick}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-2 transition-all duration-300 ease-out touch-manipulation relative",
-                  "min-w-[80px] px-5 py-4",
+                  "flex flex-col items-center justify-center gap-1 transition-all duration-300 ease-out touch-manipulation relative",
+                  "min-w-[60px] px-3 py-2.5",
                   isActive 
-                    ? "bg-gradient-to-br from-primary via-primary-glow to-primary rounded-3xl shadow-glow scale-105" 
+                    ? "bg-gradient-to-br from-primary via-primary-glow to-primary rounded-2xl shadow-glow scale-105" 
                     : "hover:scale-105 active:scale-95",
                   isLocked && "opacity-60"
                 )}
               >
                 <Icon 
                   className={cn(
-                    "w-7 h-7 transition-all duration-300",
+                    "w-5 h-5 transition-all duration-300",
                     isActive ? "text-primary-foreground" : "text-foreground"
                   )} 
                 />
                 <span 
                   className={cn(
-                    "text-sm font-bold leading-none whitespace-nowrap transition-colors duration-300",
+                    "text-[10px] font-semibold leading-none whitespace-nowrap transition-colors duration-300",
                     isActive ? "text-primary-foreground" : "text-foreground"
                   )}
                 >
                   {item.label}
                 </span>
                 {isLocked && (
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-accent rounded-full flex items-center justify-center">
-                    <Crown className="w-3 h-3 text-accent-foreground" />
+                  <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-accent rounded-full flex items-center justify-center">
+                    <Crown className="w-2.5 h-2.5 text-accent-foreground" />
                   </div>
                 )}
               </button>
