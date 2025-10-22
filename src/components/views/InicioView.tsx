@@ -478,7 +478,7 @@ const formatMovimientoDate = (dateString: string) => {
         target="_blank"
         rel="noopener noreferrer"
         className="fixed right-5 z-40 group touch-manipulation"
-        style={{ bottom: 'calc(env(safe-area-inset-bottom) + 0.75rem)' }}
+        style={{ bottom: 'calc(env(safe-area-inset-bottom) + 6.5rem)' }}
         title="Chatear con Tu Mayordomo"
       >
         <div className="relative bg-gradient-to-br from-purple-600 to-blue-600 rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center">
