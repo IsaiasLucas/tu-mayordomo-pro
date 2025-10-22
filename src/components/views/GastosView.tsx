@@ -43,13 +43,30 @@ export default function GastosView() {
   const itemsPerPage = 50;
 
   useEffect(() => {
-    const storedPhone = localStorage.getItem("tm_phone");
-    setPhone(storedPhone);
-    
-    // Si no hay phone, mostrar modal
-    if (!storedPhone) {
-      setShowProfileModal(true);
-    }
+    const checkUsuarioPhone = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // Check telefono from usuarios table
+        const { data: usuario } = await supabase
+          .from('usuarios')
+          .select('telefono')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (usuario?.telefono && usuario.telefono.trim() !== '') {
+          setPhone(usuario.telefono);
+          localStorage.setItem("tm_phone", usuario.telefono);
+        } else {
+          setShowProfileModal(true);
+        }
+      } catch (error) {
+        console.error('Error checking usuario phone:', error);
+      }
+    };
+
+    checkUsuarioPhone();
   }, []);
 
   useEffect(() => {
@@ -236,10 +253,25 @@ const tableData = (data.items || []).map(mov => [
     doc.save(fileName);
   };
 
-  const handleProfileModalClose = () => {
-    // Verificar si ahora hay phone guardado
-    const storedPhone = localStorage.getItem("tm_phone");
-    setPhone(storedPhone);
+  const handleProfileModalClose = async () => {
+    // Verificar si ahora hay telefono guardado en usuarios table
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: usuario } = await supabase
+        .from('usuarios')
+        .select('telefono')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (usuario?.telefono && usuario.telefono.trim() !== '') {
+        setPhone(usuario.telefono);
+        localStorage.setItem("tm_phone", usuario.telefono);
+      }
+    } catch (error) {
+      console.error('Error checking usuario phone:', error);
+    }
     setShowProfileModal(false);
   };
 

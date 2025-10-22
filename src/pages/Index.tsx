@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import InicioView from "@/components/views/InicioView";
 import GastosView from "@/components/views/GastosView";
@@ -27,15 +28,30 @@ const Index = () => {
 
   // Check if user needs to complete profile after login
   useEffect(() => {
-    if (isAuthenticated && !authLoading && profile) {
-      // Only show modal if WhatsApp hasn't been configured yet
-      const isWhatsAppConfigured = profile?.whatsapp_configured === true;
-      
-      // Show modal for first-time setup (when whatsapp_configured is false/null)
-      if (!isWhatsAppConfigured) {
-        setShowProfileModal(true);
+    const checkProfile = async () => {
+      if (isAuthenticated && !authLoading && profile) {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
+
+          // Check if telefono exists in usuarios table
+          const { data: usuario } = await supabase
+            .from('usuarios')
+            .select('telefono')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          // Show modal only if telefono is null or empty
+          if (!usuario?.telefono || usuario.telefono.trim() === '') {
+            setShowProfileModal(true);
+          }
+        } catch (error) {
+          console.error('Error checking profile:', error);
+        }
       }
-    }
+    };
+
+    checkProfile();
   }, [isAuthenticated, authLoading, profile]);
 
   // Sync userPlan with profile.plan

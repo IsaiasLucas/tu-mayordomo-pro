@@ -109,89 +109,104 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
   const variacionDiaria = calcularVariacionDiaria();
 
   useEffect(() => {
-    // Check phone from profile (Supabase) first
-    const phoneFromProfile = profile?.phone_personal || profile?.phone_empresa;
-    
-    // Check if phone exists and is not empty
-    if (phoneFromProfile && phoneFromProfile.trim() !== '') {
-      const phoneDigits = phoneFromProfile.replace(/\D/g, "");
-      const cachedPhone = localStorage.getItem("tm_phone")?.replace(/\D/g, "");
-      
-      // Clear cache if phone changed (different user)
-      if (cachedPhone && cachedPhone !== phoneDigits) {
-        localStorage.removeItem('tm_movimientos_cache');
-        localStorage.removeItem('tm_all_movimientos_cache');
-        setMovimientos([]);
-        setAllMovimientos([]);
-      }
-      
-      setPhone(phoneFromProfile);
-      localStorage.setItem("tm_phone", phoneFromProfile);
-      
-      // Initial load
-      fetchMovimientos();
-      fetchAllMovimientos();
-      
-      // Setup Realtime subscriptions for recent and all movements
-      const recentChannel = supabase
-        .channel('inicio-gastos-recent')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'gastos'
-          },
-          async (payload) => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-            
-            if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
-              fetchMovimientosUpdate();
-            }
+    const checkUsuarioPhone = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // Check telefono from usuarios table
+        const { data: usuario } = await supabase
+          .from('usuarios')
+          .select('telefono')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        // Check if telefono exists and is not empty
+        if (usuario?.telefono && usuario.telefono.trim() !== '') {
+          const phoneDigits = usuario.telefono;
+          const cachedPhone = localStorage.getItem("tm_phone")?.replace(/\D/g, "");
+          
+          // Clear cache if phone changed (different user)
+          if (cachedPhone && cachedPhone !== phoneDigits) {
+            localStorage.removeItem('tm_movimientos_cache');
+            localStorage.removeItem('tm_all_movimientos_cache');
+            setMovimientos([]);
+            setAllMovimientos([]);
           }
-        )
-        .subscribe();
-
-      const now = getCurrentDateInSantiago();
-      const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-      const { startISO, endISO } = monthRangeUTCFromSantiago(mes);
-
-      const allChannel = supabase
-        .channel('inicio-gastos-all')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'gastos'
-          },
-          async (payload) => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-            
-            const changeDate = (payload.new as any)?.created_at || (payload.old as any)?.created_at;
-            if (changeDate >= startISO && changeDate <= endISO) {
-              if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
-                fetchAllMovimientosUpdate();
+          
+          setPhone(phoneDigits);
+          localStorage.setItem("tm_phone", phoneDigits);
+          
+          // Initial load
+          fetchMovimientos();
+          fetchAllMovimientos();
+          
+          // Setup Realtime subscriptions for recent and all movements
+          const recentChannel = supabase
+            .channel('inicio-gastos-recent')
+            .on(
+              'postgres_changes',
+              {
+                event: '*',
+                schema: 'public',
+                table: 'gastos'
+              },
+              async (payload) => {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) return;
+                
+                if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
+                  fetchMovimientosUpdate();
+                }
               }
-            }
-          }
-        )
-        .subscribe();
-      
-      return () => {
-        supabase.removeChannel(recentChannel);
-        supabase.removeChannel(allChannel);
-      };
-    } else {
-      console.log('No phone found in profile');
-      localStorage.removeItem("tm_phone");
-      localStorage.removeItem('tm_movimientos_cache');
-      localStorage.removeItem('tm_all_movimientos_cache');
-      setMovimientos([]);
-      setAllMovimientos([]);
-    }
+            )
+            .subscribe();
+
+          const now = getCurrentDateInSantiago();
+          const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+          const { startISO, endISO } = monthRangeUTCFromSantiago(mes);
+
+          const allChannel = supabase
+            .channel('inicio-gastos-all')
+            .on(
+              'postgres_changes',
+              {
+                event: '*',
+                schema: 'public',
+                table: 'gastos'
+              },
+              async (payload) => {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) return;
+                
+                const changeDate = (payload.new as any)?.created_at || (payload.old as any)?.created_at;
+                if (changeDate >= startISO && changeDate <= endISO) {
+                  if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
+                    fetchAllMovimientosUpdate();
+                  }
+                }
+              }
+            )
+            .subscribe();
+          
+          return () => {
+            supabase.removeChannel(recentChannel);
+            supabase.removeChannel(allChannel);
+          };
+        } else {
+          console.log('No telefono found in usuarios table');
+          localStorage.removeItem("tm_phone");
+          localStorage.removeItem('tm_movimientos_cache');
+          localStorage.removeItem('tm_all_movimientos_cache');
+          setMovimientos([]);
+          setAllMovimientos([]);
+        }
+      } catch (error) {
+        console.error('Error checking usuario phone:', error);
+      }
+    };
+
+    checkUsuarioPhone();
   }, [profile]);
 
   // Listen for changes in showBalance preference
@@ -329,14 +344,26 @@ const formatMovimientoDate = (dateString: string) => {
   return formatDisplayInSantiago(dateString, "dd/MM HH:mm");
 };
 
-  const handleProfileModalClose = () => {
-    // Verificar si ahora hay phone guardado
-    const storedPhone = localStorage.getItem("tm_phone");
-    setPhone(storedPhone);
-    
-    if (storedPhone) {
-      fetchMovimientos();
-      fetchAllMovimientos();
+  const handleProfileModalClose = async () => {
+    // Verificar si ahora hay telefono guardado en usuarios table
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: usuario } = await supabase
+        .from('usuarios')
+        .select('telefono')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (usuario?.telefono && usuario.telefono.trim() !== '') {
+        setPhone(usuario.telefono);
+        localStorage.setItem("tm_phone", usuario.telefono);
+        fetchMovimientos();
+        fetchAllMovimientos();
+      }
+    } catch (error) {
+      console.error('Error checking usuario phone:', error);
     }
   };
 
