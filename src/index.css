@@ -76,11 +76,20 @@ body {
 }
 
 /* GPU acceleration for navigation */
-button[class*="rounded-full"],
+nav,
+button[class*="rounded"],
 .fixed {
   will-change: transform;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
+}
+
+/* Smooth navigation transitions */
+nav button {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.3s ease-out,
+              color 0.3s ease-out,
+              box-shadow 0.3s ease-out;
 }
 
 /* Fix for iOS Safari bottom bar */

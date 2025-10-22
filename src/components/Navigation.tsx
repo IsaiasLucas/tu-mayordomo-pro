@@ -1,23 +1,15 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Home, Receipt, BarChart3, Crown, User, Phone } from "lucide-react";
+import { Home, Receipt, BarChart3, Crown, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 interface NavigationProps {
   currentView: string;
   onViewChange: (view: string) => void;
   isPro: boolean;
-  phoneFilter: string;
-  onPhoneFilterChange: (phone: string) => void;
 }
 const Navigation = ({
   currentView,
   onViewChange,
   isPro,
-  phoneFilter,
-  onPhoneFilterChange
 }: NavigationProps) => {
-  const [showPhoneFilter, setShowPhoneFilter] = useState(false);
   const navigationItems = [{
     id: "inicio",
     label: "Inicio",
@@ -40,12 +32,14 @@ const Navigation = ({
     label: "Perfil",
     icon: User
   }];
-  return <>
-      {/* Bottom floating navigation */}
-      <div className="fixed left-1/2 transform -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-lg" style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}>
-        <div className="bg-background/95 backdrop-blur-lg border rounded-3xl shadow-xl px-3 py-3 transition-all duration-300 ease-out">
-          <div className="flex items-center justify-around gap-1.5">
-            {navigationItems.map(item => {
+  return (
+    <div 
+      className="fixed left-0 right-0 z-50 flex justify-center px-4"
+      style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}
+    >
+      <nav className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-[2rem] shadow-2xl px-6 py-4 transition-all duration-300 ease-out">
+        <div className="flex items-center justify-center gap-2">
+          {navigationItems.map(item => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
             const isLocked = item.requiresPro && !isPro;
@@ -58,16 +52,44 @@ const Navigation = ({
               }
             };
             
-            return <Button key={item.id} variant={isActive ? "default" : "ghost"} size="lg" onClick={handleClick} className={cn("flex flex-col items-center justify-center gap-2 h-auto py-4 px-4 rounded-2xl min-w-[70px] sm:min-w-[80px] flex-1 touch-manipulation transition-all duration-300 ease-out", isActive && "bg-primary text-primary-foreground shadow-lg scale-105", isLocked && "opacity-50", !isActive && "hover:scale-105 active:scale-95")}>
-                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 flex-shrink-0 transition-transform duration-300" />
-                  <span className="text-xs sm:text-sm font-semibold leading-none whitespace-nowrap">{item.label}</span>
-                  {item.requiresPro && !isPro && <Badge variant="secondary" className="absolute -top-1 -right-1 text-[9px] sm:text-xs w-4 h-4 sm:w-5 sm:h-5 p-0 flex items-center justify-center">
-              </Badge>}
-                </Button>;
+            return (
+              <button
+                key={item.id}
+                onClick={handleClick}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-2 transition-all duration-300 ease-out touch-manipulation relative",
+                  "min-w-[80px] px-5 py-4",
+                  isActive 
+                    ? "bg-gradient-to-br from-primary via-primary-glow to-primary rounded-3xl shadow-glow scale-105" 
+                    : "hover:scale-105 active:scale-95",
+                  isLocked && "opacity-60"
+                )}
+              >
+                <Icon 
+                  className={cn(
+                    "w-7 h-7 transition-all duration-300",
+                    isActive ? "text-primary-foreground" : "text-foreground"
+                  )} 
+                />
+                <span 
+                  className={cn(
+                    "text-sm font-bold leading-none whitespace-nowrap transition-colors duration-300",
+                    isActive ? "text-primary-foreground" : "text-foreground"
+                  )}
+                >
+                  {item.label}
+                </span>
+                {isLocked && (
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-accent rounded-full flex items-center justify-center">
+                    <Crown className="w-3 h-3 text-accent-foreground" />
+                  </div>
+                )}
+              </button>
+            );
           })}
-          </div>
         </div>
-      </div>
-    </>;
+      </nav>
+    </div>
+  );
 };
 export default Navigation;

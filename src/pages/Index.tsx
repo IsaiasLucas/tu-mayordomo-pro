@@ -17,7 +17,6 @@ const Index = () => {
   const { isAuthenticated, loading: authLoading, profile } = useAuth();
   const [currentView, setCurrentView] = useState("inicio");
   const [userPlan, setUserPlan] = useState("free"); // free, pro, premium
-  const [phoneFilter, setPhoneFilter] = useState("");
   const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
 
@@ -79,16 +78,6 @@ const Index = () => {
     setCurrentView(view);
   };
 
-  const handlePhoneFilterChange = (phone: string) => {
-    setPhoneFilter(phone);
-    if (phone) {
-      toast({
-        title: "Filtro aplicado",
-        description: `Mostrando transacciones para ${phone}`,
-      });
-    }
-  };
-
   const handlePlanChange = (planType: string) => {
     setUserPlan(planType);
     toast({
@@ -144,8 +133,6 @@ const Index = () => {
         currentView={currentView}
         onViewChange={handleViewChange}
         isPro={isPro}
-        phoneFilter={phoneFilter}
-        onPhoneFilterChange={handlePhoneFilterChange}
       />
       
       <main className="pb-24" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
