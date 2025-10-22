@@ -99,19 +99,17 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
 
       if (profileError) throw profileError;
 
-      // Add to usuarios table
-      const { error: usuariosError } = await (supabase as any)
+      // Update usuarios table (record was created by trigger)
+      const { error: usuariosError } = await supabase
         .from('usuarios')
-        .insert({
-          telefono: phoneDigits,
-          plan: 'free',
-          usage_count: 0,
-          reporte_mensual: true,
-          reporte_semanal: true
-        });
+        .update({
+          telefono: phoneDigits
+        })
+        .eq('user_id', user.id);
 
-      if (usuariosError && usuariosError.code !== '23505') { // Ignore duplicate key errors
-        console.error('Error adding to usuarios:', usuariosError);
+      if (usuariosError) {
+        console.error('Error updating usuarios:', usuariosError);
+        throw usuariosError;
       }
 
       toast({
