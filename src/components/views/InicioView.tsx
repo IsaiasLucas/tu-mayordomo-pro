@@ -37,6 +37,8 @@ interface Movimiento {
 const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
   const { profile, loading } = useAuth();
   const { items: gastos } = useGastos();
+  const [perfilLoaded, setPerfilLoaded] = useState(false);
+  const [perfil, setPerfil] = useState<any>(null);
   const [phone, setPhone] = useState<string | null>(null);
   const [movimientos, setMovimientos] = useState<Movimiento[]>(() => {
     const cached = localStorage.getItem('tm_movimientos_cache');
@@ -112,14 +114,20 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
     const checkUsuarioPhone = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        if (!user) {
+          setPerfilLoaded(true);
+          return;
+        }
 
-        // Check telefono from usuarios table
+        // Check telefono, nombre, tipo_cuenta from usuarios table
         const { data: usuario } = await supabase
           .from('usuarios')
-          .select('telefono')
+          .select('telefono, nombre, tipo_cuenta')
           .eq('user_id', user.id)
           .maybeSingle();
+
+        setPerfil(usuario || null);
+        setPerfilLoaded(true);
 
         // Check if telefono exists and is not empty
         if (usuario?.telefono && usuario.telefono.trim() !== '') {
@@ -203,6 +211,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
         }
       } catch (error) {
         console.error('Error checking usuario phone:', error);
+        setPerfilLoaded(true);
       }
     };
 
@@ -352,9 +361,11 @@ const formatMovimientoDate = (dateString: string) => {
 
       const { data: usuario } = await supabase
         .from('usuarios')
-        .select('telefono')
+        .select('telefono, nombre, tipo_cuenta')
         .eq('user_id', user.id)
         .maybeSingle();
+
+      setPerfil(usuario || null);
 
       if (usuario?.telefono && usuario.telefono.trim() !== '') {
         setPhone(usuario.telefono);
@@ -366,6 +377,50 @@ const formatMovimientoDate = (dateString: string) => {
       console.error('Error checking usuario phone:', error);
     }
   };
+
+  const showWhatsappCard = perfilLoaded && (!perfil?.telefono || perfil.telefono.trim() === '');
+
+  // Skeleton loading state
+  if (!perfilLoaded) {
+    return (
+      <main className="px-5 py-5 pb-32 space-y-5">
+        <Skeleton className="h-32 w-full rounded-2xl" />
+        <Skeleton className="h-24 w-full rounded-2xl" />
+        <div className="grid grid-cols-2 gap-4">
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
+        </div>
+        <Skeleton className="h-48 w-full rounded-2xl" />
+      </main>
+    );
+  }
+
+  // WhatsApp configuration card
+  if (showWhatsappCard) {
+    return (
+      <main className="px-5 py-5 pb-32 space-y-5">
+        <Card className="shadow-card rounded-2xl border-2 border-primary">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Phone className="w-5 h-5" />
+              Configura tu WhatsApp
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Para comenzar a usar Tu Mayordomo, necesitas configurar tu número de WhatsApp
+            </p>
+            <Button 
+              onClick={onOpenProfileModal}
+              className="w-full"
+            >
+              Completar Perfil
+            </Button>
+          </CardContent>
+        </Card>
+      </main>
+    );
+  }
 
   return (
     <main className="px-5 py-5 pb-32 space-y-5">

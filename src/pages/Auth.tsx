@@ -87,16 +87,23 @@ export default function Auth() {
 
         if (error) throw error;
 
-        // Ensure usuarios row has correct defaults (trigger creates row, but we set usage_month)
+        // Ensure usuarios row has correct defaults
         if (data.user) {
           const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
           await supabase
             .from('usuarios')
-            .update({
+            .upsert({
+              user_id: data.user.id,
+              telefono: '',
+              plan: 'free',
+              reporte_mensual: true,
+              reporte_semanal: true,
+              usage_count: 0,
               usage_month: currentMonth,
-              usage_count: 0
-            })
-            .eq('user_id', data.user.id);
+              created_at: new Date().toISOString()
+            }, {
+              onConflict: 'user_id'
+            });
         }
 
         toast({
