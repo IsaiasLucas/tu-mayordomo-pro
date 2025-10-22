@@ -636,29 +636,37 @@ const PerfilView = () => {
 
       {/* Account Settings */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-white shadow-sm rounded-3xl p-6">
-          <h3 className="text-lg font-semibold mb-6 flex items-center">
-            <Settings className="h-5 w-5 mr-2" />
+        <Card className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 shadow-lg rounded-3xl p-6 border-2 border-purple-100 dark:border-purple-900/50">
+          <h3 className="text-xl font-bold mb-6 flex items-center bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <Settings className="h-6 w-6 mr-2 text-purple-600 dark:text-purple-400" />
             Configuración de la Cuenta
           </h3>
           
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div>
-                <h4 className="font-medium">Mostrar saldo al inicio</h4>
-                <p className="text-sm text-gray-600">Controla la visibilidad de tu saldo principal</p>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-md border border-purple-100 dark:border-purple-900/30">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl p-2.5 mt-0.5">
+                    <Eye className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-lg">Mostrar saldo al inicio</h4>
+                    <p className="text-sm text-muted-foreground mt-0.5">Controla la visibilidad de tu saldo principal</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={showBalance}
+                  onCheckedChange={(checked) => {
+                    setShowBalance(checked);
+                    localStorage.setItem("tm_show_balance", String(checked));
+                    toast({
+                      title: checked ? "Saldo visible" : "Saldo oculto",
+                      description: checked ? "El saldo será mostrado en la pantalla inicial." : "El saldo será ocultado en la pantalla inicial.",
+                    });
+                  }}
+                  className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-600 data-[state=checked]:to-blue-600"
+                />
               </div>
-              <Switch
-                checked={showBalance}
-                onCheckedChange={(checked) => {
-                  setShowBalance(checked);
-                  localStorage.setItem("tm_show_balance", String(checked));
-                  toast({
-                    title: checked ? "Saldo visible" : "Saldo oculto",
-                    description: checked ? "El saldo será mostrado en la pantalla inicial." : "El saldo será ocultado en la pantalla inicial.",
-                  });
-                }}
-              />
             </div>
 
             <div className="border-t pt-4">
