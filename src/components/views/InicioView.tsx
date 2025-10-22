@@ -57,34 +57,18 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
 
   // Check and show profile popup once on mount if incomplete
   useEffect(() => {
-    const checkAndShowProfilePopup = async () => {
+    const checkAndShowProfilePopup = () => {
       if (!perfilLoaded || !profile) return;
       
       // Check if popup was already shown in this session
       if (sessionStorage.getItem('profilePopupShown')) return;
 
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+      // Only show popup if profile is not complete (new account)
+      const showPopup = profile.profile_complete === false;
 
-        const { data: usuario } = await supabase
-          .from('usuarios')
-          .select('telefono')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        // Compute showPopup condition once
-        const showPopup = perfilLoaded && 
-          (profile.profile_complete !== true || 
-           !usuario?.telefono || 
-           usuario.telefono.trim() === '');
-
-        if (showPopup) {
-          onOpenProfileModal();
-          sessionStorage.setItem('profilePopupShown', '1');
-        }
-      } catch (error) {
-        console.error('Error checking profile popup:', error);
+      if (showPopup) {
+        onOpenProfileModal();
+        sessionStorage.setItem('profilePopupShown', '1');
       }
     };
 

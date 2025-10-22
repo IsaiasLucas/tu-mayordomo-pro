@@ -12,7 +12,7 @@ import { format } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import CompleteProfileModal from "@/components/CompleteProfileModal";
+
 import { supabase } from "@/integrations/supabase/client";
 
 interface Movement {
@@ -40,7 +40,6 @@ export default function GastosView({ profile }: GastosViewProps) {
     format(new Date(), "yyyy-MM")
   );
   const [phone, setPhone] = useState<string | null>(null);
-  const [showProfileModal, setShowProfileModal] = useState(false);
   const [data, setData] = useState<MonthData>({ items: [], totalIngresos: 0, totalGastos: 0, saldo: 0 });
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,8 +61,6 @@ export default function GastosView({ profile }: GastosViewProps) {
         if (usuario?.telefono && usuario.telefono.trim() !== '') {
           setPhone(usuario.telefono);
           localStorage.setItem("tm_phone", usuario.telefono);
-        } else {
-          setShowProfileModal(true);
         }
       } catch (error) {
         console.error('Error checking usuario phone:', error);
@@ -257,44 +254,24 @@ const tableData = (data.items || []).map(mov => [
     doc.save(fileName);
   };
 
-  const handleProfileModalClose = async () => {
-    // Verificar si ahora hay telefono guardado en usuarios table
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: usuario } = await supabase
-        .from('usuarios')
-        .select('telefono')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (usuario?.telefono && usuario.telefono.trim() !== '') {
-        setPhone(usuario.telefono);
-        localStorage.setItem("tm_phone", usuario.telefono);
-      }
-    } catch (error) {
-      console.error('Error checking usuario phone:', error);
-    }
-    setShowProfileModal(false);
-  };
 
   if (!phone) {
     return (
-      <>
-        <div className="p-6">
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              ⚠️ Falta confirmar tu WhatsApp para vincular tu cuenta.
-            </AlertDescription>
-          </Alert>
-        </div>
-        <CompleteProfileModal 
-          open={showProfileModal}
-          onClose={handleProfileModalClose}
-        />
-      </>
+      <div className="p-6">
+        <Card className="shadow-card rounded-2xl border-2 border-primary">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <AlertCircle className="w-6 h-6" />
+              Configura tu WhatsApp
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-base text-muted-foreground">
+              Necesitas configurar tu número de WhatsApp para ver tus gastos. Ve a la pestaña Inicio para completar tu perfil.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
