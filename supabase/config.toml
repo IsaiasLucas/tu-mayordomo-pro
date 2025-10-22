@@ -7,9 +7,6 @@ schemas = ["public", "graphql_public"]
 extra_search_path = ["public", "extensions"]
 max_rows = 1000
 
-[functions.add-user-to-sheets]
-verify_jwt = false
-
 [functions.cancel-subscription]
 verify_jwt = true
 
@@ -24,6 +21,3 @@ verify_jwt = true
 
 [functions.stripe-webhook]
 verify_jwt = false
-
-[functions.sync-plan-from-sheets]
-verify_jwt = true
