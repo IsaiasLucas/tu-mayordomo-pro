@@ -64,6 +64,7 @@ export default function FacturasBoletasSection() {
   const [customEndDate, setCustomEndDate] = useState<Date>();
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const [facturaToDelete, setFacturaToDelete] = useState<{ id: string; url: string } | null>(null);
+  const [viewingFactura, setViewingFactura] = useState<{ url: string; nombre: string } | null>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -211,6 +212,33 @@ export default function FacturasBoletasSection() {
       });
     } finally {
       setGeneratingPDF(false);
+    }
+  };
+
+  const handleDownloadFile = async (url: string, nombre: string) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = nombre;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+      
+      toast({
+        title: "Descarga iniciada",
+        description: "El archivo se está descargando",
+      });
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo descargar el archivo",
+        variant: "destructive",
+      });
     }
   };
 
@@ -409,10 +437,18 @@ export default function FacturasBoletasSection() {
                       variant="outline"
                       size="sm"
                       className="flex-1 h-9"
-                      onClick={() => window.open(factura.archivo_url, '_blank')}
+                      onClick={() => setViewingFactura({ url: factura.archivo_url, nombre: factura.archivo_nombre })}
                     >
                       <ImageIcon className="h-3 w-3 mr-1" />
                       Ver
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-9"
+                      onClick={() => handleDownloadFile(factura.archivo_url, factura.archivo_nombre)}
+                    >
+                      <Download className="h-3 w-3" />
                     </Button>
                     <Button
                       variant="outline"
@@ -542,6 +578,39 @@ export default function FacturasBoletasSection() {
                 </>
               )}
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de visualización de factura */}
+      <Dialog open={!!viewingFactura} onOpenChange={() => setViewingFactura(null)}>
+        <DialogContent className="sm:max-w-[90vw] sm:max-h-[90vh] p-0">
+          <DialogHeader className="p-6 pb-0">
+            <DialogTitle>{viewingFactura?.nombre}</DialogTitle>
+            <DialogDescription>
+              Click fuera de la imagen para cerrar
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-6 pt-4">
+            {viewingFactura?.url.match(/\.(jpg|jpeg|png|webp)$/i) ? (
+              <img 
+                src={viewingFactura.url} 
+                alt={viewingFactura.nombre}
+                className="w-full h-auto max-h-[70vh] object-contain rounded-lg"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center p-12 bg-muted rounded-lg">
+                <FileText className="h-24 w-24 text-muted-foreground mb-4" />
+                <p className="text-lg font-medium mb-2">{viewingFactura?.nombre}</p>
+                <Button
+                  onClick={() => viewingFactura && window.open(viewingFactura.url, '_blank')}
+                  className="mt-4"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Abrir archivo
+                </Button>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
