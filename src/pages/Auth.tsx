@@ -14,7 +14,6 @@ export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
   const [showPassword, setShowPassword] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
@@ -48,7 +47,6 @@ export default function Auth() {
       return;
     }
 
-
     setLoading(true);
 
     try {
@@ -56,9 +54,9 @@ export default function Auth() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-            options: {
-              emailRedirectTo: `${window.location.origin}/`,
-            }
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+          }
         });
 
         // Si el usuario ya existe, intentar hacer login automáticamente
@@ -154,22 +152,22 @@ export default function Auth() {
   };
 
   return (
-    <div className="h-full w-full relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ background: 'var(--gradient-hero)' }}>
+    <div className="min-h-screen relative overflow-hidden font-['Inter']" style={{ background: 'var(--gradient-hero)' }}>
       {/* Premium animated mesh background */}
-      <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: 'var(--gradient-mesh)' }} />
+      <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'var(--gradient-mesh)' }} />
       
       {/* Floating orbs with glow effect */}
-      <div className="absolute top-20 left-20 w-96 h-96 bg-primary-glow/30 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '4s', filter: 'blur(80px)' }} />
-      <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-accent/25 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '6s', animationDelay: '1s', filter: 'blur(100px)' }} />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-lilac/20 rounded-full blur-3xl pointer-events-none" style={{ filter: 'blur(120px)' }} />
+      <div className="absolute top-20 left-20 w-96 h-96 bg-primary-glow/30 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s', filter: 'blur(80px)' }} />
+      <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-accent/25 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s', filter: 'blur(100px)' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-lilac/20 rounded-full blur-3xl" style={{ filter: 'blur(120px)' }} />
       
-      <div className="min-h-full flex flex-col lg:flex-row items-center justify-center px-4 py-6 sm:p-6 lg:p-12 relative z-10 gap-6 lg:gap-12">
-        <div className="w-full max-w-7xl mx-auto grid lg:grid-cols-2 gap-6 lg:gap-16 items-center">
+      <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center p-4 sm:p-6 lg:p-12 relative z-10 gap-8 lg:gap-12">
+        <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           {/* Left side - Hero & Branding */}
-          <div className="hidden lg:flex flex-col space-y-6 lg:space-y-8 text-white">
-            {/* Hero Title - Desktop only */}
-            <div className="text-left space-y-4 animate-fade-in">
-              <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/15 backdrop-blur-md border border-white/30 shadow-lg">
+          <div className="flex flex-col space-y-6 lg:space-y-8 text-white">
+            {/* Hero Title - Always visible */}
+            <div className="text-center lg:text-left space-y-4 animate-fade-in">
+              <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/15 backdrop-blur-md border border-white/30 shadow-lg mx-auto lg:mx-0">
                 <Sparkles className="w-5 h-5 text-yellow-300" />
                 <span className="text-sm font-semibold tracking-wide">Fintech Premium</span>
               </div>
@@ -179,7 +177,7 @@ export default function Auth() {
                   Inteligente
                 </span>
               </h1>
-              <p className="text-lg lg:text-xl text-white/90 font-light">
+              <p className="text-lg lg:text-xl text-white/90 max-w-xl mx-auto lg:mx-0 font-light">
                 Controla tus finanzas de forma profesional con análisis en tiempo real y reportes detallados
               </p>
             </div>
@@ -196,7 +194,7 @@ export default function Auth() {
             </div>
 
             {/* Feature Grid - Desktop only */}
-            <div className="grid grid-cols-2 gap-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <div className="hidden lg:grid grid-cols-2 gap-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
               <div className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/25 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-glow">
                 <TrendingUp className="w-9 h-9 mb-3 text-yellow-300" />
                 <h3 className="font-bold mb-1.5 text-lg">Reportes Inteligentes</h3>
@@ -208,47 +206,46 @@ export default function Auth() {
                 <p className="text-sm text-white/80">Protección bancaria de nivel empresarial</p>
               </div>
             </div>
+
+            {/* Mobile badges */}
+            <div className="lg:hidden flex justify-center gap-3 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/15 backdrop-blur-md border border-white/30">
+                <Shield className="w-4 h-4 text-yellow-300" />
+                <span className="text-sm font-semibold">Seguro</span>
+              </div>
+              <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/15 backdrop-blur-md border border-white/30">
+                <Zap className="w-4 h-4 text-yellow-300" />
+                <span className="text-sm font-semibold">Rápido</span>
+              </div>
+            </div>
           </div>
 
           {/* Right side - Premium Auth form */}
           <div className="w-full animate-scale-in" style={{ animationDelay: '0.15s' }}>
-            {/* Mobile header */}
-            <div className="lg:hidden text-center mb-6 text-white space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/30">
-                <Sparkles className="w-4 h-4 text-yellow-300" />
-                <span className="text-sm font-semibold">Fintech Premium</span>
-              </div>
-              <h1 className="text-3xl font-bold leading-tight">
-                <span className="bg-gradient-to-r from-white via-yellow-100 to-white bg-clip-text text-transparent">
-                  Gestión Financiera Inteligente
-                </span>
-              </h1>
-            </div>
-
-            <div className="bg-white/95 dark:bg-card/95 backdrop-blur-2xl rounded-3xl lg:rounded-[2rem] shadow-glass border border-white/30 p-6 sm:p-8 lg:p-12" style={{ boxShadow: 'var(--shadow-elegant)' }}>
-              <div className="mb-6 sm:mb-8 lg:mb-10">
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <div className="bg-white/95 dark:bg-card/95 backdrop-blur-2xl rounded-[2rem] shadow-glass border border-white/30 p-8 sm:p-10 lg:p-12" style={{ boxShadow: 'var(--shadow-elegant)' }}>
+              <div className="mb-8 sm:mb-10">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                   {isSignUp ? "Crear cuenta" : "Bienvenido de vuelta"}
                 </h2>
-                <p className="text-sm sm:text-base lg:text-lg text-muted-foreground font-light">
+                <p className="text-base sm:text-lg text-muted-foreground font-light">
                   {isSignUp ? (
                     <>
-                      Comienza tu viaje{" "}
+                      Comienza tu viaje hacia el control financiero{" "}
                       <button
                         type="button"
                         onClick={() => setIsSignUp(false)}
-                        className="text-primary font-bold hover:text-accent transition-colors"
+                        className="text-primary font-bold hover:text-accent transition-colors inline-flex items-center gap-1"
                       >
-                        Inicia sesión
+                        Inicia sesión aquí
                       </button>
                     </>
                   ) : (
                     <>
-                      ¿Nuevo?{" "}
+                      ¿Nuevo en la plataforma?{" "}
                       <button
                         type="button"
                         onClick={() => setIsSignUp(true)}
-                        className="text-primary font-bold hover:text-accent transition-colors"
+                        className="text-primary font-bold hover:text-accent transition-colors inline-flex items-center gap-1"
                       >
                         Crea tu cuenta
                       </button>
@@ -257,9 +254,9 @@ export default function Auth() {
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6 lg:space-y-7">
-                <div className="space-y-2 sm:space-y-3">
-                  <Label htmlFor="email" className="text-sm sm:text-base font-bold text-foreground">
+              <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-7">
+                <div className="space-y-3">
+                  <Label htmlFor="email" className="text-base font-bold text-foreground">
                     Correo electrónico
                   </Label>
                   <Input
@@ -269,20 +266,14 @@ export default function Auth() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="tu@correo.com"
                     required
-                    className="h-12 sm:h-14 px-4 sm:px-5 text-sm sm:text-base rounded-xl sm:rounded-2xl bg-secondary/40 border-2 border-input/60 focus:border-primary focus:bg-background/60 backdrop-blur-sm transition-all hover:bg-secondary/60 hover:border-primary/50 font-medium"
+                    className="h-14 px-5 text-base rounded-2xl bg-secondary/40 border-2 border-input/60 focus:border-primary focus:bg-background/60 backdrop-blur-sm transition-all hover:bg-secondary/60 hover:border-primary/50 font-medium"
                   />
                 </div>
 
-
-                <div className="space-y-2 sm:space-y-3">
-                  <Label htmlFor="password" className="text-sm sm:text-base font-bold text-foreground">
+                <div className="space-y-3">
+                  <Label htmlFor="password" className="text-base font-bold text-foreground">
                     Contraseña
                   </Label>
-                  {isSignUp && (
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      La contraseña debe contener letras y números
-                    </p>
-                  )}
                   <div className="relative group">
                     <Input
                       id="password"
@@ -291,28 +282,28 @@ export default function Auth() {
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Mínimo 8 caracteres"
                       required
-                      className="h-12 sm:h-14 px-4 sm:px-5 pr-12 sm:pr-14 text-sm sm:text-base rounded-xl sm:rounded-2xl bg-secondary/40 border-2 border-input/60 focus:border-primary focus:bg-background/60 backdrop-blur-sm transition-all hover:bg-secondary/60 hover:border-primary/50 font-medium"
+                      className="h-14 px-5 pr-14 text-base rounded-2xl bg-secondary/40 border-2 border-input/60 focus:border-primary focus:bg-background/60 backdrop-blur-sm transition-all hover:bg-secondary/60 hover:border-primary/50 font-medium"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors p-2 touch-manipulation rounded-full hover:bg-secondary/50"
+                      className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors p-2 touch-manipulation rounded-full hover:bg-secondary/50"
                     >
                       {showPassword ? (
-                        <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <EyeOff className="w-5 h-5" />
                       ) : (
-                        <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <Eye className="w-5 h-5" />
                       )}
                     </button>
                   </div>
                 </div>
 
                 {!isSignUp && (
-                  <div className="flex justify-end">
+                  <div className="flex justify-end -mt-2">
                     <button
                       type="button"
                       onClick={() => setShowResetDialog(true)}
-                      className="text-xs sm:text-sm font-semibold text-primary hover:text-accent transition-colors touch-manipulation"
+                      className="text-sm font-semibold text-primary hover:text-accent transition-colors touch-manipulation"
                     >
                       ¿Olvidaste tu contraseña?
                     </button>
@@ -321,14 +312,14 @@ export default function Auth() {
 
                 <Button 
                   type="submit" 
-                  className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl text-base sm:text-lg font-bold shadow-elegant hover:shadow-glow transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] touch-manipulation" 
+                  className="w-full h-14 rounded-2xl text-lg font-bold shadow-elegant hover:shadow-glow transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] touch-manipulation" 
                   style={{ background: 'var(--gradient-header)' }}
                   disabled={loading}
                 >
                   {loading ? (
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 sm:border-3 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span className="text-sm sm:text-base">Procesando...</span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />
+                      Procesando...
                     </div>
                   ) : (
                     isSignUp ? "Crear mi cuenta" : "Acceder ahora"
@@ -336,19 +327,19 @@ export default function Auth() {
                 </Button>
               </form>
 
-              <div className="mt-6 sm:mt-8 lg:mt-10 pt-5 sm:pt-6 border-t border-border/30">
-                <div className="flex items-center justify-center gap-2">
-                  <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
-                  <p className="text-xs sm:text-sm text-center text-muted-foreground font-medium">
+              <div className="mt-8 sm:mt-10 pt-6 border-t border-border/30">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <Shield className="w-4 h-4 text-primary" />
+                  <p className="text-sm text-center text-muted-foreground font-medium">
                     {isSignUp ? (
                       <>
-                        Al crear cuenta, aceptas nuestros{" "}
-                        <a href="#" className="text-primary hover:text-accent font-bold transition-colors whitespace-nowrap">
-                          términos
+                        Al crear una cuenta, aceptas nuestros{" "}
+                        <a href="#" className="text-primary hover:text-accent font-bold transition-colors">
+                          términos y condiciones
                         </a>
                       </>
                     ) : (
-                      "Protección de nivel bancario"
+                      "Tus datos están protegidos con encriptación de nivel bancario"
                     )}
                   </p>
                 </div>

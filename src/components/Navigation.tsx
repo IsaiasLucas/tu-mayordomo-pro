@@ -42,7 +42,7 @@ const Navigation = ({
   }];
   return <>
       {/* Bottom floating navigation */}
-      <div className="fixed left-1/2 transform -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md" style={{ bottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md">
         <div className="bg-background/95 backdrop-blur-lg border rounded-full shadow-xl px-4 py-4">
           <div className="flex items-center justify-around gap-2">
             {navigationItems.map(item => {

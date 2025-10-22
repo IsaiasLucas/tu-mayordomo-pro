@@ -120,59 +120,6 @@ export type Database = {
           },
         ]
       }
-      facturas_boletas: {
-        Row: {
-          account_id: string | null
-          archivo_nombre: string
-          archivo_tamanio: number | null
-          archivo_url: string
-          created_at: string
-          descripcion: string | null
-          fecha_documento: string
-          id: string
-          monto: number | null
-          tipo: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          account_id?: string | null
-          archivo_nombre: string
-          archivo_tamanio?: number | null
-          archivo_url: string
-          created_at?: string
-          descripcion?: string | null
-          fecha_documento: string
-          id?: string
-          monto?: number | null
-          tipo: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          account_id?: string | null
-          archivo_nombre?: string
-          archivo_tamanio?: number | null
-          archivo_url?: string
-          created_at?: string
-          descripcion?: string | null
-          fecha_documento?: string
-          id?: string
-          monto?: number | null
-          tipo?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "facturas_boletas_account_id_fkey"
-            columns: ["account_id"]
-            isOneToOne: false
-            referencedRelation: "accounts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       gastos: {
         Row: {
           account_id: string | null
