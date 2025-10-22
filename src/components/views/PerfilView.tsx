@@ -577,10 +577,10 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
                 </Avatar>
                 <button 
                   onClick={handleEditProfile}
-                  className="absolute -bottom-0.5 -right-0.5 bg-white text-purple-600 p-2 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 active:scale-95"
+                  className="absolute bottom-0 right-0 bg-white text-purple-600 p-1.5 rounded-full shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 active:scale-95 opacity-90 hover:opacity-100"
                   aria-label="Editar foto"
                 >
-                  <Camera className="h-4 w-4" />
+                  <Camera className="h-3.5 w-3.5" />
                 </button>
               </div>
               
@@ -1067,12 +1067,12 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
                   
                   <Label 
                     htmlFor="avatar-upload" 
-                    className="absolute bottom-0 right-0 cursor-pointer flex items-center justify-center h-12 w-12 rounded-full bg-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95"
+                    className="absolute bottom-1 right-1 cursor-pointer flex items-center justify-center h-8 w-8 rounded-full bg-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 opacity-95 hover:opacity-100"
                   >
                     {uploading ? (
-                      <div className="animate-spin h-5 w-5 border-2 border-purple-600 border-t-transparent rounded-full" />
+                      <div className="animate-spin h-4 w-4 border-2 border-purple-600 border-t-transparent rounded-full" />
                     ) : (
-                      <Camera className="h-5 w-5 text-purple-600" />
+                      <Camera className="h-4 w-4 text-purple-600" />
                     )}
                   </Label>
                   <Input
