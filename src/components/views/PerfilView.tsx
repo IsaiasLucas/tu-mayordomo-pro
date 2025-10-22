@@ -1065,6 +1065,8 @@ const PerfilView = () => {
                 onChange={(e) => setEditName(e.target.value)}
                 placeholder="Tu nombre"
                 className="rounded-xl h-12 text-base"
+                autoFocus={false}
+                onFocus={(e) => e.target.blur()}
               />
             </div>
 
@@ -1076,6 +1078,7 @@ const PerfilView = () => {
                 value={userProfile.phone}
                 disabled
                 className="rounded-xl h-12 text-base bg-gray-100 cursor-not-allowed"
+                autoFocus={false}
               />
               <p className="text-xs text-muted-foreground">
                 El teléfono no puede ser modificado porque está vinculado a tu cuenta.
@@ -1090,6 +1093,7 @@ const PerfilView = () => {
                 value={userProfile.email}
                 disabled
                 className="rounded-xl h-12 text-base bg-gray-100 cursor-not-allowed"
+                autoFocus={false}
               />
             </div>
           </div>
