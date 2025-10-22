@@ -34,14 +34,15 @@ const Navigation = ({
   }];
   return (
     <>
-      {/* WhatsApp Floating Button */}
-      <div 
-        className="fixed z-50 flex justify-end items-center px-4"
-        style={{ 
-          bottom: 'calc(env(safe-area-inset-bottom) + 6.5rem)',
-          right: '1rem'
-        }}
-      >
+      {/* WhatsApp Floating Button - Only on Inicio */}
+      {currentView === "inicio" && (
+        <div 
+          className="fixed z-50 flex justify-end items-center px-4"
+          style={{ 
+            bottom: 'calc(env(safe-area-inset-bottom) + 6.5rem)',
+            right: '1rem'
+          }}
+        >
         <a
           href="https://wa.me/56955264713?text=Enséñame%20a%20usar%20Tu%20Mayordomo%20paso%20a%20paso%20🚀"
           target="_blank"
@@ -58,6 +59,7 @@ const Navigation = ({
           </div>
         </a>
       </div>
+      )}
 
       {/* Navigation Bar */}
       <div 
