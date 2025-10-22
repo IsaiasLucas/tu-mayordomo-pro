@@ -14,36 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      accounts: {
-        Row: {
-          avatar_url: string | null
-          created_at: string | null
-          email: string | null
-          id: string
-          name: string
-          phone: string | null
-          user_id: string
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string | null
-          email?: string | null
-          id?: string
-          name: string
-          phone?: string | null
-          user_id: string
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string | null
-          email?: string | null
-          id?: string
-          name?: string
-          phone?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       company_members: {
         Row: {
           active: boolean | null
@@ -110,15 +80,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "entities_account_id_fkey"
-            columns: ["account_id"]
-            isOneToOne: false
-            referencedRelation: "accounts"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       facturas_boletas: {
         Row: {
@@ -163,15 +125,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "facturas_boletas_account_id_fkey"
-            columns: ["account_id"]
-            isOneToOne: false
-            referencedRelation: "accounts"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       gastos: {
         Row: {
@@ -216,15 +170,7 @@ export type Database = {
           tipo?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "gastos_account_id_fkey"
-            columns: ["account_id"]
-            isOneToOne: false
-            referencedRelation: "accounts"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       invitation_codes: {
         Row: {
@@ -361,15 +307,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "reportes_account_id_fkey"
-            columns: ["account_id"]
-            isOneToOne: false
-            referencedRelation: "accounts"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       student_verifications: {
         Row: {
@@ -408,11 +346,13 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          nombre: string | null
           plan: string | null
           plan_expires_at: string | null
           reporte_mensual: boolean | null
           reporte_semanal: boolean | null
           telefono: string
+          tipo_cuenta: string | null
           usage_count: number | null
           usage_month: string | null
           user_id: string | null
@@ -420,11 +360,13 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
+          nombre?: string | null
           plan?: string | null
           plan_expires_at?: string | null
           reporte_mensual?: boolean | null
           reporte_semanal?: boolean | null
           telefono: string
+          tipo_cuenta?: string | null
           usage_count?: number | null
           usage_month?: string | null
           user_id?: string | null
@@ -432,11 +374,13 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
+          nombre?: string | null
           plan?: string | null
           plan_expires_at?: string | null
           reporte_mensual?: boolean | null
           reporte_semanal?: boolean | null
           telefono?: string
+          tipo_cuenta?: string | null
           usage_count?: number | null
           usage_month?: string | null
           user_id?: string | null

@@ -15,6 +15,7 @@ interface CompleteProfileModalProps {
 export default function CompleteProfileModal({ open, onClose }: CompleteProfileModalProps) {
   const [nombre, setNombre] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
+  const [tipo, setTipo] = useState("");
   const [loading, setLoading] = useState(false);
   const [phoneValid, setPhoneValid] = useState<boolean | null>(null);
 
@@ -64,6 +65,15 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
       return;
     }
 
+    if (!tipo) {
+      toast({
+        title: "Error",
+        description: "Debes seleccionar un tipo de cuenta",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -87,11 +97,13 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
 
       if (profileError) throw profileError;
 
-      // Update usuarios table with telefono
+      // Update usuarios table with telefono, nombre, and tipo_cuenta
       const { error: usuariosError } = await supabase
         .from('usuarios')
         .update({
-          telefono: phoneDigits
+          telefono: phoneDigits,
+          nombre: nombre,
+          tipo_cuenta: tipo.toLowerCase()
         })
         .eq('user_id', user.id);
 
@@ -145,10 +157,10 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="nombre">Nombre completo *</Label>
+            <Label htmlFor="nombre">Nombre *</Label>
             <Input
               id="nombre"
-              placeholder="Tu nombre completo"
+              placeholder="Tu nombre"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               disabled={loading}
@@ -189,6 +201,61 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
               Introduce tu número chileno (debe comenzar con 9)
             </p>
           </div>
+
+          <div className="space-y-3">
+            <Label>Tipo de cuenta *</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setTipo("Personal")}
+                disabled={loading}
+                className={`flex flex-col items-center justify-center gap-3 p-6 rounded-xl border-2 transition-all duration-200 relative ${
+                  tipo === "Personal" 
+                    ? "border-primary bg-primary/10 shadow-md" 
+                    : "border-border bg-card hover:border-primary/50"
+                }`}
+              >
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  tipo === "Personal" ? "bg-primary/20" : "bg-muted"
+                }`}>
+                  <span className="text-2xl">👤</span>
+                </div>
+                <span className={`text-sm font-medium ${
+                  tipo === "Personal" ? "text-primary" : "text-foreground"
+                }`}>
+                  Personal
+                </span>
+                {tipo === "Personal" && (
+                  <CheckCircle2 className="w-5 h-5 text-primary absolute top-2 right-2" />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTipo("Empresa")}
+                disabled={loading}
+                className={`flex flex-col items-center justify-center gap-3 p-6 rounded-xl border-2 transition-all duration-200 relative ${
+                  tipo === "Empresa" 
+                    ? "border-primary bg-primary/10 shadow-md" 
+                    : "border-border bg-card hover:border-primary/50"
+                }`}
+              >
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  tipo === "Empresa" ? "bg-primary/20" : "bg-muted"
+                }`}>
+                  <span className="text-2xl">🏢</span>
+                </div>
+                <span className={`text-sm font-medium ${
+                  tipo === "Empresa" ? "text-primary" : "text-foreground"
+                }`}>
+                  Empresa
+                </span>
+                {tipo === "Empresa" && (
+                  <CheckCircle2 className="w-5 h-5 text-primary absolute top-2 right-2" />
+                )}
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="flex gap-3 justify-end">
@@ -201,7 +268,7 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
           </Button>
           <Button
             onClick={handleSave}
-            disabled={loading || phoneValid !== true || !nombre.trim()}
+            disabled={loading || phoneValid !== true || !nombre.trim() || !tipo}
             className="min-w-[120px]"
           >
             {loading ? "Guardando..." : "Guardar"}
