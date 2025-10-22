@@ -149,8 +149,21 @@ const PerfilView = () => {
 
   const handleExportData = async () => {
     try {
+      // Filter out sensitive and technical fields from profile
+      const filteredProfile = profile ? {
+        email: profile.email,
+        display_name: profile.display_name,
+        phone_personal: profile.phone_personal,
+        phone_empresa: profile.phone_empresa,
+        plan: profile.plan,
+        entidad: profile.entidad,
+        whatsapp_configured: profile.whatsapp_configured,
+        created_at: profile.created_at,
+        updated_at: profile.updated_at,
+      } : null;
+
       const dataToExport = {
-        profile: profile,
+        profile: filteredProfile,
         user: {
           email: user?.email,
           created_at: user?.created_at,
