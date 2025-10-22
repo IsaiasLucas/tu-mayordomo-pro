@@ -34,11 +34,11 @@ const Navigation = ({
   }];
   return (
     <div 
-      className="fixed left-0 right-0 z-50 flex justify-center px-4"
+      className="fixed left-0 right-0 z-50 flex justify-center items-center px-4"
       style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}
     >
-      <nav className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-[2rem] shadow-2xl px-6 py-4 transition-all duration-300 ease-out">
-        <div className="flex items-center justify-center gap-2">
+      <nav className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-[2rem] shadow-2xl transition-all duration-300 ease-out">
+        <div className="flex items-center justify-center gap-2 px-6 py-4">
           {navigationItems.map(item => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
