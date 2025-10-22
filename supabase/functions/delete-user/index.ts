@@ -56,7 +56,7 @@ serve(async (req) => {
       .eq('user_id', user.id);
 
     if (gastosError) {
-      console.error('Error deleting gastos:', gastosError);
+      console.error('[INTERNAL] Error deleting gastos:', gastosError);
     }
 
     // 2. Delete reportes (reports)
@@ -66,7 +66,7 @@ serve(async (req) => {
       .eq('user_id', user.id);
 
     if (reportesError) {
-      console.error('Error deleting reportes:', reportesError);
+      console.error('[INTERNAL] Error deleting reportes:', reportesError);
     }
 
     // 3. Delete entities
@@ -76,7 +76,7 @@ serve(async (req) => {
       .eq('user_id', user.id);
 
     if (entitiesError) {
-      console.error('Error deleting entities:', entitiesError);
+      console.error('[INTERNAL] Error deleting entities:', entitiesError);
     }
 
     // 4. Delete student verifications
@@ -86,7 +86,7 @@ serve(async (req) => {
       .eq('user_id', user.id);
 
     if (verificationsError) {
-      console.error('Error deleting student_verifications:', verificationsError);
+      console.error('[INTERNAL] Error deleting student_verifications:', verificationsError);
     }
 
     // 5. Delete invitation codes (if user is empresa)
@@ -96,7 +96,7 @@ serve(async (req) => {
       .eq('company_id', user.id);
 
     if (invitationsError) {
-      console.error('Error deleting invitation_codes:', invitationsError);
+      console.error('[INTERNAL] Error deleting invitation_codes:', invitationsError);
     }
 
     // 6. Delete accounts
@@ -106,7 +106,7 @@ serve(async (req) => {
       .eq('user_id', user.id);
 
     if (accountsError) {
-      console.error('Error deleting accounts:', accountsError);
+      console.error('[INTERNAL] Error deleting accounts:', accountsError);
     }
 
     // 7. Delete from usuarios table if phone exists
@@ -122,7 +122,7 @@ serve(async (req) => {
           .eq('telefono', phoneDigits);
 
         if (usuariosError) {
-          console.error('Error deleting from usuarios:', usuariosError);
+          console.error('[INTERNAL] Error deleting from usuarios:', usuariosError);
         }
       }
     }
@@ -134,7 +134,7 @@ serve(async (req) => {
       .eq('user_id', user.id);
 
     if (profileError) {
-      console.error('Error deleting profile:', profileError);
+      console.error('[INTERNAL] Error deleting profile:', profileError);
       // Continue anyway to delete the auth user
     }
 
@@ -142,8 +142,8 @@ serve(async (req) => {
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user.id);
 
     if (deleteError) {
-      console.error('Error deleting user:', deleteError);
-      throw deleteError;
+      console.error('[INTERNAL] Error deleting user:', deleteError);
+      throw new Error('Error al eliminar la cuenta');
     }
 
     console.log(`User account deleted successfully: ${user.id}`);
@@ -153,10 +153,9 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );
   } catch (error) {
-    console.error('Error in delete-user function:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    console.error('[INTERNAL] Error in delete-user function:', error);
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: 'Error al eliminar la cuenta. Por favor intenta nuevamente.' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
     );
   }

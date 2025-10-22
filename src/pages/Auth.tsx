@@ -106,10 +106,21 @@ export default function Auth() {
         });
       }
     } catch (error: any) {
-      console.error('Auth error:', error);
+      // Log detailed error only in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Auth error:', error);
+      }
+      
+      // Map known errors to safe messages
+      const safeMessage = error.message === 'Invalid login credentials' 
+        ? 'Credenciales incorrectas. Verifica tu email y contraseña.'
+        : error.message === 'Email not confirmed'
+        ? 'Por favor confirma tu email antes de continuar.'
+        : 'Error de autenticación. Por favor intenta nuevamente.';
+      
       toast({
         title: "Error",
-        description: error.message || "Ocurrió un error durante la autenticación",
+        description: safeMessage,
         variant: "destructive",
       });
     } finally {

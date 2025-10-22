@@ -83,9 +83,11 @@ serve(async (req) => {
     );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("Error in verify-student-email:", errorMessage);
+    console.error("[INTERNAL] Error in verify-student-email:", errorMessage);
+    
+    // Return safe error message to client
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: "Error al verificar el email estudiantil. Por favor intenta nuevamente." }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
