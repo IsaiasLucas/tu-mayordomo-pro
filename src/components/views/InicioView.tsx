@@ -477,8 +477,8 @@ const formatMovimientoDate = (dateString: string) => {
         href="https://wa.me/56955264713?text=Enséñame%20a%20usar%20Tu%20Mayordomo%20paso%20a%20paso%20🚀"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed right-4 sm:right-5 z-40 group touch-manipulation"
-        style={{ bottom: 'calc(env(safe-area-inset-bottom) + 8rem)' }}
+        className="fixed right-5 z-40 group touch-manipulation"
+        style={{ bottom: 'calc(env(safe-area-inset-bottom) + 6.5rem)' }}
         title="Chatear con Tu Mayordomo"
       >
         <div className="relative bg-gradient-to-br from-purple-600 to-blue-600 rounded-full w-16 h-16 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center">
