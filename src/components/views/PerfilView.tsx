@@ -724,6 +724,14 @@ const PerfilView = () => {
                   <Shield className="h-4 w-4 mr-2 flex-shrink-0" />
                   Cambiar contraseña
                 </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => window.open('https://ig.me/m/tumayordomoapp', '_blank')}
+                  className="w-full h-11 sm:h-12 rounded-2xl text-sm sm:text-base font-semibold justify-start touch-manipulation border-purple-300 hover:bg-purple-50"
+                >
+                  <MessageCircle className="h-4 w-4 mr-2 flex-shrink-0" />
+                  Ajuda
+                </Button>
               </div>
             </div>
 
