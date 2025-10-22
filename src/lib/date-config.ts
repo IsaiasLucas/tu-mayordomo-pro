@@ -46,51 +46,52 @@ export const formatDatabaseDate = (
   pattern: string = "dd/MM HH:mm"
 ): string => {
   try {
-    let d: Date;
-
     if (typeof date === 'string') {
-      // Parse a data diretamente sem conversão de timezone
-      d = new Date(date);
-    } else {
-      d = date;
+      const raw = date.trim();
+      // Extrai partes diretamente da string (sem conversão de fuso)
+      const m = raw.match(/^(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2})/);
+      if (m) {
+        const [, y, mo, d, h, mi] = m;
+        const year = y;
+        const month = mo;
+        const day = d;
+        const hours = h;
+        const minutes = mi;
+
+        if (pattern === "dd/MM HH:mm") return `${day}/${month} ${hours}:${minutes}`;
+        if (pattern === "dd/MM/yyyy HH:mm") return `${day}/${month}/${year} ${hours}:${minutes}`;
+        if (pattern === "HH:mm") return `${hours}:${minutes}`;
+        if (pattern.includes("MMMM")) {
+          const monthNamesEs = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+          const monthName = monthNamesEs[parseInt(month, 10) - 1];
+          return pattern.replace('dd', day).replace('MMMM', monthName).replace('yyyy', year);
+        }
+        return `${day}/${month}/${year} ${hours}:${minutes}`;
+      }
     }
 
+    // Fallback: usa componentes em UTC para evitar variações de fuso
+    const d = typeof date === 'string' ? new Date(date) : date;
     if (!isValid(d)) {
       console.warn('formatDatabaseDate: invalid date', date);
       return String(date);
     }
 
-    // Formatar usando UTC para manter fidelidade com o banco
-    const year = d.getUTCFullYear();
+    const year = String(d.getUTCFullYear());
     const month = String(d.getUTCMonth() + 1).padStart(2, '0');
     const day = String(d.getUTCDate()).padStart(2, '0');
     const hours = String(d.getUTCHours()).padStart(2, '0');
     const minutes = String(d.getUTCMinutes()).padStart(2, '0');
 
-    if (pattern === "dd/MM HH:mm") {
-      return `${day}/${month} ${hours}:${minutes}`;
-    }
-
-    if (pattern === "dd/MM/yyyy HH:mm") {
-      return `${day}/${month}/${year} ${hours}:${minutes}`;
-    }
-
-    if (pattern === "HH:mm") {
-      return `${hours}:${minutes}`;
-    }
-
+    if (pattern === "dd/MM HH:mm") return `${day}/${month} ${hours}:${minutes}`;
+    if (pattern === "dd/MM/yyyy HH:mm") return `${day}/${month}/${year} ${hours}:${minutes}`;
+    if (pattern === "HH:mm") return `${hours}:${minutes}`;
     if (pattern.includes("MMMM")) {
-      // Para padrões com nome do mês, usar date-fns com UTC
-      const monthNames = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 
-                         'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-      const monthName = monthNames[d.getUTCMonth()];
-      return pattern
-        .replace('dd', day)
-        .replace('MMMM', monthName)
-        .replace('yyyy', String(year));
+      const monthNamesEs = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+      const monthName = monthNamesEs[parseInt(month, 10) - 1];
+      return pattern.replace('dd', day).replace('MMMM', monthName).replace('yyyy', year);
     }
 
-    // Fallback genérico
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   } catch (e) {
     console.warn('formatDatabaseDate error:', date, e);
