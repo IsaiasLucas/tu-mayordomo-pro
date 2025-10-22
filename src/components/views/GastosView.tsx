@@ -302,52 +302,52 @@ const tableData = (data.items || []).map(mov => [
   const totalPages = Math.ceil((data.items || []).length / itemsPerPage);
 
   return (
-    <div className="p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-4 md:space-y-6 pb-20 sm:pb-24">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Gastos</h1>
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center w-full sm:w-auto">
+    <div className="p-4 sm:p-5 md:p-7 space-y-4 sm:space-y-5 md:space-y-7 pb-24 sm:pb-28">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-5">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Gastos</h1>
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center w-full sm:w-auto">
           <input
             type="month"
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
-            className="px-3 py-2 border rounded-lg w-full sm:w-auto text-sm sm:text-base h-10 sm:h-11 touch-manipulation"
+            className="px-4 py-2.5 border rounded-lg w-full sm:w-auto text-base sm:text-lg h-12 sm:h-13 touch-manipulation"
           />
-          <Button onClick={handleDownloadPDF} className="w-full sm:w-auto h-10 sm:h-11 text-sm sm:text-base touch-manipulation">
-            <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2" />
+          <Button onClick={handleDownloadPDF} className="w-full sm:w-auto h-12 sm:h-13 text-base sm:text-lg touch-manipulation">
+            <Download className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
             Descargar PDF
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
         <Card className="rounded-xl sm:rounded-2xl">
-          <CardHeader className="pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Ingresos</CardTitle>
+          <CardHeader className="pb-3 px-5 sm:px-7 pt-5 sm:pt-7">
+            <CardTitle className="text-sm sm:text-base font-medium text-muted-foreground">Ingresos</CardTitle>
           </CardHeader>
-          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-            <div className="text-xl sm:text-2xl font-bold text-green-600">
+          <CardContent className="px-5 sm:px-7 pb-5 sm:pb-7">
+            <div className="text-2xl sm:text-3xl font-bold text-green-600">
               {fmtCLP(data.totalIngresos)}
             </div>
           </CardContent>
         </Card>
 
         <Card className="rounded-xl sm:rounded-2xl">
-          <CardHeader className="pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Gastos</CardTitle>
+          <CardHeader className="pb-3 px-5 sm:px-7 pt-5 sm:pt-7">
+            <CardTitle className="text-sm sm:text-base font-medium text-muted-foreground">Gastos</CardTitle>
           </CardHeader>
-          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-            <div className="text-xl sm:text-2xl font-bold text-red-600">
+          <CardContent className="px-5 sm:px-7 pb-5 sm:pb-7">
+            <div className="text-2xl sm:text-3xl font-bold text-red-600">
               {fmtCLP(data.totalGastos)}
             </div>
           </CardContent>
         </Card>
 
         <Card className="rounded-xl sm:rounded-2xl">
-          <CardHeader className="pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Saldo</CardTitle>
+          <CardHeader className="pb-3 px-5 sm:px-7 pt-5 sm:pt-7">
+            <CardTitle className="text-sm sm:text-base font-medium text-muted-foreground">Saldo</CardTitle>
           </CardHeader>
-          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-            <div className={`text-xl sm:text-2xl font-bold ${data.saldo >= 0 ? 'text-primary' : 'text-red-600'}`}>
+          <CardContent className="px-5 sm:px-7 pb-5 sm:pb-7">
+            <div className={`text-2xl sm:text-3xl font-bold ${data.saldo >= 0 ? 'text-primary' : 'text-red-600'}`}>
               {fmtCLP(data.saldo)}
             </div>
           </CardContent>
@@ -355,29 +355,29 @@ const tableData = (data.items || []).map(mov => [
       </div>
 
       <Card className="rounded-xl sm:rounded-2xl">
-        <CardHeader className="px-4 sm:px-6">
-          <CardTitle className="text-lg sm:text-xl">Movimientos del mes</CardTitle>
+        <CardHeader className="px-5 sm:px-7">
+          <CardTitle className="text-xl sm:text-2xl">Movimientos del mes</CardTitle>
         </CardHeader>
-        <CardContent className="px-4 sm:px-6">
+        <CardContent className="px-5 sm:px-7">
           {loading ? (
             <div className="space-y-3">
               <div className="overflow-x-auto -mx-4 sm:mx-0">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-xs sm:text-sm md:text-base py-3 sm:py-4 whitespace-nowrap">Fecha</TableHead>
-                      <TableHead className="text-xs sm:text-sm md:text-base py-3 sm:py-4">Descripción</TableHead>
-                      <TableHead className="text-xs sm:text-sm md:text-base py-3 sm:py-4 whitespace-nowrap">Tipo</TableHead>
-                      <TableHead className="text-right text-xs sm:text-sm md:text-base py-3 sm:py-4 whitespace-nowrap">Monto</TableHead>
+                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Fecha</TableHead>
+                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5">Descripción</TableHead>
+                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Tipo</TableHead>
+                      <TableHead className="text-right text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Monto</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                       <TableRow key={i}>
-                        <TableCell className="py-3 sm:py-4"><Skeleton className="h-4 sm:h-5 w-20 sm:w-24" /></TableCell>
-                        <TableCell className="py-3 sm:py-4"><Skeleton className="h-4 sm:h-5 w-32 sm:w-40" /></TableCell>
-                        <TableCell className="py-3 sm:py-4"><Skeleton className="h-5 sm:h-6 w-16 sm:w-20" /></TableCell>
-                        <TableCell className="text-right py-3 sm:py-4"><Skeleton className="h-4 sm:h-5 w-16 sm:w-20 ml-auto" /></TableCell>
+                        <TableCell className="py-4 sm:py-5"><Skeleton className="h-5 sm:h-6 w-24 sm:w-28" /></TableCell>
+                        <TableCell className="py-4 sm:py-5"><Skeleton className="h-5 sm:h-6 w-40 sm:w-48" /></TableCell>
+                        <TableCell className="py-4 sm:py-5"><Skeleton className="h-6 sm:h-7 w-20 sm:w-24" /></TableCell>
+                        <TableCell className="text-right py-4 sm:py-5"><Skeleton className="h-5 sm:h-6 w-20 sm:w-24 ml-auto" /></TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -390,20 +390,20 @@ const tableData = (data.items || []).map(mov => [
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-xs sm:text-sm md:text-base py-3 sm:py-4 whitespace-nowrap">Fecha</TableHead>
-                      <TableHead className="text-xs sm:text-sm md:text-base py-3 sm:py-4">Descripción</TableHead>
-                      <TableHead className="text-xs sm:text-sm md:text-base py-3 sm:py-4 whitespace-nowrap">Tipo</TableHead>
-                      <TableHead className="text-right text-xs sm:text-sm md:text-base py-3 sm:py-4 whitespace-nowrap">Monto</TableHead>
+                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Fecha</TableHead>
+                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5">Descripción</TableHead>
+                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Tipo</TableHead>
+                      <TableHead className="text-right text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Monto</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {paginatedMovements.map((mov) => (
                       <TableRow key={mov.id}>
-        <TableCell className="py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm md:text-base">
+        <TableCell className="py-4 sm:py-5 whitespace-nowrap text-sm sm:text-base md:text-lg">
           {formatDisplayInSantiago((mov as any).created_at, "dd/MM HH:mm")}
         </TableCell>
-                        <TableCell className="py-3 sm:py-4 text-xs sm:text-sm md:text-base">{mov.descripcion}</TableCell>
-                        <TableCell className="py-3 sm:py-4">
+                        <TableCell className="py-4 sm:py-5 text-sm sm:text-base md:text-lg">{mov.descripcion}</TableCell>
+                        <TableCell className="py-4 sm:py-5">
                           <Badge
                             variant={
                               mov.tipo.toLowerCase().includes("ingreso") || 
@@ -411,12 +411,12 @@ const tableData = (data.items || []).map(mov => [
                                 ? "default"
                                 : "destructive"
                             }
-                            className="text-xs sm:text-sm whitespace-nowrap"
+                            className="text-sm sm:text-base whitespace-nowrap"
                           >
                             {mov.tipo}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right font-medium py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm md:text-base">
+                        <TableCell className="text-right font-medium py-4 sm:py-5 whitespace-nowrap text-sm sm:text-base md:text-lg">
                           {fmtCLP(mov.monto)}
                         </TableCell>
                       </TableRow>

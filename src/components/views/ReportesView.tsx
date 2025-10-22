@@ -392,26 +392,26 @@ export default function ReportesView() {
   }
 
   return (
-    <main className="px-4 py-5 space-y-6 pb-24 max-w-7xl mx-auto">
+    <main className="px-5 py-6 space-y-7 pb-28 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+      <div className="space-y-3">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
           Reportes Pro
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-lg text-muted-foreground">
           Análisis detallado de tus finanzas y documentos
         </p>
       </div>
 
       {/* Tabs para organizar las secciones */}
       <Tabs defaultValue="analisis" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 h-12 mb-6">
-          <TabsTrigger value="analisis" className="h-10 data-[state=active]:shadow-elegant">
-            <BarChart3 className="h-4 w-4 mr-2" />
+        <TabsList className="grid w-full grid-cols-2 h-14 mb-7">
+          <TabsTrigger value="analisis" className="h-12 text-base data-[state=active]:shadow-elegant">
+            <BarChart3 className="h-5 w-5 mr-2" />
             Análisis Financiero
           </TabsTrigger>
-          <TabsTrigger value="facturas" className="h-10 data-[state=active]:shadow-elegant">
-            <Receipt className="h-4 w-4 mr-2" />
+          <TabsTrigger value="facturas" className="h-12 text-base data-[state=active]:shadow-elegant">
+            <Receipt className="h-5 w-5 mr-2" />
             Facturas y Boletas
           </TabsTrigger>
         </TabsList>
@@ -434,21 +434,21 @@ export default function ReportesView() {
               <Button
                 variant={selectedPeriod === "month" ? "default" : "outline"}
                 onClick={() => setSelectedPeriod("month")}
-                className="h-11 text-xs sm:text-sm px-2"
+                className="h-12 text-sm sm:text-base px-3"
               >
                 Mes Actual
               </Button>
               <Button
                 variant={selectedPeriod === "lastMonth" ? "default" : "outline"}
                 onClick={() => setSelectedPeriod("lastMonth")}
-                className="h-11 text-xs sm:text-sm px-2"
+                className="h-12 text-sm sm:text-base px-3"
               >
                 Mes Pasado
               </Button>
               <Button
                 variant={selectedPeriod === "custom" ? "default" : "outline"}
                 onClick={() => setSelectedPeriod("custom")}
-                className="h-11 text-xs sm:text-sm px-2"
+                className="h-12 text-sm sm:text-base px-3"
               >
                 Personalizado
               </Button>
@@ -498,18 +498,18 @@ export default function ReportesView() {
       </Card>
 
       {/* KPIs Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Ingresos */}
         <Card className="shadow-card border-0 overflow-hidden animate-fade-in">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 rounded-xl bg-green-100 dark:bg-green-900/20">
-                <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
+          <CardContent className="p-7">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-4 rounded-xl bg-green-100 dark:bg-green-900/20">
+                <TrendingUp className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
             </div>
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground font-medium">Ingresos</p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400 truncate">
+            <div className="space-y-1.5">
+              <p className="text-base text-muted-foreground font-medium">Ingresos</p>
+              <p className="text-3xl font-bold text-green-600 dark:text-green-400 truncate">
                 {fmtCLP(totalIngresos)}
               </p>
             </div>
@@ -518,15 +518,15 @@ export default function ReportesView() {
 
         {/* Egresos */}
         <Card className="shadow-card border-0 overflow-hidden animate-fade-in" style={{ animationDelay: '0.1s' }}>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 rounded-xl bg-red-100 dark:bg-red-900/20">
-                <TrendingDown className="w-5 h-5 text-red-600 dark:text-red-400" />
+          <CardContent className="p-7">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-4 rounded-xl bg-red-100 dark:bg-red-900/20">
+                <TrendingDown className="w-6 h-6 text-red-600 dark:text-red-400" />
               </div>
             </div>
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground font-medium">Egresos</p>
-              <p className="text-2xl font-bold text-red-600 dark:text-red-400 truncate">
+            <div className="space-y-1.5">
+              <p className="text-base text-muted-foreground font-medium">Egresos</p>
+              <p className="text-3xl font-bold text-red-600 dark:text-red-400 truncate">
                 {fmtCLP(totalEgresos)}
               </p>
             </div>
@@ -535,8 +535,8 @@ export default function ReportesView() {
 
         {/* Saldo */}
         <Card className="shadow-card border-0 overflow-hidden animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-3">
+          <CardContent className="p-7">
+            <div className="flex items-center justify-between mb-4">
               <div className={cn(
                 "p-3 rounded-xl",
                 totalIngresos - totalEgresos >= 0 
@@ -551,10 +551,10 @@ export default function ReportesView() {
                 )} />
               </div>
             </div>
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground font-medium">Saldo</p>
+            <div className="space-y-1.5">
+              <p className="text-base text-muted-foreground font-medium">Saldo</p>
               <p className={cn(
-                "text-2xl font-bold truncate",
+                "text-3xl font-bold truncate",
                 totalIngresos - totalEgresos >= 0 
                   ? "text-primary" 
                   : "text-orange-600 dark:text-orange-400"
@@ -567,15 +567,15 @@ export default function ReportesView() {
 
         {/* Movimientos */}
         <Card className="shadow-card border-0 overflow-hidden animate-fade-in" style={{ animationDelay: '0.3s' }}>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 rounded-xl bg-blue-100 dark:bg-blue-900/20">
-                <Activity className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <CardContent className="p-7">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-4 rounded-xl bg-blue-100 dark:bg-blue-900/20">
+                <Activity className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground font-medium">Movimientos</p>
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            <div className="space-y-1.5">
+              <p className="text-base text-muted-foreground font-medium">Movimientos</p>
+              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                 {totalMovimientos}
               </p>
             </div>
@@ -584,7 +584,7 @@ export default function ReportesView() {
       </div>
 
       {/* Gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
         {/* Donut Chart - Gastos por Categoría */}
         <Card className="shadow-card border-0">
           <CardHeader>
