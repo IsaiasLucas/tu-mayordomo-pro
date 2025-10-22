@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { fmtCLP } from "@/lib/api";
-import { CHILE_TIMEZONE, chileDateOptions, formatDisplayInSantiago, monthRangeUTCFromSantiago } from "@/lib/date-config";
+import { CHILE_TIMEZONE, chileDateOptions, formatDatabaseDate, monthRangeUTCFromSantiago } from "@/lib/date-config";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -107,7 +107,7 @@ export default function GastosView() {
             id: m.id,
             created_at_raw: m.created_at,
             newDate_toISOString: m?.created_at ? new Date(m.created_at).toISOString() : null,
-            display_scl: formatDisplayInSantiago(m.created_at, "dd/MM HH:mm"),
+            display_scl: formatDatabaseDate(m.created_at, "dd/MM HH:mm"),
           }));
           console.log("[DEBUG Gastos] sample times:", sample);
         } catch (e) {
@@ -217,7 +217,7 @@ export default function GastosView() {
     
     // Tabla de movimientos
 const tableData = (data.items || []).map(mov => [
-  formatDisplayInSantiago((mov as any).created_at, "dd/MM HH:mm"),
+  formatDatabaseDate((mov as any).created_at, "dd/MM HH:mm"),
   mov.descripcion,
   mov.tipo,
   fmtCLP(mov.monto)
@@ -400,7 +400,7 @@ const tableData = (data.items || []).map(mov => [
                     {paginatedMovements.map((mov) => (
                       <TableRow key={mov.id}>
         <TableCell className="py-4 sm:py-5 whitespace-nowrap text-sm sm:text-base md:text-lg">
-          {formatDisplayInSantiago((mov as any).created_at, "dd/MM HH:mm")}
+          {formatDatabaseDate((mov as any).created_at, "dd/MM HH:mm")}
         </TableCell>
                         <TableCell className="py-4 sm:py-5 text-sm sm:text-base md:text-lg">{mov.descripcion}</TableCell>
                         <TableCell className="py-4 sm:py-5">

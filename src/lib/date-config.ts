@@ -40,8 +40,8 @@ export const chileDateOptions: Intl.DateTimeFormatOptions = {
   hour12: false
 };
 
-// Formato estándar para mostrar fechas basado SIEMPRE en America/Santiago
-export const formatDisplayInSantiago = (
+// Formato para exibir a data EXATAMENTE como está no banco (sem conversão)
+export const formatDatabaseDate = (
   date: string | Date,
   pattern: string = "dd/MM HH:mm"
 ): string => {
@@ -49,45 +49,51 @@ export const formatDisplayInSantiago = (
     let d: Date;
 
     if (typeof date === 'string') {
-      const raw = date.trim();
-      const hasTZ = /[zZ]|[+-]\d{2}:?\d{2}/.test(raw);
-      const hasT = /T/.test(raw);
-
-      if (!hasTZ) {
-        const normalized = hasT ? raw : raw.replace(' ', 'T');
-        d = fromZonedTime(normalized, CHILE_TIMEZONE);
-      } else {
-        const parsed = parseISO(raw);
-        d = isValid(parsed) ? parsed : new Date(raw);
-      }
+      // Parse a data diretamente sem conversão de timezone
+      d = new Date(date);
     } else {
       d = date;
     }
 
-    // Usamos Intl para evitar qualquer desvio indesejado
-    const parts = new Intl.DateTimeFormat('es-CL', {
-      timeZone: CHILE_TIMEZONE,
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    }).formatToParts(d);
-
-    const get = (type: string) => parts.find(p => p.type === type)?.value || '';
-    const dd = get('day');
-    const MM = get('month');
-    const HH = get('hour');
-    const mm = get('minute');
-
-    if (pattern === "dd/MM HH:mm") {
-      return `${dd}/${MM} ${HH}:${mm}`;
+    if (!isValid(d)) {
+      console.warn('formatDatabaseDate: invalid date', date);
+      return String(date);
     }
 
-    // Para outros padrões, fallback ao formatInTimeZone
-    return formatInTimeZone(d, CHILE_TIMEZONE, pattern);
+    // Formatar usando UTC para manter fidelidade com o banco
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    const hours = String(d.getUTCHours()).padStart(2, '0');
+    const minutes = String(d.getUTCMinutes()).padStart(2, '0');
+
+    if (pattern === "dd/MM HH:mm") {
+      return `${day}/${month} ${hours}:${minutes}`;
+    }
+
+    if (pattern === "dd/MM/yyyy HH:mm") {
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
+    }
+
+    if (pattern === "HH:mm") {
+      return `${hours}:${minutes}`;
+    }
+
+    if (pattern.includes("MMMM")) {
+      // Para padrões com nome do mês, usar date-fns com UTC
+      const monthNames = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 
+                         'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+      const monthName = monthNames[d.getUTCMonth()];
+      return pattern
+        .replace('dd', day)
+        .replace('MMMM', monthName)
+        .replace('yyyy', String(year));
+    }
+
+    // Fallback genérico
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
   } catch (e) {
-    console.warn('formatDisplayInSantiago fallback for value:', date, e);
+    console.warn('formatDatabaseDate error:', date, e);
     return String(date);
   }
 };

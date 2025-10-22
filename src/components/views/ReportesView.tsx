@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths, eachDayOfInterval, parseISO } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { es } from "date-fns/locale";
-import { CHILE_TIMEZONE, chileDateOptions, formatDisplayInSantiago } from "@/lib/date-config";
+import { CHILE_TIMEZONE, chileDateOptions, formatDatabaseDate } from "@/lib/date-config";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Download, FileText, Loader2, PieChart, Lock, Calendar, TrendingUp, TrendingDown, Activity, BarChart3, DollarSign, Receipt } from "lucide-react";
@@ -249,7 +249,7 @@ export default function ReportesView() {
       startY: (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 10 : 130,
       head: [['Fecha', 'Descripción', 'Categoría', 'Tipo', 'Valor']],
       body: movimientos.map(m => [
-        formatDisplayInSantiago((m as any).created_at, "dd/MM/yyyy HH:mm"),
+        formatDatabaseDate((m as any).created_at, "dd/MM/yyyy HH:mm"),
         m.descripcion,
         m.categoria || '-',
         m.tipo,
@@ -846,7 +846,7 @@ export default function ReportesView() {
                           ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
                           : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
                       )}>
-                        {formatDisplayInSantiago((mov as any).created_at || mov.fecha, "dd/MM HH:mm")}
+                        {formatDatabaseDate((mov as any).created_at || mov.fecha, "dd/MM HH:mm")}
                        </span>
                       {mov.categoria && (
                         <span className="text-xs text-muted-foreground">• {mov.categoria}</span>

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, TrendingUp, TrendingDown, Crown, Calendar, Clock, Phone, Tag, FileText } from "lucide-react";
 import { format } from "date-fns";
-import { getCurrentDateInSantiago, CHILE_TIMEZONE, formatDisplayInSantiago, monthRangeUTCFromSantiago } from "@/lib/date-config";
+import { getCurrentDateInSantiago, CHILE_TIMEZONE, formatDatabaseDate, monthRangeUTCFromSantiago } from "@/lib/date-config";
 import { formatInTimeZone } from "date-fns-tz";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -350,7 +350,7 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
   };
 
 const formatMovimientoDate = (dateString: string) => {
-  return formatDisplayInSantiago(dateString, "dd/MM HH:mm");
+  return formatDatabaseDate(dateString, "dd/MM HH:mm");
 };
 
   const handleProfileModalClose = async () => {
@@ -622,12 +622,12 @@ const formatMovimientoDate = (dateString: string) => {
                   <div className="flex items-center gap-2 text-white/90">
                     <Calendar className="w-4 h-4" />
                     <span className="text-sm font-medium">
-                      {formatDisplayInSantiago(selectedMovimiento.created_at || selectedMovimiento.fecha, "dd 'de' MMMM, yyyy")}
+                      {formatDatabaseDate(selectedMovimiento.created_at || selectedMovimiento.fecha, "dd 'de' MMMM, yyyy")}
                     </span>
                     <span className="mx-1">•</span>
                     <Clock className="w-4 h-4" />
                     <span className="text-sm font-medium">
-                      {formatDisplayInSantiago(selectedMovimiento.created_at || selectedMovimiento.fecha, "HH:mm")}
+                      {formatDatabaseDate(selectedMovimiento.created_at || selectedMovimiento.fecha, "HH:mm")}
                     </span>
                   </div>
                 </div>
