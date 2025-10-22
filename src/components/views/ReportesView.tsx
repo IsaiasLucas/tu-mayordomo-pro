@@ -119,7 +119,7 @@ export default function ReportesView() {
     const timeline = days.map(day => {
       const dayStr = format(day, 'yyyy-MM-dd');
       const dayMovs = movimientos.filter(m => {
-        const movDate = format(parseISO((m as any).created_at || m.fecha), 'yyyy-MM-dd');
+        const movDate = format(parseISO(m.fecha), 'yyyy-MM-dd');
         return movDate === dayStr;
       });
 
@@ -249,7 +249,7 @@ export default function ReportesView() {
       startY: (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 10 : 130,
       head: [['Fecha', 'Descripción', 'Categoría', 'Tipo', 'Valor']],
       body: movimientos.map(m => [
-        formatDatabaseDate((m as any).created_at, "dd/MM/yyyy HH:mm"),
+        formatDatabaseDate(m.fecha, "dd/MM/yyyy HH:mm"),
         m.descripcion,
         m.categoria || '-',
         m.tipo,
@@ -846,7 +846,7 @@ export default function ReportesView() {
                           ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
                           : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
                       )}>
-                        {formatDatabaseDate((mov as any).created_at || mov.fecha, "dd/MM HH:mm")}
+                        {formatDatabaseDate(mov.fecha, "dd/MM HH:mm")}
                        </span>
                       {mov.categoria && (
                         <span className="text-xs text-muted-foreground">• {mov.categoria}</span>

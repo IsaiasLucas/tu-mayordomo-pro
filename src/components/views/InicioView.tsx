@@ -560,7 +560,7 @@ const formatMovimientoDate = (dateString: string) => {
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
                       }`}>
-                        {formatMovimientoDate(((mov as any).created_at ?? mov.fecha) as string)}
+                        {formatMovimientoDate((mov.fecha) as string)}
                       </span>
                       {(mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita") ? (
                         <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
@@ -622,12 +622,12 @@ const formatMovimientoDate = (dateString: string) => {
                   <div className="flex items-center gap-2 text-white/90">
                     <Calendar className="w-4 h-4" />
                     <span className="text-sm font-medium">
-                      {formatDatabaseDate(selectedMovimiento.created_at || selectedMovimiento.fecha, "dd 'de' MMMM, yyyy")}
+                      {formatDatabaseDate(selectedMovimiento.fecha, "dd 'de' MMMM, yyyy")}
                     </span>
                     <span className="mx-1">•</span>
                     <Clock className="w-4 h-4" />
                     <span className="text-sm font-medium">
-                      {formatDatabaseDate(selectedMovimiento.created_at || selectedMovimiento.fecha, "HH:mm")}
+                      {formatDatabaseDate(selectedMovimiento.fecha, "HH:mm")}
                     </span>
                   </div>
                 </div>
