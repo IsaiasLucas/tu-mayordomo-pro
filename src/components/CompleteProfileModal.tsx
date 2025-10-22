@@ -104,7 +104,8 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
           phone_personal: tipo === "Personal" ? whatsapp : null,
           phone_empresa: tipo === "Empresa" ? whatsapp : null,
           entidad: tipo.toLowerCase(),
-          whatsapp_configured: true
+          whatsapp_configured: true,
+          profile_complete: true
         })
         .eq('user_id', user.id);
 

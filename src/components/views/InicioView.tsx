@@ -56,6 +56,42 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
   const [selectedMovimiento, setSelectedMovimiento] = useState<any>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
+  // Check and show profile popup once on mount if incomplete
+  useEffect(() => {
+    const checkAndShowProfilePopup = async () => {
+      if (!perfilLoaded || !profile) return;
+      
+      // Check if popup was already shown in this session
+      if (sessionStorage.getItem('profilePopupShown')) return;
+
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: usuario } = await supabase
+          .from('usuarios')
+          .select('telefono')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        // Compute showPopup condition once
+        const showPopup = perfilLoaded && 
+          (profile.profile_complete !== true || 
+           !usuario?.telefono || 
+           usuario.telefono.trim() === '');
+
+        if (showPopup) {
+          onOpenProfileModal();
+          sessionStorage.setItem('profilePopupShown', '1');
+        }
+      } catch (error) {
+        console.error('Error checking profile popup:', error);
+      }
+    };
+
+    checkAndShowProfilePopup();
+  }, [perfilLoaded, profile, onOpenProfileModal]);
+
   // Calculate from ALL movimientos of the month
   const ingresos = allMovimientos
     .filter(m => m.tipo.toLowerCase() === "ingreso" || m.tipo.toLowerCase() === "receita")
@@ -352,31 +388,6 @@ const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
 const formatMovimientoDate = (dateString: string) => {
   return formatDatabaseDate(dateString, "dd/MM HH:mm");
 };
-
-  const handleProfileModalClose = async () => {
-    // Verificar si ahora hay telefono guardado en usuarios table
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: usuario } = await supabase
-        .from('usuarios')
-        .select('telefono, nombre, tipo_cuenta')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      setPerfil(usuario || null);
-
-      if (usuario?.telefono && usuario.telefono.trim() !== '') {
-        setPhone(usuario.telefono);
-        localStorage.setItem("tm_phone", usuario.telefono);
-        fetchMovimientos();
-        fetchAllMovimientos();
-      }
-    } catch (error) {
-      console.error('Error checking usuario phone:', error);
-    }
-  };
 
   const showWhatsappCard = perfilLoaded && (!perfil?.telefono || perfil.telefono.trim() === '');
 

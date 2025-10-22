@@ -26,34 +26,6 @@ const Index = () => {
     }
   }, [isAuthenticated, authLoading, navigate]);
 
-  // Check if user needs to complete profile after login
-  useEffect(() => {
-    const checkProfile = async () => {
-      if (isAuthenticated && !authLoading && profile) {
-        try {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (!user) return;
-
-          // Check if telefono exists in usuarios table
-          const { data: usuario } = await supabase
-            .from('usuarios')
-            .select('telefono')
-            .eq('user_id', user.id)
-            .maybeSingle();
-
-          // Show modal only if telefono is null or empty
-          if (!usuario?.telefono || usuario.telefono.trim() === '') {
-            setShowProfileModal(true);
-          }
-        } catch (error) {
-          console.error('Error checking profile:', error);
-        }
-      }
-    };
-
-    checkProfile();
-  }, [isAuthenticated, authLoading, profile]);
-
   // Sync userPlan with profile.plan
   useEffect(() => {
     if (profile?.plan) {

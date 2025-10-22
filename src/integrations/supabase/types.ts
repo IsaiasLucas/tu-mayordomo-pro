@@ -213,6 +213,7 @@ export type Database = {
           phone_personal: string | null
           plan: string | null
           plan_renewal_date: string | null
+          profile_complete: boolean | null
           stripe_customer_id: string | null
           stripe_customer_id_updated_at: string | null
           stripe_subscription_id: string | null
@@ -235,6 +236,7 @@ export type Database = {
           phone_personal?: string | null
           plan?: string | null
           plan_renewal_date?: string | null
+          profile_complete?: boolean | null
           stripe_customer_id?: string | null
           stripe_customer_id_updated_at?: string | null
           stripe_subscription_id?: string | null
@@ -257,6 +259,7 @@ export type Database = {
           phone_personal?: string | null
           plan?: string | null
           plan_renewal_date?: string | null
+          profile_complete?: boolean | null
           stripe_customer_id?: string | null
           stripe_customer_id_updated_at?: string | null
           stripe_subscription_id?: string | null
