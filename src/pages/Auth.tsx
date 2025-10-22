@@ -53,7 +53,7 @@ export default function Auth() {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
             options: {
@@ -86,6 +86,18 @@ export default function Auth() {
         }
 
         if (error) throw error;
+
+        // Ensure usuarios row has correct defaults (trigger creates row, but we set usage_month)
+        if (data.user) {
+          const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
+          await supabase
+            .from('usuarios')
+            .update({
+              usage_month: currentMonth,
+              usage_count: 0
+            })
+            .eq('user_id', data.user.id);
+        }
 
         toast({
           title: "Cuenta creada",
