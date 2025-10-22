@@ -1009,10 +1009,10 @@ const PerfilView = () => {
 
       {/* Edit Profile Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="max-w-[90vw] sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Editar Perfil</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="max-w-[95vw] sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-2xl font-bold">Editar Perfil</DialogTitle>
+            <DialogDescription className="text-base">
               Actualiza tu información personal y foto de perfil.
             </DialogDescription>
           </DialogHeader>
@@ -1021,11 +1021,11 @@ const PerfilView = () => {
             {/* Avatar Upload */}
             <div className="flex flex-col items-center">
               {/* Background gradient container */}
-              <div className="w-full bg-gradient-to-br from-purple-600 to-blue-600 rounded-3xl py-12 px-6 mb-6 flex justify-center items-center">
+              <div className="w-full bg-gradient-to-br from-purple-600 to-blue-600 rounded-3xl py-10 px-6 mb-4 flex justify-center items-center">
                 <div className="relative group">
-                  <Avatar className="h-36 w-36 border-4 border-white/30 shadow-2xl ring-4 ring-white/10 transition-transform group-hover:scale-105">
+                  <Avatar className="h-32 w-32 border-4 border-white/30 shadow-2xl ring-4 ring-white/10 transition-transform group-hover:scale-105">
                     <AvatarImage src={avatarUrl || profile?.avatar_url || undefined} className="object-cover" />
-                    <AvatarFallback className="text-5xl bg-white/20 text-white backdrop-blur">
+                    <AvatarFallback className="text-4xl bg-white/20 text-white backdrop-blur">
                       {editName.charAt(0).toUpperCase() || userProfile.name.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -1037,7 +1037,7 @@ const PerfilView = () => {
                     {uploading ? (
                       <div className="animate-spin h-5 w-5 border-2 border-purple-600 border-t-transparent rounded-full" />
                     ) : (
-                      <Camera className="h-6 w-6 text-purple-600" />
+                      <Camera className="h-5 w-5 text-purple-600" />
                     )}
                   </Label>
                   <Input
@@ -1051,61 +1051,61 @@ const PerfilView = () => {
                 </div>
               </div>
               
-              <p className="text-sm text-muted-foreground text-center mb-6">
+              <p className="text-sm text-muted-foreground text-center mb-4">
                 Clique no ícone da câmera para alterar sua foto
               </p>
             </div>
 
             {/* Name Input */}
             <div className="space-y-2">
-              <Label htmlFor="name">Nome</Label>
+              <Label htmlFor="name" className="text-base font-semibold">Nome</Label>
               <Input
                 id="name"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 placeholder="Tu nombre"
-                className="rounded-xl"
+                className="rounded-xl h-12 text-base"
               />
             </div>
 
             {/* Phone (disabled) */}
             <div className="space-y-2">
-              <Label htmlFor="phone">Teléfono</Label>
+              <Label htmlFor="phone" className="text-base font-semibold">Teléfono</Label>
               <Input
                 id="phone"
                 value={userProfile.phone}
                 disabled
-                className="rounded-xl bg-gray-100 cursor-not-allowed"
+                className="rounded-xl h-12 text-base bg-gray-100 cursor-not-allowed"
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 El teléfono no puede ser modificado porque está vinculado a tu cuenta.
               </p>
             </div>
 
             {/* Email (disabled) */}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-base font-semibold">Email</Label>
               <Input
                 id="email"
                 value={userProfile.email}
                 disabled
-                className="rounded-xl bg-gray-100 cursor-not-allowed"
+                className="rounded-xl h-12 text-base bg-gray-100 cursor-not-allowed"
               />
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-3 sm:gap-2">
             <Button
               variant="outline"
               onClick={() => setShowEditDialog(false)}
-              className="rounded-xl"
+              className="rounded-xl h-12 text-base flex-1 sm:flex-initial"
             >
               Cancelar
             </Button>
             <Button
               onClick={handleSaveProfile}
               disabled={loading || uploading}
-              className="rounded-xl bg-purple-600 hover:bg-purple-700"
+              className="rounded-xl h-12 text-base bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 flex-1 sm:flex-initial"
             >
               {loading ? "Guardando..." : "Guardar Cambios"}
             </Button>
