@@ -14,6 +14,7 @@ export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
@@ -47,6 +48,15 @@ export default function Auth() {
       return;
     }
 
+    if (isSignUp && !phone) {
+      toast({
+        title: "Error",
+        description: "Por favor ingresa tu número de teléfono",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -56,6 +66,10 @@ export default function Auth() {
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/`,
+            data: {
+              phone: phone,
+              telefone: phone
+            }
           }
         });
 
@@ -269,6 +283,23 @@ export default function Auth() {
                     className="h-14 px-5 text-base rounded-2xl bg-secondary/40 border-2 border-input/60 focus:border-primary focus:bg-background/60 backdrop-blur-sm transition-all hover:bg-secondary/60 hover:border-primary/50 font-medium"
                   />
                 </div>
+
+                {isSignUp && (
+                  <div className="space-y-3">
+                    <Label htmlFor="phone" className="text-base font-bold text-foreground">
+                      Número de teléfono
+                    </Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+56 9 1234 5678"
+                      required
+                      className="h-14 px-5 text-base rounded-2xl bg-secondary/40 border-2 border-input/60 focus:border-primary focus:bg-background/60 backdrop-blur-sm transition-all hover:bg-secondary/60 hover:border-primary/50 font-medium"
+                    />
+                  </div>
+                )}
 
                 <div className="space-y-3">
                   <Label htmlFor="password" className="text-base font-bold text-foreground">
