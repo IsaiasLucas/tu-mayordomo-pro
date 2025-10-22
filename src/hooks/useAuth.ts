@@ -99,6 +99,12 @@ export const useAuth = () => {
     localStorage.removeItem('tm_movimientos_cache');
     localStorage.removeItem('tm_all_movimientos_cache');
     localStorage.removeItem('tm_show_balance');
+    sessionStorage.removeItem('profilePopupShown');
+    
+    // Clear profile cache
+    const { clearProfileCache } = await import('@/hooks/useProfile');
+    clearProfileCache();
+    
     await supabase.auth.signOut();
   };
 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import HeroOverview from "../HeroOverview";
-import { useAuth } from "@/hooks/useAuth";
 import { useGastos } from "@/hooks/useGastos";
 import { fmtCLP } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -22,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 
 interface InicioViewProps {
+  profile: any;
   onOpenProfileModal: () => void;
   onViewChange: (view: string) => void;
 }
@@ -34,8 +34,7 @@ interface Movimiento {
   tipo: string;
 }
 
-const InicioView = ({ onOpenProfileModal, onViewChange }: InicioViewProps) => {
-  const { profile, loading } = useAuth();
+const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewProps) => {
   const { items: gastos } = useGastos();
   const [perfilLoaded, setPerfilLoaded] = useState(false);
   const [perfil, setPerfil] = useState<any>(null);
@@ -443,7 +442,7 @@ const formatMovimientoDate = (dateString: string) => {
         </p>
       </div>
 
-      {!loading && profile?.plan === "free" && (
+      {profile?.plan === "free" && (
         <Card className="shadow-card rounded-xl sm:rounded-2xl border-2 border-primary/20">
           <CardContent className="p-5 sm:p-6">
             <div className="flex flex-col gap-4 sm:gap-5">
@@ -465,7 +464,7 @@ const formatMovimientoDate = (dateString: string) => {
         </Card>
       )}
 
-      {!loading && profile?.plan && profile.plan !== "free" && (
+      {profile?.plan && profile.plan !== "free" && (
         <Card className="shadow-card rounded-xl sm:rounded-2xl border-2 border-primary bg-primary/5">
           <CardContent className="p-5 sm:p-6">
             <div className="flex items-center gap-4 sm:gap-5">

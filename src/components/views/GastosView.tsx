@@ -31,7 +31,11 @@ interface MonthData {
   saldo: number;
 }
 
-export default function GastosView() {
+interface GastosViewProps {
+  profile: any;
+}
+
+export default function GastosView({ profile }: GastosViewProps) {
   const [selectedMonth, setSelectedMonth] = useState<string>(
     format(new Date(), "yyyy-MM")
   );

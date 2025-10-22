@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { useProfile } from "@/hooks/useProfile";
 import Navigation from "@/components/Navigation";
 import InicioView from "@/components/views/InicioView";
 import GastosView from "@/components/views/GastosView";
@@ -11,51 +11,54 @@ import PerfilView from "@/components/views/PerfilView";
 import CompleteProfileModal from "@/components/CompleteProfileModal";
 import InstallPrompt from "@/components/InstallPrompt";
 import { ViewTransition } from "@/components/ViewTransition";
-import { toast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
-  const { isAuthenticated, loading: authLoading, profile } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { profile, loading: profileLoading, isPro, refreshProfile } = useProfile();
   const [currentView, setCurrentView] = useState("inicio");
-  const [userPlan, setUserPlan] = useState("free"); // free, pro, premium
   const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
 
+  // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       navigate("/auth");
     }
   }, [isAuthenticated, authLoading, navigate]);
 
-  // Sync userPlan with profile.plan
-  useEffect(() => {
-    if (profile?.plan) {
-      setUserPlan(profile.plan);
-    }
-  }, [profile?.plan]);
-
-  if (authLoading) {
+  // Show loading skeleton while auth or profile are loading
+  if (authLoading || profileLoading) {
     return (
-      <div className="w-full bg-background flex items-center justify-center" style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Cargando...</p>
+      <div className="w-full bg-background" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)' }}>
+        <div className="px-6 py-6 pb-32 space-y-6">
+          <Skeleton className="h-36 w-full rounded-2xl" />
+          <Skeleton className="h-28 w-full rounded-2xl" />
+          <div className="grid grid-cols-2 gap-5">
+            <Skeleton className="h-28 w-full rounded-2xl" />
+            <Skeleton className="h-28 w-full rounded-2xl" />
+          </div>
+          <Skeleton className="h-56 w-full rounded-2xl" />
         </div>
       </div>
     );
   }
 
-  const isPro = userPlan === "pro" || userPlan === "mensal" || userPlan === "anual";
-
+  // Navigation guard: redirect to Planes if trying to access Reportes without pro
   const handleViewChange = (view: string) => {
+    // Guard for Reportes - redirect immediately to Planes if not pro
+    if (view === "reportes" && !isPro) {
+      setCurrentView("planes");
+      return;
+    }
+
     setCurrentView(view);
   };
 
-  const handlePlanChange = (planType: string) => {
-    setUserPlan(planType);
-    toast({
-      title: "Plan actualizado",
-      description: `Has cambiado al plan ${planType.toUpperCase()}`,
-    });
+  const handleModalClose = async () => {
+    setShowProfileModal(false);
+    // Refresh profile after modal closes
+    await refreshProfile();
   };
 
   const renderCurrentView = () => {
@@ -63,16 +66,25 @@ const Index = () => {
       case "inicio":
         return (
           <ViewTransition viewKey="inicio">
-            <InicioView onOpenProfileModal={() => setShowProfileModal(true)} onViewChange={handleViewChange} />
+            <InicioView 
+              profile={profile}
+              onOpenProfileModal={() => setShowProfileModal(true)} 
+              onViewChange={handleViewChange} 
+            />
           </ViewTransition>
         );
       case "gastos":
         return (
           <ViewTransition viewKey="gastos">
-            <GastosView />
+            <GastosView profile={profile} />
           </ViewTransition>
         );
       case "reportes":
+        // This should never render for non-pro due to guard, but double check
+        if (!isPro) {
+          setCurrentView("planes");
+          return null;
+        }
         return (
           <ViewTransition viewKey="reportes">
             <ReportesView />
@@ -93,7 +105,11 @@ const Index = () => {
       default:
         return (
           <ViewTransition viewKey="inicio">
-            <InicioView onOpenProfileModal={() => setShowProfileModal(true)} onViewChange={handleViewChange} />
+            <InicioView 
+              profile={profile}
+              onOpenProfileModal={() => setShowProfileModal(true)} 
+              onViewChange={handleViewChange} 
+            />
           </ViewTransition>
         );
     }
@@ -113,7 +129,7 @@ const Index = () => {
 
       <CompleteProfileModal
         open={showProfileModal}
-        onClose={() => setShowProfileModal(false)}
+        onClose={handleModalClose}
       />
       
       <InstallPrompt />
