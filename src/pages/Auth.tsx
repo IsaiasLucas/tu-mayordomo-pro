@@ -277,6 +277,11 @@ export default function Auth() {
                   <Label htmlFor="password" className="text-base font-bold text-foreground">
                     Contraseña
                   </Label>
+                  {isSignUp && (
+                    <p className="text-sm text-muted-foreground">
+                      La contraseña debe contener letras y números
+                    </p>
+                  )}
                   <div className="relative group">
                     <Input
                       id="password"
