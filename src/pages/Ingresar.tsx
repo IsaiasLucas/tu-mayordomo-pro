@@ -47,7 +47,7 @@ export default function Ingresar() {
   };
 
   return (
-    <div className="h-full w-full overflow-y-auto bg-background">
+    <div className="h-full w-full overflow-y-auto bg-background" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
       <main className="p-4 sm:p-6 space-y-4 max-w-md mx-auto min-h-full flex flex-col justify-center">
       <h1 className="text-2xl font-semibold">Ingresar</h1>
       <p className="text-sm sm:text-base">Escribe tu número (solo dígitos, Chile 56...)</p>

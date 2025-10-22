@@ -42,11 +42,13 @@ body {
   overflow-x: hidden;
   position: relative;
   overscroll-behavior-y: contain;
-  /* Safe area for devices with notch - apply to root instead of body */
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
+  /* Safe area for devices with notch - left and right only */
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
+  /* No top padding - content extends behind status bar */
+  padding-top: 0;
+  /* Bottom padding handled by navigation */
+  padding-bottom: 0;
 }
 
 /* Prevent pull-to-refresh on mobile */
@@ -295,11 +297,12 @@ All colors MUST be HSL.
   /* PWA Specific Styles */
   @media (display-mode: standalone) {
     #root {
-      /* Ensure safe areas are respected when installed as PWA */
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
+      /* Ensure safe areas are respected when installed as PWA - sides only */
       padding-left: env(safe-area-inset-left);
       padding-right: env(safe-area-inset-right);
+      /* Content extends behind status bar */
+      padding-top: 0;
+      padding-bottom: 0;
     }
   }
   

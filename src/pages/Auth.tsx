@@ -177,7 +177,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="w-full relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)', background: 'var(--gradient-hero)' }}>
+    <div className="w-full relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)', background: 'var(--gradient-hero)', paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
       {/* Premium animated mesh background */}
       <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: 'var(--gradient-mesh)' }} />
       

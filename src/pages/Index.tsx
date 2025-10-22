@@ -123,7 +123,7 @@ const Index = () => {
         onPhoneFilterChange={handlePhoneFilterChange}
       />
       
-      <main className="pb-24">
+      <main className="pb-24" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
         {renderCurrentView()}
       </main>
 
