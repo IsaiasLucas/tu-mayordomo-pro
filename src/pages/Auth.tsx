@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Eye, EyeOff, Sparkles, TrendingUp, Shield, Zap } from "lucide-react";
-import fintechHero from "@/assets/fintech-hero.png";
 
 export default function Auth() {
   const [loading, setLoading] = useState(false);
@@ -152,111 +151,109 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden font-['Inter']" style={{ background: 'var(--gradient-hero)' }}>
-      {/* Premium animated mesh background */}
-      <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'var(--gradient-mesh)' }} />
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-accent font-['Inter']">
+      {/* Animated mesh background - simplified for mobile performance */}
+      <div className="absolute inset-0 opacity-20 sm:opacity-30" style={{ backgroundImage: 'var(--gradient-mesh)' }} />
       
-      {/* Floating orbs with glow effect */}
-      <div className="absolute top-20 left-20 w-96 h-96 bg-primary-glow/30 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s', filter: 'blur(80px)' }} />
-      <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-accent/25 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s', filter: 'blur(100px)' }} />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-lilac/20 rounded-full blur-3xl" style={{ filter: 'blur(120px)' }} />
+      {/* Animated orbs - reduced on mobile */}
+      <div className="absolute top-10 sm:top-20 left-10 sm:left-20 w-48 sm:w-72 h-48 sm:h-72 bg-primary-glow/20 sm:bg-primary-glow/30 rounded-full blur-2xl sm:blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
+      <div className="absolute bottom-10 sm:bottom-20 right-10 sm:right-20 w-56 sm:w-96 h-56 sm:h-96 bg-accent/15 sm:bg-accent/20 rounded-full blur-2xl sm:blur-3xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
       
-      <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center p-4 sm:p-6 lg:p-12 relative z-10 gap-8 lg:gap-12">
-        <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-          {/* Left side - Hero & Branding */}
-          <div className="flex flex-col space-y-6 lg:space-y-8 text-white">
-            {/* Hero Title - Always visible */}
-            <div className="text-center lg:text-left space-y-4 animate-fade-in">
-              <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/15 backdrop-blur-md border border-white/30 shadow-lg mx-auto lg:mx-0">
-                <Sparkles className="w-5 h-5 text-yellow-300" />
-                <span className="text-sm font-semibold tracking-wide">Fintech Premium</span>
-              </div>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+      <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center p-4 sm:p-6 lg:p-8 relative z-10">
+        <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-6 lg:gap-8 items-center">
+          {/* Left side - Branding */}
+          <div className="flex flex-col space-y-4 sm:space-y-6 lg:space-y-8 text-white">
+            {/* Mobile header */}
+            <div className="lg:hidden text-center space-y-3 animate-fade-in">
+              <h1 className="text-3xl sm:text-4xl font-bold">
                 Gestión Financiera<br />
-                <span className="bg-gradient-to-r from-white via-yellow-100 to-white bg-clip-text text-transparent drop-shadow-lg">
+                <span className="bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
                   Inteligente
                 </span>
               </h1>
-              <p className="text-lg lg:text-xl text-white/90 max-w-xl mx-auto lg:mx-0 font-light">
-                Controla tus finanzas de forma profesional con análisis en tiempo real y reportes detallados
+            </div>
+
+            {/* Desktop full branding */}
+            <div className="hidden lg:block space-y-4 animate-fade-in">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
+                <Sparkles className="w-4 h-4" />
+                <span className="text-sm font-medium">Sistema de Gestión Financiera</span>
+              </div>
+              <h1 className="text-5xl font-bold leading-tight">
+                Controla tus<br />
+                <span className="bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                  finanzas personales
+                </span>
+              </h1>
+              <p className="text-lg text-white/80 max-w-md">
+                Gestiona gastos, crea presupuestos y obtén reportes detallados de forma simple y profesional.
               </p>
             </div>
 
-            {/* Hero Illustration */}
-            <div className="hidden lg:block relative animate-scale-in" style={{ animationDelay: '0.2s' }}>
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-3xl blur-2xl" />
-              <img 
-                src={fintechHero} 
-                alt="Mujer analizando finanzas" 
-                className="relative rounded-3xl shadow-2xl border border-white/20 w-full h-auto"
-                style={{ boxShadow: 'var(--shadow-glow)' }}
-              />
-            </div>
-
-            {/* Feature Grid - Desktop only */}
-            <div className="hidden lg:grid grid-cols-2 gap-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <div className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/25 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-glow">
-                <TrendingUp className="w-9 h-9 mb-3 text-yellow-300" />
-                <h3 className="font-bold mb-1.5 text-lg">Reportes Inteligentes</h3>
-                <p className="text-sm text-white/80">Análisis avanzados y visualización de datos</p>
+            {/* Feature cards - only on larger screens */}
+            <div className="hidden lg:grid grid-cols-2 gap-4">
+              <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
+                <TrendingUp className="w-8 h-8 mb-3 text-white" />
+                <h3 className="font-semibold mb-1">Reportes Inteligentes</h3>
+                <p className="text-sm text-white/70">Análisis detallados en tiempo real</p>
               </div>
-              <div className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/25 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-glow">
-                <Shield className="w-9 h-9 mb-3 text-yellow-300" />
-                <h3 className="font-bold mb-1.5 text-lg">Seguridad Total</h3>
-                <p className="text-sm text-white/80">Protección bancaria de nivel empresarial</p>
+              <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
+                <Sparkles className="w-8 h-8 mb-3 text-white" />
+                <h3 className="font-semibold mb-1">Control Total</h3>
+                <p className="text-sm text-white/70">Gestión completa de tus gastos</p>
               </div>
             </div>
 
-            {/* Mobile badges */}
+            {/* Mobile feature badges */}
             <div className="lg:hidden flex justify-center gap-3 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/15 backdrop-blur-md border border-white/30">
-                <Shield className="w-4 h-4 text-yellow-300" />
-                <span className="text-sm font-semibold">Seguro</span>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
+                <Shield className="w-4 h-4" />
+                <span className="text-sm font-medium">Seguro</span>
               </div>
-              <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/15 backdrop-blur-md border border-white/30">
-                <Zap className="w-4 h-4 text-yellow-300" />
-                <span className="text-sm font-semibold">Rápido</span>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
+                <Zap className="w-4 h-4" />
+                <span className="text-sm font-medium">Rápido</span>
               </div>
             </div>
           </div>
 
-          {/* Right side - Premium Auth form */}
-          <div className="w-full animate-scale-in" style={{ animationDelay: '0.15s' }}>
-            <div className="bg-white/95 dark:bg-card/95 backdrop-blur-2xl rounded-[2rem] shadow-glass border border-white/30 p-8 sm:p-10 lg:p-12" style={{ boxShadow: 'var(--shadow-elegant)' }}>
-              <div className="mb-8 sm:mb-10">
-                <h2 className="text-3xl sm:text-4xl font-bold mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  {isSignUp ? "Crear cuenta" : "Bienvenido de vuelta"}
+          {/* Right side - Auth form */}
+          <div className="w-full animate-scale-in" style={{ animationDelay: '0.1s' }}>
+            <div className="bg-card/95 backdrop-blur-xl rounded-3xl shadow-glass border border-white/20 p-6 sm:p-8 lg:p-10">
+              <div className="mb-6 sm:mb-8">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2">
+                  {isSignUp ? "Crear cuenta" : "Bienvenido"}
                 </h2>
-                <p className="text-base sm:text-lg text-muted-foreground font-light">
+                <p className="text-sm sm:text-base text-muted-foreground">
                   {isSignUp ? (
                     <>
-                      Comienza tu viaje hacia el control financiero{" "}
+                      Comienza tu viaje financiero{" "}
                       <button
                         type="button"
                         onClick={() => setIsSignUp(false)}
-                        className="text-primary font-bold hover:text-accent transition-colors inline-flex items-center gap-1"
+                        className="text-primary font-semibold hover:underline inline-flex items-center gap-1"
                       >
-                        Inicia sesión aquí
+                        Inicia sesión
                       </button>
                     </>
                   ) : (
                     <>
-                      ¿Nuevo en la plataforma?{" "}
+                      ¿No tienes cuenta?{" "}
                       <button
                         type="button"
                         onClick={() => setIsSignUp(true)}
-                        className="text-primary font-bold hover:text-accent transition-colors inline-flex items-center gap-1"
+                        className="text-primary font-semibold hover:underline inline-flex items-center gap-1"
                       >
-                        Crea tu cuenta
+                        Regístrate
                       </button>
                     </>
                   )}
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-7">
-                <div className="space-y-3">
-                  <Label htmlFor="email" className="text-base font-bold text-foreground">
+              <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-semibold">
                     Correo electrónico
                   </Label>
                   <Input
@@ -264,14 +261,14 @@ export default function Auth() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="tu@correo.com"
+                    placeholder="nombre@ejemplo.com"
                     required
-                    className="h-14 px-5 text-base rounded-2xl bg-secondary/40 border-2 border-input/60 focus:border-primary focus:bg-background/60 backdrop-blur-sm transition-all hover:bg-secondary/60 hover:border-primary/50 font-medium"
+                    className="h-12 sm:h-13 px-4 text-base rounded-xl bg-secondary/30 border border-input/50 focus:border-primary focus:bg-background/50 backdrop-blur-sm transition-all hover:bg-secondary/50"
                   />
                 </div>
 
-                <div className="space-y-3">
-                  <Label htmlFor="password" className="text-base font-bold text-foreground">
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-sm font-semibold">
                     Contraseña
                   </Label>
                   <div className="relative group">
@@ -282,12 +279,12 @@ export default function Auth() {
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Mínimo 8 caracteres"
                       required
-                      className="h-14 px-5 pr-14 text-base rounded-2xl bg-secondary/40 border-2 border-input/60 focus:border-primary focus:bg-background/60 backdrop-blur-sm transition-all hover:bg-secondary/60 hover:border-primary/50 font-medium"
+                      className="h-12 sm:h-13 px-4 pr-12 text-base rounded-xl bg-secondary/30 border border-input/50 focus:border-primary focus:bg-background/50 backdrop-blur-sm transition-all hover:bg-secondary/50"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors p-2 touch-manipulation rounded-full hover:bg-secondary/50"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 touch-manipulation"
                     >
                       {showPassword ? (
                         <EyeOff className="w-5 h-5" />
@@ -299,11 +296,11 @@ export default function Auth() {
                 </div>
 
                 {!isSignUp && (
-                  <div className="flex justify-end -mt-2">
+                  <div className="flex justify-end">
                     <button
                       type="button"
                       onClick={() => setShowResetDialog(true)}
-                      className="text-sm font-semibold text-primary hover:text-accent transition-colors touch-manipulation"
+                      className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors touch-manipulation"
                     >
                       ¿Olvidaste tu contraseña?
                     </button>
@@ -312,37 +309,33 @@ export default function Auth() {
 
                 <Button 
                   type="submit" 
-                  className="w-full h-14 rounded-2xl text-lg font-bold shadow-elegant hover:shadow-glow transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] touch-manipulation" 
-                  style={{ background: 'var(--gradient-header)' }}
+                  className="w-full h-12 sm:h-13 rounded-xl text-base font-semibold bg-gradient-to-r from-primary to-accent hover:opacity-90 hover:shadow-elegant transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] touch-manipulation" 
                   disabled={loading}
                 >
                   {loading ? (
-                    <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       Procesando...
                     </div>
                   ) : (
-                    isSignUp ? "Crear mi cuenta" : "Acceder ahora"
+                    isSignUp ? "Crear cuenta" : "Iniciar sesión"
                   )}
                 </Button>
               </form>
 
-              <div className="mt-8 sm:mt-10 pt-6 border-t border-border/30">
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <Shield className="w-4 h-4 text-primary" />
-                  <p className="text-sm text-center text-muted-foreground font-medium">
-                    {isSignUp ? (
-                      <>
-                        Al crear una cuenta, aceptas nuestros{" "}
-                        <a href="#" className="text-primary hover:text-accent font-bold transition-colors">
-                          términos y condiciones
-                        </a>
-                      </>
-                    ) : (
-                      "Tus datos están protegidos con encriptación de nivel bancario"
-                    )}
-                  </p>
-                </div>
+              <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-border/50">
+                <p className="text-xs sm:text-sm text-center text-muted-foreground px-2">
+                  {isSignUp ? (
+                    <>
+                      Al crear una cuenta, aceptas nuestros{" "}
+                      <a href="#" className="text-primary hover:underline font-medium">
+                        términos
+                      </a>
+                    </>
+                  ) : (
+                    "Tus datos están protegidos de forma segura"
+                  )}
+                </p>
               </div>
             </div>
           </div>
