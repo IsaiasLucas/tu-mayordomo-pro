@@ -48,6 +48,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function FacturasBoletasSection() {
   const { facturas, loading, uploadFactura, deleteFactura } = useFacturas();
@@ -468,93 +469,95 @@ export default function FacturasBoletasSection() {
 
       {/* Dialog de subida */}
       <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col p-0">
+          <DialogHeader className="px-6 pt-6 pb-0">
             <DialogTitle>Subir Factura o Boleta</DialogTitle>
             <DialogDescription>
-              Los archivos de imagen se comprimirán automáticamente para optimizar el almacenamiento
+              Las imágenes se comprimirán automáticamente para optimizar el almacenamiento
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>Tipo de Documento</Label>
-              <Select value={tipo} onValueChange={(v: any) => setTipo(v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="factura">Factura</SelectItem>
-                  <SelectItem value="boleta">Boleta</SelectItem>
-                  <SelectItem value="transferencia">Comprobante de Transferencia</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Archivo (Imagen o PDF)</Label>
-              <Input
-                type="file"
-                accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
-                onChange={handleFileChange}
-                className="cursor-pointer"
-              />
-              {selectedFile && (
-                <p className="text-xs text-muted-foreground">
-                  {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
-                </p>
-              )}
-            </div>
-
-            {filePreview && (
-              <div className="aspect-video rounded-xl overflow-hidden bg-muted">
-                <img src={filePreview} alt="Preview" className="w-full h-full object-contain" />
+          <ScrollArea className="flex-1 px-6">
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>Tipo de Documento</Label>
+                <Select value={tipo} onValueChange={(v: any) => setTipo(v)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="factura">Factura</SelectItem>
+                    <SelectItem value="boleta">Boleta</SelectItem>
+                    <SelectItem value="transferencia">Comprobante de Transferencia</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            )}
 
-            <div className="space-y-2">
-              <Label>Fecha del Documento</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    {format(fechaDocumento, "dd/MM/yyyy", { locale: es })}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={fechaDocumento}
-                    onSelect={(date) => date && setFechaDocumento(date)}
-                    initialFocus
-                    className="pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
+              <div className="space-y-2">
+                <Label>Archivo (Imagen o PDF)</Label>
+                <Input
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
+                  onChange={handleFileChange}
+                  className="cursor-pointer"
+                />
+                {selectedFile && (
+                  <p className="text-xs text-muted-foreground">
+                    {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
+                  </p>
+                )}
+              </div>
+
+              {filePreview && (
+                <div className="aspect-video rounded-xl overflow-hidden bg-muted border">
+                  <img src={filePreview} alt="Preview" className="w-full h-full object-contain" />
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label>Fecha del Documento</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      {format(fechaDocumento, "dd/MM/yyyy", { locale: es })}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={fechaDocumento}
+                      onSelect={(date) => date && setFechaDocumento(date)}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Monto (opcional)</Label>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={monto}
+                  onChange={(e) => setMonto(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Descripción (opcional)</Label>
+                <Textarea
+                  placeholder="Ej: Compra de materiales de oficina..."
+                  value={descripcion}
+                  onChange={(e) => setDescripcion(e.target.value)}
+                  rows={3}
+                />
+              </div>
             </div>
+          </ScrollArea>
 
-            <div className="space-y-2">
-              <Label>Monto (opcional)</Label>
-              <Input
-                type="number"
-                placeholder="0"
-                value={monto}
-                onChange={(e) => setMonto(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Descripción (opcional)</Label>
-              <Textarea
-                placeholder="Ej: Compra de materiales de oficina..."
-                value={descripcion}
-                onChange={(e) => setDescripcion(e.target.value)}
-                rows={3}
-              />
-            </div>
-          </div>
-
-          <div className="flex gap-2 justify-end">
+          <div className="flex gap-2 justify-end px-6 py-4 border-t bg-background">
             <Button
               variant="outline"
               onClick={() => setShowUploadDialog(false)}
@@ -565,6 +568,7 @@ export default function FacturasBoletasSection() {
             <Button
               onClick={handleUpload}
               disabled={!selectedFile || uploading}
+              className="min-w-[100px]"
             >
               {uploading ? (
                 <>
@@ -574,7 +578,7 @@ export default function FacturasBoletasSection() {
               ) : (
                 <>
                   <Upload className="h-4 w-4 mr-2" />
-                  Subir
+                  Guardar
                 </>
               )}
             </Button>
