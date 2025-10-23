@@ -68,17 +68,13 @@ export default function ReportesView() {
     if (!phone) return [];
 
     try {
-      const phoneDigits = phone.replace(/\D/g, "");
-      const startISO = fromZonedTime(`${format(startDate, 'yyyy-MM-dd')}T00:00:00`, CHILE_TIMEZONE).toISOString();
-      const endISO = fromZonedTime(`${format(endDate, 'yyyy-MM-dd')}T23:59:59`, CHILE_TIMEZONE).toISOString();
-      
-      const { data: gastos, error } = await (supabase as any)
+      const { data: gastos, error } = await supabase
         .from('gastos')
         .select('*')
-        .eq('telefono', phoneDigits)
+        .eq('user_id', user!.id)
         .gte('fecha', format(startDate, 'yyyy-MM-dd'))
         .lte('fecha', format(endDate, 'yyyy-MM-dd'))
-        .order('fecha', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       return gastos || [];
@@ -146,8 +142,6 @@ export default function ReportesView() {
   useEffect(() => {
     const loadPeriodData = async () => {
       if (!isPro) return;
-      const phone = profile?.phone_personal || profile?.phone_empresa;
-      if (!phone) return;
       
       const now = new Date();
       let startDate: Date;
@@ -847,7 +841,7 @@ export default function ReportesView() {
                           ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
                           : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
                       )}>
-                        {formatDatabaseDate(mov.fecha, "dd/MM HH:mm")}
+                        {formatDatabaseDate((mov as any).created_at || mov.fecha, "dd/MM HH:mm")}
                        </span>
                       {mov.categoria && (
                         <span className="text-xs text-muted-foreground">• {mov.categoria}</span>
