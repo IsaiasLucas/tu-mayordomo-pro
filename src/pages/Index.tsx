@@ -44,17 +44,20 @@ const Index = () => {
     );
   }
 
-  // Navigation guard: redirect to Planes if trying to access Reportes without pro
   const handleViewChange = (view: string) => {
     // Guard for Reportes - redirect immediately to Planes if not pro
-    if (view === "reportes" && !isPro) {
-      setCurrentView("planes");
-      return;
+    const target = view === "reportes" && !isPro ? "planes" : view;
+
+    // Use View Transitions API if available for seamless swaps
+    const nav = () => setCurrentView(target);
+    // @ts-ignore - experimental API
+    const startVT = (document as any).startViewTransition;
+    if (typeof startVT === 'function') {
+      startVT(nav);
+    } else {
+      nav();
     }
-
-    setCurrentView(view);
   };
-
   const handleModalClose = async () => {
     setShowProfileModal(false);
     // Refresh profile after modal closes
@@ -80,14 +83,10 @@ const Index = () => {
           </ViewTransition>
         );
       case "reportes":
-        // This should never render for non-pro due to guard, but double check
-        if (!isPro) {
-          setCurrentView("planes");
-          return null;
-        }
+        // This should never render for non-pro due to guard; render Planes when not pro without state changes
         return (
           <ViewTransition viewKey="reportes">
-            <ReportesView />
+            {isPro ? <ReportesView /> : <PlanesView />}
           </ViewTransition>
         );
       case "planes":
