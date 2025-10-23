@@ -48,9 +48,9 @@ export function useGastos(mes?: string) {
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-        .gte('created_at', startISO)
-        .lte('created_at', endISO)
-        .order('created_at', { ascending: false });
+        .gte('fecha', ym + '-01')
+        .lte('fecha', ym + '-31')
+        .order('fecha', { ascending: false });
 
       if (fetchError) throw fetchError;
       

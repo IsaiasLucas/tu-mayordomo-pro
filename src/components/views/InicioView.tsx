@@ -95,14 +95,14 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
     const fmtDay = (d: Date | string) => formatInTimeZone(new Date(d), CHILE_TIMEZONE, 'yyyy-MM-dd');
 
     const saldoHoy = allMovimientos
-      .filter(m => fmtDay((m as any).created_at as string) === fmtDay(hoy))
+      .filter(m => fmtDay((m as any).fecha as string) === fmtDay(hoy))
       .reduce((total, m) => {
         const isIngreso = m.tipo.toLowerCase() === 'ingreso' || m.tipo.toLowerCase() === 'receita';
         return total + (isIngreso ? Number(m.monto) : -Number(m.monto));
       }, 0);
 
     const saldoAyer = allMovimientos
-      .filter(m => fmtDay((m as any).created_at as string) === fmtDay(ayer))
+      .filter(m => fmtDay((m as any).fecha as string) === fmtDay(ayer))
       .reduce((total, m) => {
         const isIngreso = m.tipo.toLowerCase() === 'ingreso' || m.tipo.toLowerCase() === 'receita';
         return total + (isIngreso ? Number(m.monto) : -Number(m.monto));
@@ -189,10 +189,6 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
             )
             .subscribe();
 
-          const now = getCurrentDateInSantiago();
-          const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-          const { startISO, endISO } = monthRangeUTCFromSantiago(mes);
-
           const allChannel = supabase
             .channel('inicio-gastos-all')
             .on(
@@ -206,11 +202,9 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
                 const { data: { user } } = await supabase.auth.getUser();
                 if (!user) return;
                 
-                const changeDate = (payload.new as any)?.created_at || (payload.old as any)?.created_at;
-                if (changeDate >= startISO && changeDate <= endISO) {
-                  if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
-                    fetchAllMovimientosUpdate();
-                  }
+                // Refetch if change is for current user
+                if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
+                  fetchAllMovimientosUpdate();
                 }
               }
             )
@@ -266,7 +260,7 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+        .order('fecha', { ascending: false })
         .limit(5);
 
       if (error) throw error;
@@ -291,7 +285,7 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+        .order('fecha', { ascending: false })
         .limit(5);
 
       if (error) throw error;
@@ -322,9 +316,9 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-.gte('created_at', startISO)
-.lte('created_at', endISO)
-        .order('created_at', { ascending: false });
+        .gte('fecha', mes + '-01')
+        .lte('fecha', mes + '-31')
+        .order('fecha', { ascending: false });
 
       if (error) throw error;
 
@@ -350,9 +344,9 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-        .gte('created_at', startISO)
-        .lte('created_at', endISO)
-        .order('created_at', { ascending: false });
+        .gte('fecha', mes + '-01')
+        .lte('fecha', mes + '-31')
+        .order('fecha', { ascending: false });
 
       if (error) throw error;
 
@@ -537,7 +531,7 @@ const formatMovimientoDate = (dateString: string) => {
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
                       }`}>
-                        {formatMovimientoDate((mov.created_at || mov.fecha) as string)}
+                        {formatMovimientoDate(mov.fecha as string)}
                       </span>
                       {(mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita") ? (
                         <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
@@ -599,12 +593,12 @@ const formatMovimientoDate = (dateString: string) => {
                   <div className="flex items-center gap-2 text-white/90">
                     <Calendar className="w-4 h-4" />
                     <span className="text-sm font-medium">
-                      {formatDatabaseDate(selectedMovimiento.created_at || selectedMovimiento.fecha, "dd 'de' MMMM, yyyy")}
+                      {formatDatabaseDate(selectedMovimiento.fecha, "dd 'de' MMMM, yyyy")}
                     </span>
                     <span className="mx-1">•</span>
                     <Clock className="w-4 h-4" />
                     <span className="text-sm font-medium">
-                      {formatDatabaseDate(selectedMovimiento.created_at || selectedMovimiento.fecha, "HH:mm")}
+                      {formatDatabaseDate(selectedMovimiento.fecha, "HH:mm")}
                     </span>
                   </div>
                 </div>

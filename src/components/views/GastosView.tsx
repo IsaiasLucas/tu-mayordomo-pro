@@ -87,9 +87,9 @@ export default function GastosView({ profile }: GastosViewProps) {
           .from('gastos')
           .select('*')
           .eq('user_id', user.id)
-          .gte('created_at', startISO)
-          .lte('created_at', endISO)
-          .order('created_at', { ascending: false });
+          .gte('fecha', selectedMonth + '-01')
+          .lte('fecha', selectedMonth + '-31')
+          .order('fecha', { ascending: false });
 
         if (error) throw error;
 
@@ -132,8 +132,6 @@ export default function GastosView({ profile }: GastosViewProps) {
     fetchData();
     
     // Setup Realtime subscription
-    const { startISO, endISO } = monthRangeUTCFromSantiago(selectedMonth);
-    
     const channel = supabase
       .channel('gastos-changes')
       .on(
@@ -150,41 +148,37 @@ export default function GastosView({ profile }: GastosViewProps) {
           const { data: { user } } = await supabase.auth.getUser();
           if (!user) return;
           
-          // Check if the change is within the selected month and for current user
-          const changeDate = (payload.new as any)?.created_at || (payload.old as any)?.created_at;
-          if (changeDate >= startISO && changeDate <= endISO) {
-            // Only refetch if the change is for the current user
-            if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
-              // Silently refetch data without showing loading state
-              try {
-                const { data: gastos, error } = await supabase
-                  .from('gastos')
-                  .select('*')
-                  .eq('user_id', user.id)
-                  .gte('created_at', startISO)
-                  .lte('created_at', endISO)
-                  .order('created_at', { ascending: false });
+          // Only refetch if the change is for the current user
+          if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
+            // Silently refetch data without showing loading state
+            try {
+              const { data: gastos, error } = await supabase
+                .from('gastos')
+                .select('*')
+                .eq('user_id', user.id)
+                .gte('fecha', selectedMonth + '-01')
+                .lte('fecha', selectedMonth + '-31')
+                .order('fecha', { ascending: false });
 
-                if (error) throw error;
+              if (error) throw error;
 
-                const items = gastos || [];
-                const totalIngresos = items
-                  .filter((m: any) => m.tipo?.toLowerCase() === "ingreso")
-                  .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
-                
-                const totalGastos = items
-                  .filter((m: any) => m.tipo?.toLowerCase() === "egreso" || m.tipo?.toLowerCase() === "gasto")
-                  .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
+              const items = gastos || [];
+              const totalIngresos = items
+                .filter((m: any) => m.tipo?.toLowerCase() === "ingreso")
+                .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
+              
+              const totalGastos = items
+                .filter((m: any) => m.tipo?.toLowerCase() === "egreso" || m.tipo?.toLowerCase() === "gasto")
+                .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
 
-                setData({
-                  items,
-                  totalIngresos,
-                  totalGastos,
-                  saldo: totalIngresos - totalGastos
-                });
-              } catch (error) {
-                console.error("Error refreshing data:", error);
-              }
+              setData({
+                items,
+                totalIngresos,
+                totalGastos,
+                saldo: totalIngresos - totalGastos
+              });
+            } catch (error) {
+              console.error("Error refreshing data:", error);
             }
           }
         }
@@ -218,7 +212,7 @@ export default function GastosView({ profile }: GastosViewProps) {
     
     // Tabla de movimientos
 const tableData = (data.items || []).map(mov => [
-  formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm"),
+  formatDatabaseDate(mov.fecha, "dd/MM HH:mm"),
   mov.descripcion,
   mov.tipo,
   fmtCLP(mov.monto)
@@ -381,7 +375,7 @@ const tableData = (data.items || []).map(mov => [
                     {paginatedMovements.map((mov) => (
                       <TableRow key={mov.id}>
         <TableCell className="py-4 sm:py-5 whitespace-nowrap text-sm sm:text-base md:text-lg">
-          {formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm")}
+          {formatDatabaseDate(mov.fecha, "dd/MM HH:mm")}
         </TableCell>
                         <TableCell className="py-4 sm:py-5 text-sm sm:text-base md:text-lg">{mov.descripcion}</TableCell>
                         <TableCell className="py-4 sm:py-5">
