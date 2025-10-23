@@ -260,7 +260,7 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-        .order('fecha', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(5);
 
       if (error) throw error;
@@ -285,7 +285,7 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-        .order('fecha', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(5);
 
       if (error) throw error;
