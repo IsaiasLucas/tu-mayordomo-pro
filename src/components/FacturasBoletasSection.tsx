@@ -469,61 +469,136 @@ export default function FacturasBoletasSection() {
 
       {/* Dialog de subida */}
       <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
-        <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col p-0">
-          <DialogHeader className="px-6 pt-6 pb-0">
-            <DialogTitle>Subir Factura o Boleta</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="sm:max-w-[520px] max-h-[90vh] flex flex-col p-0 overflow-hidden">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b bg-gradient-to-br from-primary/5 via-accent/5 to-transparent">
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10">
+                <Upload className="h-5 w-5 text-primary" />
+              </div>
+              Subir Documento
+            </DialogTitle>
+            <DialogDescription className="text-xs">
               Las imágenes se comprimirán automáticamente para optimizar el almacenamiento
             </DialogDescription>
           </DialogHeader>
 
           <ScrollArea className="flex-1 px-6">
-            <div className="space-y-4 py-4">
+            <div className="space-y-5 py-6">
               <div className="space-y-2">
-                <Label>Tipo de Documento</Label>
+                <Label className="text-sm font-semibold flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-primary" />
+                  Tipo de Documento
+                </Label>
                 <Select value={tipo} onValueChange={(v: any) => setTipo(v)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-12 border-border/50 hover:border-primary/50 bg-card hover:bg-primary/5 transition-all">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="factura">Factura</SelectItem>
-                    <SelectItem value="boleta">Boleta</SelectItem>
-                    <SelectItem value="transferencia">Comprobante de Transferencia</SelectItem>
+                  <SelectContent className="bg-popover">
+                    <SelectItem value="factura">
+                      <div className="flex items-center gap-3 py-1">
+                        <div className="p-1.5 rounded-md bg-primary/10">
+                          <FileText className="h-4 w-4 text-primary" />
+                        </div>
+                        <span>Factura</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="boleta">
+                      <div className="flex items-center gap-3 py-1">
+                        <div className="p-1.5 rounded-md bg-accent/10">
+                          <FileCheck className="h-4 w-4 text-accent" />
+                        </div>
+                        <span>Boleta</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="transferencia">
+                      <div className="flex items-center gap-3 py-1">
+                        <div className="p-1.5 rounded-md bg-success/10">
+                          <FileText className="h-4 w-4 text-success" />
+                        </div>
+                        <span>Transferencia</span>
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label>Archivo (Imagen o PDF)</Label>
-                <Input
-                  type="file"
-                  accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
-                  onChange={handleFileChange}
-                  className="cursor-pointer"
-                />
-                {selectedFile && (
-                  <p className="text-xs text-muted-foreground">
-                    {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
-                  </p>
+                <Label className="text-sm font-semibold flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4 text-primary" />
+                  Archivo (PDF o Imagen)
+                </Label>
+                <div className="relative">
+                  <Input
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    id="file-upload-input"
+                  />
+                  <label
+                    htmlFor="file-upload-input"
+                    className="flex flex-col items-center justify-center gap-3 h-32 border-2 border-dashed border-border/50 rounded-xl cursor-pointer hover:border-primary/50 hover:bg-gradient-to-br hover:from-primary/5 hover:to-accent/5 transition-all duration-200 group"
+                  >
+                    {selectedFile ? (
+                      <div className="flex items-center gap-3 text-sm px-4">
+                        <div className="p-2 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10">
+                          <FileText className="w-6 h-6 text-primary" />
+                        </div>
+                        <div className="text-left">
+                          <p className="font-semibold text-foreground line-clamp-1">{selectedFile.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                        <div className="p-3 rounded-full bg-muted/50 group-hover:bg-primary/10 transition-colors">
+                          <Upload className="w-7 h-7 group-hover:text-primary transition-colors" />
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm font-medium">Haz clic para seleccionar</p>
+                          <p className="text-xs text-muted-foreground/70">o arrastra el archivo aquí</p>
+                        </div>
+                      </div>
+                    )}
+                  </label>
+                </div>
+                
+                {filePreview && (
+                  <div className="mt-3 relative group">
+                    <div className="relative rounded-xl overflow-hidden border-2 border-border/50 shadow-lg">
+                      <img 
+                        src={filePreview} 
+                        alt="Preview" 
+                        className="w-full h-56 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <div className="absolute bottom-3 left-3 right-3">
+                          <p className="text-white text-xs font-medium">Vista previa del documento</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
 
-              {filePreview && (
-                <div className="aspect-video rounded-xl overflow-hidden bg-muted border">
-                  <img src={filePreview} alt="Preview" className="w-full h-full object-contain" />
-                </div>
-              )}
-
               <div className="space-y-2">
-                <Label>Fecha del Documento</Label>
+                <Label className="text-sm font-semibold flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  Fecha del Documento
+                </Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start">
-                      <Calendar className="h-4 w-4 mr-2" />
+                    <Button
+                      variant="outline"
+                      className="w-full h-12 justify-start text-left font-normal border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all"
+                    >
+                      <Calendar className="mr-2 h-4 w-4 text-primary" />
                       {format(fechaDocumento, "dd/MM/yyyy", { locale: es })}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent className="w-auto p-0 bg-popover" align="start">
                     <CalendarComponent
                       mode="single"
                       selected={fechaDocumento}
@@ -535,32 +610,45 @@ export default function FacturasBoletasSection() {
                 </Popover>
               </div>
 
-              <div className="space-y-2">
-                <Label>Monto (opcional)</Label>
-                <Input
-                  type="number"
-                  placeholder="0"
-                  value={monto}
-                  onChange={(e) => setMonto(e.target.value)}
-                />
-              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold">Monto (opcional)</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">$</span>
+                    <Input
+                      type="number"
+                      placeholder="0"
+                      value={monto}
+                      onChange={(e) => setMonto(e.target.value)}
+                      className="h-12 pl-7 border-border/50 hover:border-primary/50 bg-card hover:bg-primary/5 transition-all"
+                    />
+                  </div>
+                </div>
 
-              <div className="space-y-2">
-                <Label>Descripción (opcional)</Label>
-                <Textarea
-                  placeholder="Ej: Compra de materiales de oficina..."
-                  value={descripcion}
-                  onChange={(e) => setDescripcion(e.target.value)}
-                  rows={3}
-                />
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold">Categoría (opcional)</Label>
+                  <Input
+                    placeholder="Ej: Supermercado"
+                    value={descripcion}
+                    onChange={(e) => setDescripcion(e.target.value)}
+                    className="h-12 border-border/50 hover:border-primary/50 bg-card hover:bg-primary/5 transition-all"
+                  />
+                </div>
               </div>
             </div>
           </ScrollArea>
 
-          <div className="flex gap-2 justify-end px-6 py-4 border-t bg-background">
+          <div className="flex gap-3 p-6 border-t bg-gradient-to-br from-card to-background">
             <Button
               variant="outline"
-              onClick={() => setShowUploadDialog(false)}
+              onClick={() => {
+                setShowUploadDialog(false);
+                setSelectedFile(null);
+                setFilePreview(null);
+                setMonto('');
+                setDescripcion('');
+              }}
+              className="flex-1 h-12 hover:bg-muted"
               disabled={uploading}
             >
               Cancelar
@@ -568,16 +656,16 @@ export default function FacturasBoletasSection() {
             <Button
               onClick={handleUpload}
               disabled={!selectedFile || uploading}
-              className="min-w-[100px]"
+              className="flex-1 h-12 bg-gradient-to-r from-primary to-accent hover:opacity-90 shadow-lg disabled:opacity-50"
             >
               {uploading ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Subiendo...
                 </>
               ) : (
                 <>
-                  <Upload className="h-4 w-4 mr-2" />
+                  <FileCheck className="mr-2 h-4 w-4" />
                   Guardar
                 </>
               )}
