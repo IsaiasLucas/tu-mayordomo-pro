@@ -648,7 +648,7 @@ export default function FacturasBoletasSection() {
                 setMonto('');
                 setDescripcion('');
               }}
-              className="flex-1 h-12 hover:bg-muted"
+              className="min-w-[120px] h-11 hover:bg-muted"
               disabled={uploading}
             >
               Cancelar
@@ -656,7 +656,7 @@ export default function FacturasBoletasSection() {
             <Button
               onClick={handleUpload}
               disabled={!selectedFile || uploading}
-              className="flex-1 h-12 bg-gradient-to-r from-primary to-accent hover:opacity-90 shadow-lg disabled:opacity-50"
+              className="flex-1 h-11 bg-gradient-to-r from-primary to-accent hover:opacity-90 shadow-lg disabled:opacity-50"
             >
               {uploading ? (
                 <>
