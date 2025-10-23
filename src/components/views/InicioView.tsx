@@ -210,9 +210,16 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
             )
             .subscribe();
           
+          // Silent polling every 5 seconds
+          const pollingInterval = setInterval(() => {
+            fetchMovimientosUpdate();
+            fetchAllMovimientosUpdate();
+          }, 5000);
+          
           return () => {
             supabase.removeChannel(recentChannel);
             supabase.removeChannel(allChannel);
+            clearInterval(pollingInterval);
           };
         } else {
           console.log('No telefono found in usuarios table');
