@@ -212,7 +212,7 @@ export default function GastosView({ profile }: GastosViewProps) {
     
     // Tabla de movimientos
 const tableData = (data.items || []).map(mov => [
-  formatDatabaseDate(mov.fecha, "dd/MM HH:mm"),
+  formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm"),
   mov.descripcion,
   mov.tipo,
   fmtCLP(mov.monto)
@@ -375,7 +375,7 @@ const tableData = (data.items || []).map(mov => [
                     {paginatedMovements.map((mov) => (
                       <TableRow key={mov.id}>
         <TableCell className="py-4 sm:py-5 whitespace-nowrap text-sm sm:text-base md:text-lg">
-          {formatDatabaseDate(mov.fecha, "dd/MM HH:mm")}
+          {formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm")}
         </TableCell>
                         <TableCell className="py-4 sm:py-5 text-sm sm:text-base md:text-lg">{mov.descripcion}</TableCell>
                         <TableCell className="py-4 sm:py-5">

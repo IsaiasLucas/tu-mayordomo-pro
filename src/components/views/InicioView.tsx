@@ -369,8 +369,8 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
     }
   };
 
-const formatMovimientoDate = (dateString: string) => {
-  return formatDatabaseDate(dateString, "dd/MM HH:mm");
+const formatMovimientoDate = (mov: any) => {
+  return formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm");
 };
 
   const showWhatsappCard = perfilLoaded && (!perfil?.telefono || perfil.telefono.trim() === '');
@@ -538,7 +538,7 @@ const formatMovimientoDate = (dateString: string) => {
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
                       }`}>
-                        {formatMovimientoDate(mov.fecha as string)}
+                        {formatMovimientoDate(mov)}
                       </span>
                       {(mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita") ? (
                         <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
@@ -600,12 +600,12 @@ const formatMovimientoDate = (dateString: string) => {
                   <div className="flex items-center gap-2 text-white/90">
                     <Calendar className="w-4 h-4" />
                     <span className="text-sm font-medium">
-                      {formatDatabaseDate(selectedMovimiento.fecha, "dd 'de' MMMM, yyyy")}
+                      {formatDatabaseDate(selectedMovimiento.created_at || selectedMovimiento.fecha, "dd 'de' MMMM, yyyy")}
                     </span>
                     <span className="mx-1">•</span>
                     <Clock className="w-4 h-4" />
                     <span className="text-sm font-medium">
-                      {formatDatabaseDate(selectedMovimiento.fecha, "HH:mm")}
+                      {formatDatabaseDate(selectedMovimiento.created_at || selectedMovimiento.fecha, "HH:mm")}
                     </span>
                   </div>
                 </div>

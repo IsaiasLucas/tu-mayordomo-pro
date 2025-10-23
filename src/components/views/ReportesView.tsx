@@ -249,7 +249,7 @@ export default function ReportesView() {
       startY: (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 10 : 130,
       head: [['Fecha', 'Descripción', 'Categoría', 'Tipo', 'Valor']],
       body: movimientos.map(m => [
-        formatDatabaseDate(m.fecha, "dd/MM/yyyy HH:mm"),
+        formatDatabaseDate((m as any).created_at || m.fecha, "dd/MM/yyyy HH:mm"),
         m.descripcion,
         m.categoria || '-',
         m.tipo,
