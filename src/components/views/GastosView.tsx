@@ -251,7 +251,7 @@ const tableData = (data.items || []).map(mov => [
 
   if (!phone) {
     return (
-      <div className="p-6">
+      <div className="p-6 animate-fade-in">
         <Card className="shadow-card rounded-2xl border-2 border-primary">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
@@ -277,7 +277,7 @@ const tableData = (data.items || []).map(mov => [
   const totalPages = Math.ceil((data.items || []).length / itemsPerPage);
 
   return (
-    <div className="p-4 sm:p-5 md:p-7 space-y-4 sm:space-y-5 md:space-y-7 pb-24 sm:pb-28">
+    <div className="p-4 sm:p-5 md:p-7 space-y-4 sm:space-y-5 md:space-y-7 pb-24 sm:pb-28 animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-5">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Gastos</h1>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center w-full sm:w-auto">

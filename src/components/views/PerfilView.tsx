@@ -560,7 +560,7 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
   ];
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-20 animate-fade-in">
       {/* Profile Header */}
       <Card className="bg-gradient-to-br from-purple-600 via-purple-500 to-blue-600 text-white shadow-xl rounded-2xl overflow-hidden">
         {/* Header Content */}
