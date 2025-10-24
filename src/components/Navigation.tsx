@@ -37,7 +37,7 @@ const Navigation = ({
       {/* WhatsApp Floating Button - Only on Inicio */}
       {currentView === "inicio" && (
         <div 
-          className="fixed z-50 flex justify-end items-center px-4"
+          className="fixed z-40 flex justify-end items-center px-4"
           style={{ 
             bottom: 'calc(env(safe-area-inset-bottom) + 6.5rem)',
             right: '1rem'
@@ -63,7 +63,7 @@ const Navigation = ({
 
       {/* Navigation Bar */}
       <div 
-        className="fixed left-0 right-0 z-50 flex justify-center items-center px-4"
+        className="fixed left-0 right-0 z-[9999] flex justify-center items-center px-4"
         style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}
       >
       <nav className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-[1.5rem] shadow-2xl transition-all duration-300 ease-out pointer-events-auto">
@@ -74,6 +74,9 @@ const Navigation = ({
             const isLocked = item.requiresPro && !isPro;
             
             const handleClick = () => {
+              const target = isLocked ? 'planes' : item.id;
+              // Debug: log interactions for mobile
+              try { console.log('[Nav] click', { from: currentView, target, isLocked, isPro }); } catch {}
               if (isLocked) {
                 onViewChange('planes');
               } else {
@@ -86,6 +89,8 @@ const Navigation = ({
                 type="button"
                 key={item.id}
                 onClick={(e) => { e.preventDefault(); handleClick(); }}
+                onTouchEnd={handleClick}
+                onPointerUp={handleClick}
                 aria-pressed={isActive}
                 aria-label={item.label}
                 className={cn(

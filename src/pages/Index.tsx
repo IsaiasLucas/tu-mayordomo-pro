@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import Navigation from "@/components/Navigation";
@@ -19,13 +19,23 @@ const Index = () => {
   const [currentView, setCurrentView] = useState("inicio");
   const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
-
+  const location = useLocation();
   // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       navigate("/auth");
     }
   }, [isAuthenticated, authLoading, navigate]);
+
+  // Sync currentView with ?tab= in URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab');
+    const allowed = ['inicio','gastos','reportes','planes','perfil'];
+    if (tab && allowed.includes(tab) && tab !== currentView) {
+      setCurrentView(tab);
+    }
+  }, [location.search]);
 
   // Show loading skeleton while auth or profile are loading
   if (authLoading || profileLoading) {
@@ -48,15 +58,20 @@ const Index = () => {
     // Guard for Reportes - redirect immediately to Planes if not pro
     const target = view === "reportes" && !isPro ? "planes" : view;
 
-    // Use View Transitions API if available for seamless swaps
-    const nav = () => setCurrentView(target);
-    // @ts-ignore - experimental API
-    const startVT = (document as any).startViewTransition;
-    if (typeof startVT === 'function') {
-      startVT(nav);
-    } else {
-      nav();
-    }
+    try { console.log('[Index] handleViewChange', { view, target, isPro }); } catch {}
+
+  // Use View Transitions API if available for seamless swaps
+  const nav = () => {
+    setCurrentView(target);
+    try { navigate(`${location.pathname}?tab=${target}`, { replace: true }); } catch {}
+  };
+  // @ts-ignore - experimental API
+  const startVT = (document as any).startViewTransition;
+  if (typeof startVT === 'function') {
+    startVT(nav);
+  } else {
+    nav();
+  }
   };
   const handleModalClose = async () => {
     setShowProfileModal(false);
