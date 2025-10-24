@@ -1,9 +1,9 @@
+import React, { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast";
 
-export function Toaster() {
+function ClientToaster() {
   const { toasts } = useToast();
-
   return (
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
@@ -21,4 +21,11 @@ export function Toaster() {
       <ToastViewport />
     </ToastProvider>
   );
+}
+
+export function Toaster() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return <ClientToaster />;
 }
