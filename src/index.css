@@ -48,7 +48,8 @@ html.auth-page {
 html:not(.auth-page) {
   /* iOS safe area insets */
   padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
+  /* No bottom padding to avoid white band under fixed nav */
+  padding-bottom: 0;
   /* White background for internal pages */
   background: #FFFFFF;
 }
@@ -77,8 +78,6 @@ body.auth-page {
 body:not(.auth-page) {
   /* White background for internal pages */
   background: #FFFFFF;
-  /* Add bottom padding for tab bar + safe area */
-  padding-bottom: calc(env(safe-area-inset-bottom) + 6rem);
 }
 
 #root {
