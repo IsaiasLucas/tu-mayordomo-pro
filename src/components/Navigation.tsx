@@ -1,15 +1,8 @@
 import { Home, Receipt, BarChart3, Crown, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-interface NavigationProps {
-  currentView: string;
-  onViewChange: (view: string) => void;
-  isPro: boolean;
-}
-const Navigation = ({
-  currentView,
-  onViewChange,
-  isPro,
-}: NavigationProps) => {
+import { useActiveTab, ActiveTab } from "@/store/appState";
+const Navigation = () => {
+  const { activeTab, setActiveTab } = useActiveTab();
   const navigationItems = [{
     id: "inicio",
     label: "Inicio",
@@ -35,7 +28,7 @@ const Navigation = ({
   return (
     <>
       {/* WhatsApp Floating Button - Only on Inicio */}
-      {currentView === "inicio" && (
+      {activeTab === "inicio" && (
         <div 
           className="fixed z-40 flex justify-end items-center px-4"
           style={{ 
@@ -68,40 +61,31 @@ const Navigation = ({
       >
       <nav className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-[1.5rem] shadow-2xl transition-all duration-300 ease-out pointer-events-auto">
         <div className="flex items-center justify-center gap-1.5 px-4 py-2.5">
-          {navigationItems.map(item => {
-            const Icon = item.icon;
-            const isActive = currentView === item.id;
-            const isLocked = item.requiresPro && !isPro;
-            
-            const handleClick = () => {
-              const target = isLocked ? 'planes' : item.id;
-              // Debug: log interactions for mobile
-              try { console.log('[Nav] click', { from: currentView, target, isLocked, isPro }); } catch {}
-              if (isLocked) {
-                onViewChange('planes');
-              } else {
-                onViewChange(item.id);
-              }
-            };
+            {navigationItems.map(item => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              const isLocked = !!item.requiresPro; // UI only, no gating
+              
+              const handleClick = () => {
+                try { console.log('[Nav] setActiveTab', { from: activeTab, to: item.id }); } catch {}
+                setActiveTab(item.id as ActiveTab);
+              };
             
             return (
-              <button
-                type="button"
-                key={item.id}
-                onClick={(e) => { e.preventDefault(); handleClick(); }}
-                onTouchEnd={handleClick}
-                onPointerUp={handleClick}
-                aria-pressed={isActive}
-                aria-label={item.label}
-                className={cn(
-                  "flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ease-out touch-manipulation relative",
-                  "min-w-[69px] px-3.5 py-2.5",
-                  isActive 
-                    ? "bg-gradient-to-br from-primary via-primary-glow to-primary rounded-2xl shadow-glow scale-105" 
-                    : "hover:scale-105 active:scale-95",
-                  isLocked && "opacity-60"
-                )}
-              >
+                <button
+                  type="button"
+                  key={item.id}
+                  onClick={(e) => { e.preventDefault(); handleClick(); }}
+                  aria-pressed={isActive}
+                  aria-label={item.label}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ease-out touch-manipulation relative",
+                    "min-w-[69px] px-3.5 py-2.5",
+                    isActive 
+                      ? "bg-gradient-to-br from-primary via-primary-glow to-primary rounded-2xl shadow-glow scale-105" 
+                      : "hover:scale-105 active:scale-95"
+                  )}
+                >
                 <Icon 
                   className={cn(
                     "w-[22px] h-[22px] transition-all duration-300",

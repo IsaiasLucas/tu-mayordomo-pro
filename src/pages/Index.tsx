@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import Navigation from "@/components/Navigation";
@@ -12,14 +12,13 @@ import CompleteProfileModal from "@/components/CompleteProfileModal";
 import InstallPrompt from "@/components/InstallPrompt";
 import { ViewTransition } from "@/components/ViewTransition";
 import { Skeleton } from "@/components/ui/skeleton";
-
+import { useActiveTab, ActiveTab } from "@/store/appState";
 const Index = () => {
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const { profile, loading: profileLoading, isPro, refreshProfile } = useProfile();
-  const [currentView, setCurrentView] = useState("inicio");
+  const { profile, loading: profileLoading, refreshProfile } = useProfile();
+  const { activeTab, setActiveTab } = useActiveTab();
   const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
   // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -27,15 +26,7 @@ const Index = () => {
     }
   }, [isAuthenticated, authLoading, navigate]);
 
-  // Sync currentView with pathname or ?tab=
-  useEffect(() => {
-    const allowed = ['inicio','gastos','reportes','planes','perfil'];
-    const path = location.pathname.replace('/', '') || 'inicio';
-    const params = new URLSearchParams(location.search);
-    const tab = params.get('tab');
-    const target = allowed.includes(path) ? path : (tab && allowed.includes(tab) ? tab : 'inicio');
-    if (target !== currentView) setCurrentView(target);
-  }, [location.pathname, location.search]);
+  // Removed URL sync: single source of truth is global app.activeTab
 
   // Show loading skeleton while auth or profile are loading
   if (authLoading || profileLoading) {
@@ -55,23 +46,14 @@ const Index = () => {
   }
 
   const handleViewChange = (view: string) => {
-    // Guard for Reportes - redirect immediately to Planes if not pro
-    const target = view === "reportes" && !isPro ? "planes" : view;
-
-    try { console.log('[Index] handleViewChange', { view, target, isPro }); } catch {}
-
-  // Use View Transitions API if available for seamless swaps
-  const nav = () => {
-    setCurrentView(target);
-    try { navigate(target === 'inicio' ? '/inicio' : `/${target}`, { replace: true }); } catch {}
-  };
-  // @ts-ignore - experimental API
-  const startVT = (document as any).startViewTransition;
-  if (typeof startVT === 'function') {
-    startVT(nav);
-  } else {
-    nav();
-  }
+    const set = () => setActiveTab(view as ActiveTab);
+    // @ts-ignore - experimental API
+    const startVT = (document as any).startViewTransition;
+    if (typeof startVT === 'function') {
+      startVT(set);
+    } else {
+      set();
+    }
   };
   const handleModalClose = async () => {
     setShowProfileModal(false);
@@ -80,7 +62,7 @@ const Index = () => {
   };
 
   const renderCurrentView = () => {
-    switch (currentView) {
+    switch (activeTab) {
       case "inicio":
         return (
           <ViewTransition viewKey="inicio">
@@ -98,10 +80,9 @@ const Index = () => {
           </ViewTransition>
         );
       case "reportes":
-        // This should never render for non-pro due to guard; render Planes when not pro without state changes
         return (
           <ViewTransition viewKey="reportes">
-            {isPro ? <ReportesView /> : <PlanesView />}
+            <ReportesView />
           </ViewTransition>
         );
       case "planes":
@@ -131,13 +112,9 @@ const Index = () => {
 
   return (
     <div className="w-full bg-background overflow-y-auto overflow-x-hidden" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)' }}>
-      <Navigation
-        currentView={currentView}
-        onViewChange={handleViewChange}
-        isPro={isPro}
-      />
+      <Navigation />
       
-      <main key={currentView} className="pb-24" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
+      <main key={activeTab} className="pb-24" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
         {renderCurrentView()}
       </main>
 
