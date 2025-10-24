@@ -22,6 +22,10 @@ html {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   -webkit-text-size-adjust: 100%;
+  /* iOS safe area - purple gradient background */
+  background: linear-gradient(180deg, #A46BFF 0%, #8E5BFF 100%);
+  background-attachment: fixed;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 body {
@@ -37,6 +41,10 @@ body {
   position: relative;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
+  /* iOS safe area - purple gradient background */
+  background: linear-gradient(180deg, #A46BFF 0%, #8E5BFF 100%);
+  background-attachment: fixed;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 #root {
