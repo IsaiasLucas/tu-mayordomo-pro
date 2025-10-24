@@ -49,16 +49,22 @@ export const useAuth = () => {
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching profile:', error);
+        setProfile(null);
       } else {
         setProfile(data);
         
         // Check subscription status only - removed sync from sheets
-        setTimeout(() => {
-          checkSubscriptionStatus();
-        }, 0);
+        if (data) {
+          setTimeout(() => {
+            checkSubscriptionStatus().catch(err => {
+              console.error('Subscription check failed:', err);
+            });
+          }, 0);
+        }
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
+      setProfile(null);
     } finally {
       setLoading(false);
     }
@@ -66,46 +72,65 @@ export const useAuth = () => {
 
   const checkSubscriptionStatus = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        console.error('Session error:', sessionError);
+        return;
+      }
 
-      await supabase.functions.invoke("check-subscription", {
+      const { error: invokeError } = await supabase.functions.invoke("check-subscription", {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
       });
+
+      if (invokeError) {
+        console.error('Check subscription error:', invokeError);
+        return;
+      }
       
       // Refresh profile after check
       if (session.user) {
-        const { data: updatedProfile } = await supabase
+        const { data: updatedProfile, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('user_id', session.user.id)
           .maybeSingle();
         
-        if (updatedProfile) {
+        if (!profileError && updatedProfile) {
           setProfile(updatedProfile);
         }
       }
     } catch (error) {
       console.error('Error checking subscription:', error);
+      // Don't throw - this is a background operation
     }
   };
 
   const signOut = async () => {
-    // Clear all localStorage data on logout
-    localStorage.removeItem('tm_phone');
-    localStorage.removeItem('tm_nombre');
-    localStorage.removeItem('tm_movimientos_cache');
-    localStorage.removeItem('tm_all_movimientos_cache');
-    localStorage.removeItem('tm_show_balance');
-    sessionStorage.removeItem('profilePopupShown');
-    
-    // Clear profile cache
-    const { clearProfileCache } = await import('@/hooks/useProfile');
-    clearProfileCache();
-    
-    await supabase.auth.signOut();
+    try {
+      // Clear all localStorage data on logout
+      localStorage.removeItem('tm_phone');
+      localStorage.removeItem('tm_nombre');
+      localStorage.removeItem('tm_movimientos_cache');
+      localStorage.removeItem('tm_all_movimientos_cache');
+      localStorage.removeItem('tm_show_balance');
+      localStorage.removeItem('app.activeTab');
+      sessionStorage.removeItem('profilePopupShown');
+      
+      // Clear profile cache
+      const { clearProfileCache } = await import('@/hooks/useProfile');
+      clearProfileCache();
+      
+      // Sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Sign out error:', error);
+      }
+    } catch (error) {
+      console.error('Error during sign out:', error);
+      // Continue with signout even if there's an error
+    }
   };
 
   return {
