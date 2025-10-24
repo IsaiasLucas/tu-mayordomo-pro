@@ -11,6 +11,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/inicio" element={<Index />} />
+        <Route path="/gastos" element={<Index />} />
+        <Route path="/reportes" element={<Index />} />
+        <Route path="/planes" element={<Index />} />
+        <Route path="/perfil" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

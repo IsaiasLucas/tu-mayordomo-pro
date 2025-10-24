@@ -27,15 +27,15 @@ const Index = () => {
     }
   }, [isAuthenticated, authLoading, navigate]);
 
-  // Sync currentView with ?tab= in URL
+  // Sync currentView with pathname or ?tab=
   useEffect(() => {
+    const allowed = ['inicio','gastos','reportes','planes','perfil'];
+    const path = location.pathname.replace('/', '') || 'inicio';
     const params = new URLSearchParams(location.search);
     const tab = params.get('tab');
-    const allowed = ['inicio','gastos','reportes','planes','perfil'];
-    if (tab && allowed.includes(tab) && tab !== currentView) {
-      setCurrentView(tab);
-    }
-  }, [location.search]);
+    const target = allowed.includes(path) ? path : (tab && allowed.includes(tab) ? tab : 'inicio');
+    if (target !== currentView) setCurrentView(target);
+  }, [location.pathname, location.search]);
 
   // Show loading skeleton while auth or profile are loading
   if (authLoading || profileLoading) {
@@ -63,7 +63,7 @@ const Index = () => {
   // Use View Transitions API if available for seamless swaps
   const nav = () => {
     setCurrentView(target);
-    try { navigate(`${location.pathname}?tab=${target}`, { replace: true }); } catch {}
+    try { navigate(target === 'inicio' ? '/inicio' : `/${target}`, { replace: true }); } catch {}
   };
   // @ts-ignore - experimental API
   const startVT = (document as any).startViewTransition;
