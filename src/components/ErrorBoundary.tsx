@@ -39,8 +39,19 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   private handleReset = () => {
+    // Clear all state and caches
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch (e) {
+      console.error('Error clearing storage:', e);
+    }
+    
+    // Reset state
     this.setState({ hasError: false, error: null });
-    window.location.href = '/';
+    
+    // Hard redirect to auth to fully reset app
+    window.location.href = '/auth';
   };
 
   public render() {
@@ -63,9 +74,9 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
             <Button 
               onClick={this.handleReset}
-              className="w-full rounded-xl"
+              className="w-full rounded-xl h-12 text-base font-semibold"
             >
-              Volver al inicio
+              Ir al inicio de sesión
             </Button>
           </div>
         </div>

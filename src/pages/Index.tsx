@@ -26,6 +26,8 @@ const Index = () => {
   // Redirect if not authenticated (only after hydration completes)
   useEffect(() => {
     if (!isHydrating && !isAuthenticated) {
+      // Clear any stale tab state
+      localStorage.removeItem('app.activeTab');
       navigate("/auth", { replace: true });
     }
   }, [isHydrating, isAuthenticated, navigate]);
@@ -43,8 +45,17 @@ const Index = () => {
   }, [activeTab, isHydrating, isAuthorized]);
 
   // Keep showing previous content while hydrating
-  if (isHydrating && !isAuthenticated) {
-    return null; // First load, nothing to show
+  if (isHydrating) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center">
+        <div className="w-6 h-6 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
+  
+  // If not authenticated after hydration, show nothing (redirect will happen)
+  if (!isAuthenticated) {
+    return null;
   }
 
   const handleViewChange = (view: string) => {

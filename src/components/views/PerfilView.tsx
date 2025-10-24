@@ -60,6 +60,19 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
   const { user, profile, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Guard: if no user, show loading instead of rendering full component
+  if (!user) {
+    return (
+      <div className="screen flex items-center justify-center p-4" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <div className="text-center space-y-3">
+          <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
+          <p className="text-muted-foreground">Cargando perfil...</p>
+        </div>
+      </div>
+    );
+  }
+  
   const [showBalance, setShowBalance] = useState(() => {
     const saved = localStorage.getItem("tm_show_balance");
     return saved === null ? true : saved === "true";
@@ -107,11 +120,13 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
   }, [isEmpresa, user?.id]);
 
   const fetchInvitationCodes = async () => {
+    if (!user?.id) return;
+    
     try {
       const { data, error } = await supabase
         .from('invitation_codes')
         .select('*')
-        .eq('company_id', user?.id)
+        .eq('company_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -120,10 +135,6 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
       console.error('Error fetching invitation codes:', error);
     }
   };
-
-  if (!user) {
-    return <div className="p-4">Cargando perfil...</div>;
-  }
 
   const formatCLP = (amount: number) => {
     return new Intl.NumberFormat('es-CL', {
@@ -136,20 +147,21 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
 
   const handleSignOut = async () => {
     try {
-      setLoading(true);
-      
-      // Clear state immediately (optimistic)
+      // Clear state first
       localStorage.removeItem('app.activeTab');
       
-      // Perform logout
+      // Sign out from Supabase
       await signOut();
       
-      // Navigate directly - no intermediate screens
-      window.location.replace("/auth");
+      // Small delay to ensure signOut completes
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Hard redirect to auth page
+      window.location.href = "/auth";
     } catch (error) {
       console.error("Error signing out:", error);
-      // Even on error, force redirect to auth
-      window.location.replace("/auth");
+      // Force redirect even on error
+      window.location.href = "/auth";
     }
   };
 
@@ -776,11 +788,10 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
                 <Button 
                   variant="outline" 
                   onClick={handleSignOut}
-                  disabled={loading}
                   className="w-full h-11 sm:h-12 rounded-2xl text-sm sm:text-base font-semibold justify-start touch-manipulation"
                 >
                   <LogOut className="h-4 w-4 mr-2 flex-shrink-0" />
-                  {loading ? "Cerrando sesión..." : "Salir"}
+                  Salir
                 </Button>
               </div>
             </div>
