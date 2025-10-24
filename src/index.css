@@ -37,6 +37,15 @@ html {
   -webkit-overflow-scrolling: touch;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
+}
+
+html.auth-page {
+  background: transparent;
+  padding: 0;
+  overflow: hidden;
+}
+
+html:not(.auth-page) {
   /* iOS safe area insets */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
@@ -57,6 +66,15 @@ body {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   -webkit-tap-highlight-color: transparent;
+}
+
+body.auth-page {
+  background: transparent;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+
+body:not(.auth-page) {
   /* White background for internal pages */
   background: #FFFFFF;
   /* Add bottom padding for tab bar + safe area */
@@ -80,6 +98,15 @@ body {
   padding-top: 0;
   /* Bottom padding handled by html/body */
   padding-bottom: 0;
+}
+
+#root.auth-page {
+  background: transparent;
+  padding: 0;
+  overflow: hidden;
+}
+
+#root:not(.auth-page) {
   /* White background for internal pages */
   background: #FFFFFF;
 }
