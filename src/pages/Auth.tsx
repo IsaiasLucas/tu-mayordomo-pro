@@ -20,6 +20,8 @@ export default function Auth() {
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
+  const [showEmailConfirmModal, setShowEmailConfirmModal] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,7 +61,7 @@ export default function Auth() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
           }
         });
 
@@ -83,22 +85,23 @@ export default function Auth() {
             title: "Bienvenido de nuevo",
             description: "Accediendo a tu cuenta",
           });
-          // El listener onAuthStateChange redireccionará automáticamente
           return;
         }
 
-        if (error) throw error;
-
-        // Sync profile after signup
-        if (data.user) {
-          await syncUserProfile();
+        if (error) {
+          toast({
+            title: "Error",
+            description: "No pudimos enviar el correo de confirmación. Intenta nuevamente o contáctanos.",
+            variant: "destructive",
+          });
+          throw error;
         }
 
-        toast({
-          title: "Cuenta creada",
-          description: "Bienvenido a Tu Mayordomo",
-        });
-        // El listener onAuthStateChange redireccionará automáticamente
+        // Mostrar modal de confirmación
+        setRegisteredEmail(email);
+        setShowEmailConfirmModal(true);
+        
+        // No redirigir automáticamente, esperar confirmación por email
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -390,6 +393,31 @@ export default function Auth() {
         </div>
       </div>
 
+      {/* Modal de confirmación de email */}
+      <Dialog open={showEmailConfirmModal} onOpenChange={setShowEmailConfirmModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Confirma tu correo</DialogTitle>
+            <DialogDescription className="text-base pt-2">
+              Hemos enviado un correo a <span className="font-semibold text-primary">{registeredEmail}</span> con un enlace para activar tu cuenta. Por favor, revisa tu bandeja de entrada y spam, luego haz clic en el enlace para continuar.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end pt-4">
+            <Button
+              onClick={() => {
+                setShowEmailConfirmModal(false);
+                setEmail("");
+                setPassword("");
+              }}
+              className="w-full sm:w-auto"
+            >
+              Entendido
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de restablecer contraseña */}
       <Dialog open={showResetDialog} onOpenChange={setShowResetDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

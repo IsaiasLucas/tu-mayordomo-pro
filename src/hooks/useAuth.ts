@@ -16,7 +16,18 @@ export const useAuth = () => {
       setSession(session);
       setUser(session?.user ?? null);
 
-      if (session?.user) {
+      if (event === 'SIGNED_IN' && session?.user) {
+        // Cuando el usuario completa el registro por email, hacer refetch global
+        setTimeout(async () => {
+          await performSync();
+          fetchProfile(session.user!.id);
+          
+          // Redirigir a home si estamos en callback
+          if (window.location.pathname === '/auth/callback') {
+            window.location.replace('/');
+          }
+        }, 0);
+      } else if (session?.user) {
         // Defer sync and profile fetch to avoid deadlocks
         setTimeout(async () => {
           await performSync();
