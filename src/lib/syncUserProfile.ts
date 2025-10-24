@@ -22,16 +22,43 @@ export async function syncUserProfile() {
     const phoneFromMeta = user.user_metadata?.phone || user.phone || '';
 
     // 2. SINCRONIZAR TABLA PROFILES
-    const { data: existingProfiles, error: profilesError } = await supabase
+    let existingProfiles = null;
+    
+    // Primeiro buscar por user_id
+    const { data: profileByUserId } = await supabase
       .from('profiles')
       .select('*')
       .eq('user_id', user.id)
       .maybeSingle();
 
-    if (!existingProfiles) {
-      console.log('No profile found by user_id, attempting reconciliation...');
+    existingProfiles = profileByUserId;
+
+    // Se não encontrou por user_id, buscar por email
+    if (!existingProfiles && user.email) {
+      console.log('No profile found by user_id, searching by email...');
       
-      // Buscar perfil antiguo por email
+      const { data: profileByEmail } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('email', user.email)
+        .maybeSingle();
+
+      if (profileByEmail) {
+        console.log('Found profile by email, linking to user_id');
+        // Vincular ao user_id
+        await supabase
+          .from('profiles')
+          .update({ user_id: user.id })
+          .eq('id', profileByEmail.id);
+        
+        existingProfiles = profileByEmail;
+      }
+    }
+
+    if (!existingProfiles) {
+      console.log('No profile found, attempting phone reconciliation...');
+      
+      // Buscar perfil antiguo por email (sem user_id)
       let oldProfile = null;
       if (user.email) {
         const { data: profileByEmail } = await supabase
@@ -147,7 +174,36 @@ export async function syncUserProfile() {
       }
     }
 
-    // 4. Retornar perfil unificado
+    // 4. VINCULAR GASTOS ANTIGOS PELO TELEFONE
+    if (existingProfiles?.phone_personal || existingProfiles?.phone_empresa) {
+      const phoneToMatch = existingProfiles.phone_personal || existingProfiles.phone_empresa;
+      const normalizedPhone = phoneToMatch.replace(/[^0-9]/g, '');
+      
+      console.log('Linking old gastos by phone...');
+      
+      // Buscar gastos sem user_id que correspondam ao telefone
+      const { data: gastosToLink } = await supabase
+        .from('gastos')
+        .select('id, telefono')
+        .is('user_id', null)
+        .limit(1000);
+      
+      // Filtrar gastos que correspondem ao telefone
+      const gastosIds = gastosToLink
+        ?.filter(g => g.telefono && g.telefono.replace(/[^0-9]/g, '') === normalizedPhone)
+        .map(g => g.id) || [];
+      
+      if (gastosIds.length > 0) {
+        await supabase
+          .from('gastos')
+          .update({ user_id: user.id })
+          .in('id', gastosIds);
+        
+        console.log(`Linked ${gastosIds.length} gastos to user_id`);
+      }
+    }
+
+    // 5. Retornar perfil unificado
     const [profileResult, usuarioResult] = await Promise.all([
       supabase
         .from('profiles')

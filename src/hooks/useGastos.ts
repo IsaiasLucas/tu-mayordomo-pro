@@ -30,6 +30,13 @@ export function useGastos(mes?: string) {
         return;
       }
 
+      // Get user profile to get phone number
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('phone_personal, phone_empresa')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
       const d = new Date();
       const ym = mes || `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
       
@@ -44,7 +51,8 @@ export function useGastos(mes?: string) {
       // Buscar gastos del mes específico por user_id
       const { startISO, endISO } = monthRangeUTCFromSantiago(ym);
       
-      const { data, error: fetchError } = await supabase
+      // Query principal: buscar por user_id
+      let query = supabase
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
@@ -52,9 +60,40 @@ export function useGastos(mes?: string) {
         .lte('fecha', ym + '-31')
         .order('fecha', { ascending: false });
 
+      const { data, error: fetchError } = await query;
+
       if (fetchError) throw fetchError;
       
       const gastos = data || [];
+      
+      // Se tiver telefone e não encontrou gastos, buscar por telefone também
+      if (gastos.length === 0 && profile) {
+        const phoneToSearch = profile.phone_personal || profile.phone_empresa;
+        if (phoneToSearch) {
+          const normalizedPhone = phoneToSearch.replace(/[^0-9]/g, '');
+          
+          // Buscar todos os gastos sem filtro de RLS (via função ou API pública)
+          const { data: gastosByPhone } = await supabase
+            .from('gastos')
+            .select('*')
+            .eq('telefono', normalizedPhone)
+            .gte('fecha', ym + '-01')
+            .lte('fecha', ym + '-31')
+            .order('fecha', { ascending: false });
+          
+          if (gastosByPhone && gastosByPhone.length > 0) {
+            // Vincular esses gastos ao user_id
+            const gastosIds = gastosByPhone.map(g => g.id);
+            await supabase
+              .from('gastos')
+              .update({ user_id: user.id })
+              .in('id', gastosIds);
+            
+            gastos.push(...gastosByPhone);
+          }
+        }
+      }
+      
       // Salvar no cache
       gastosCache.set(ym, { data: gastos, timestamp: Date.now() });
       setItems(gastos);
