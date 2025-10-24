@@ -28,6 +28,16 @@ html {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* Fixed background layer for seamless gradient */
+html::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, #A46BFF 0%, #8E5BFF 100%);
+  z-index: -1;
+  pointer-events: none;
+}
+
 body {
   width: 100%;
   max-width: 100%;
@@ -42,8 +52,7 @@ body {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   /* iOS safe area - purple gradient background */
-  background: linear-gradient(180deg, #A46BFF 0%, #8E5BFF 100%);
-  background-attachment: fixed;
+  background: transparent;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -62,8 +71,10 @@ body {
   padding-right: env(safe-area-inset-right);
   /* No top padding - content extends behind status bar */
   padding-top: 0;
-  /* Bottom padding handled by navigation */
+  /* Bottom padding handled by html/body */
   padding-bottom: 0;
+  /* Transparent background - inherit from html */
+  background: transparent;
 }
 
 /* Prevent pull-to-refresh on mobile */
@@ -80,7 +91,7 @@ body {
 
 /* Auth page gradient background */
 .auth-page-gradient {
-  background: linear-gradient(135deg, hsl(270 70% 60%) 0%, hsl(280 80% 70%) 50%, hsl(285 75% 65%) 100%);
+  background: transparent;
   background-attachment: fixed;
   background-size: cover;
   background-position: center;

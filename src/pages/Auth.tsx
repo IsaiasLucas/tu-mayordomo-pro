@@ -189,7 +189,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="auth-page-gradient w-full max-w-full min-h-screen-ios relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
+    <div className="auth-page-gradient w-full min-h-screen-ios relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
       {/* Premium animated mesh background */}
       <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: 'var(--gradient-mesh)' }} />
       
@@ -199,7 +199,7 @@ export default function Auth() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-lilac/20 rounded-full blur-3xl pointer-events-none" style={{ filter: 'blur(120px)' }} />
       
       <div className="min-h-screen-ios flex flex-col lg:flex-row items-center justify-center px-4 py-6 sm:p-6 lg:p-12 relative z-10 gap-6 lg:gap-12">
-        <div className="w-full max-w-full mx-auto grid lg:grid-cols-2 gap-6 lg:gap-16 items-center" style={{ maxWidth: '1280px' }}>
+        <div className="w-full mx-auto grid lg:grid-cols-2 gap-6 lg:gap-16 items-center" style={{ maxWidth: '1280px' }}>
           {/* Left side - Hero & Branding */}
           <div className="hidden lg:flex flex-col space-y-6 lg:space-y-8 text-white">
             {/* Hero Title - Desktop only */}
