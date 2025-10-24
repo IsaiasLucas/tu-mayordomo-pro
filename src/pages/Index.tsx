@@ -15,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useActiveTab, ActiveTab } from "@/store/appState";
 const Index = () => {
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const { profile, loading: profileLoading, refreshProfile } = useProfile();
+  const { profile, loading: profileLoading, isPro, refreshProfile } = useProfile();
   const { activeTab, setActiveTab } = useActiveTab();
   const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
@@ -112,7 +112,7 @@ const Index = () => {
 
   return (
     <div className="w-full bg-background overflow-y-auto overflow-x-hidden" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)' }}>
-      <Navigation />
+      <Navigation isPro={isPro} />
       
       <main key={activeTab} className="pb-24" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
         {renderCurrentView()}

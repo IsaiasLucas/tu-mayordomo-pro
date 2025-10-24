@@ -1,7 +1,12 @@
 import { Home, Receipt, BarChart3, Crown, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useActiveTab, ActiveTab } from "@/store/appState";
-const Navigation = () => {
+
+interface NavigationProps {
+  isPro: boolean;
+}
+
+const Navigation = ({ isPro }: NavigationProps) => {
   const { activeTab, setActiveTab } = useActiveTab();
   const navigationItems = [{
     id: "inicio",
@@ -27,22 +32,22 @@ const Navigation = () => {
   }];
   return (
     <>
-      {/* WhatsApp Floating Button - Only on Inicio */}
-      {activeTab === "inicio" && (
-        <div 
-          className="fixed z-40 flex justify-end items-center px-4"
-          style={{ 
-            bottom: 'calc(env(safe-area-inset-bottom) + 6.5rem)',
-            right: '1rem'
-          }}
-        >
-        <a
-          href="https://wa.me/56955264713?text=Enséñame%20a%20usar%20Tu%20Mayordomo%20paso%20a%20paso%20🚀"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group touch-manipulation"
-          title="Chatear con Tu Mayordomo"
-        >
+       {/* WhatsApp Floating Button - Only on Inicio */}
+       {activeTab === "inicio" && (
+         <div 
+           className="fixed z-40 flex justify-end items-center px-4 pointer-events-none"
+           style={{ 
+             bottom: 'calc(env(safe-area-inset-bottom) + 6.5rem)',
+             right: '1rem'
+           }}
+         >
+         <a
+           href="https://wa.me/56955264713?text=Enséñame%20a%20usar%20Tu%20Mayordomo%20paso%20a%20paso%20🚀"
+           target="_blank"
+           rel="noopener noreferrer"
+           className="group touch-manipulation pointer-events-auto"
+           title="Chatear con Tu Mayordomo"
+         >
           <div className="relative bg-gradient-to-br from-purple-600 to-blue-600 rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center">
             <div className="absolute inset-0 rounded-full bg-purple-400 animate-ping opacity-20"></div>
             
@@ -64,11 +69,12 @@ const Navigation = () => {
             {navigationItems.map(item => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
-              const isLocked = !!item.requiresPro; // UI only, no gating
+              const isLocked = item.requiresPro && !isPro;
               
               const handleClick = () => {
-                try { console.log('[Nav] setActiveTab', { from: activeTab, to: item.id }); } catch {}
-                setActiveTab(item.id as ActiveTab);
+                const target = isLocked ? 'planes' : (item.id as ActiveTab);
+                try { console.log('[Nav] setActiveTab', { from: activeTab, to: target, isLocked, isPro }); } catch {}
+                setActiveTab(target);
               };
             
             return (
@@ -83,7 +89,8 @@ const Navigation = () => {
                     "min-w-[69px] px-3.5 py-2.5",
                     isActive 
                       ? "bg-gradient-to-br from-primary via-primary-glow to-primary rounded-2xl shadow-glow scale-105" 
-                      : "hover:scale-105 active:scale-95"
+                      : "hover:scale-105 active:scale-95",
+                    isLocked && "opacity-60"
                   )}
                 >
                 <Icon 
