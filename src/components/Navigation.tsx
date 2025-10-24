@@ -50,14 +50,14 @@ const Navigation = ({ isPro = false }: NavigationProps) => {
            href={whatsappLink}
            target="_blank"
            rel="noopener noreferrer"
-           className="fixed z-40 bg-[#25D366] text-white p-5 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 animate-bounce-subtle"
+           className="fixed z-10 bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300"
            style={{
              right: '16px',
-             bottom: 'calc(env(safe-area-inset-bottom) + 84px)'
+             bottom: 'calc(16px + env(safe-area-inset-bottom) + 68px)'
            }}
            aria-label="Abrir WhatsApp"
          >
-           <MessageCircle className="h-8 w-8" />
+           <MessageCircle className="h-6 w-6" />
          </a>
        )}
 

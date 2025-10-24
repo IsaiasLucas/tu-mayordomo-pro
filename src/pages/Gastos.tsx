@@ -23,7 +23,7 @@ export default function Gastos() {
 
   if (loading) {
     return (
-      <main className="screen px-6 py-6 space-y-6" style={{ minHeight: '100dvh', overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      <main className="screen px-6 py-6 space-y-6 animate-fade-in" style={{ minHeight: '100dvh', overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <Skeleton className="h-32 w-full rounded-2xl" />
         <Skeleton className="h-96 w-full rounded-xl" />
       </main>
@@ -32,7 +32,7 @@ export default function Gastos() {
 
   if (needsWhatsAppConfig) {
     return (
-      <main className="screen px-6 py-6 space-y-6" style={{ minHeight: '100dvh', overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      <main className="screen px-6 py-6 space-y-6 animate-fade-in" style={{ minHeight: '100dvh', overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <CardConfigWhatsApp />
       </main>
     );

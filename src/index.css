@@ -10,9 +10,7 @@ main {
   overflow-y: auto !important;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  /* No extra padding - handled by component level */
-  padding: 0;
-  /* Ensure scroll is never disabled */
+  padding-bottom: calc(84px + env(safe-area-inset-bottom));
   touch-action: pan-y;
 }
 
@@ -51,8 +49,8 @@ html:not(.auth-page) {
   padding-left: 0;
   padding-right: 0;
   padding-bottom: 0;
-  /* White background for internal pages */
-  background: #FFFFFF;
+  /* Light background matching manifest */
+  background: #F8F5FF;
 }
 
 body {
@@ -77,8 +75,8 @@ body.auth-page {
 }
 
 body:not(.auth-page) {
-  /* White background for internal pages */
-  background: #FFFFFF;
+  /* Light background matching manifest */
+  background: #F8F5FF;
 }
 
 #root {
@@ -101,8 +99,8 @@ body:not(.auth-page) {
 }
 
 #root:not(.auth-page) {
-  /* White background for internal pages */
-  background: #FFFFFF;
+  /* Light background matching manifest */
+  background: #F8F5FF;
 }
 
 /* Prevent pull-to-refresh on mobile */

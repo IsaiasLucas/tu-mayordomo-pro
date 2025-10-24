@@ -48,7 +48,7 @@ export default function Inicio() {
 
   if (needsWhatsAppConfig) {
     return (
-      <main className="screen px-6 py-6 space-y-6" style={{ minHeight: '100dvh', overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      <main className="screen px-6 py-6 space-y-6 animate-fade-in" style={{ minHeight: '100dvh', overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <CardConfigWhatsApp />
       </main>
     );
