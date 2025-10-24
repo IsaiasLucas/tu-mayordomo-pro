@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useMemo, useState, useCallback } from "react";
 
 export type ActiveTab = 'inicio' | 'gastos' | 'reportes' | 'planes' | 'perfil';
 
@@ -12,7 +12,7 @@ const ActiveTabContext = createContext<ActiveTabContextValue>({
   setActiveTab: () => {},
 });
 
-export const ActiveTabProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function ActiveTabProvider({ children }: { children: React.ReactNode }) {
   const [activeTabState, setActiveTabState] = useState<ActiveTab>(() => {
     try {
       const saved = localStorage.getItem('app.activeTab') as ActiveTab | null;
@@ -21,18 +21,21 @@ export const ActiveTabProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return 'inicio';
   });
 
-  const setActiveTab = (tab: ActiveTab) => {
+  const setActiveTab = useCallback((tab: ActiveTab) => {
     setActiveTabState(tab);
     try { localStorage.setItem('app.activeTab', tab); } catch {}
-  };
+  }, []);
 
-  const value = useMemo(() => ({ activeTab: activeTabState, setActiveTab }), [activeTabState]);
+  const value = useMemo(() => ({ 
+    activeTab: activeTabState, 
+    setActiveTab 
+  }), [activeTabState, setActiveTab]);
 
   return (
     <ActiveTabContext.Provider value={value}>
       {children}
     </ActiveTabContext.Provider>
   );
-};
+}
 
 export const useActiveTab = () => useContext(ActiveTabContext);
