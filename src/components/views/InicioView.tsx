@@ -9,8 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, TrendingUp, TrendingDown, Crown, Calendar, Clock, Phone, Tag, FileText } from "lucide-react";
 import { format } from "date-fns";
-import { getCurrentDateInSantiago, CHILE_TIMEZONE, monthRangeUTCFromSantiago } from "@/lib/date-config";
-import { formatDatabaseDate } from "@/lib/date-config";
+import { getCurrentDateInSantiago, CHILE_TIMEZONE, monthRangeUTCFromSantiago, formatDatabaseDate } from "@/lib/date-config";
 import { formatInTimeZone } from "date-fns-tz";
 import { supabase } from "@/integrations/supabase/client";
 import {
