@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { fmtCLP } from "@/lib/api";
-import { CHILE_TIMEZONE, chileDateOptions, monthRangeUTCFromSantiago } from "@/lib/date-config";
-import { formatDatabaseDate } from "@/lib/date-config";
+import { CHILE_TIMEZONE, chileDateOptions, formatDatabaseDate, monthRangeUTCFromSantiago } from "@/lib/date-config";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
