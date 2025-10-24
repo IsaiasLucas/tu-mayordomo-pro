@@ -57,52 +57,57 @@ export default function Auth() {
       const { syncUserProfile } = await import('@/lib/syncUserProfile');
       
       if (isSignUp) {
+        const redirectTo = 'https://tumayordomo.app/auth/callback';
+        
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: redirectTo
           }
         });
 
-        // Si el usuario ya existe, intentar hacer login automáticamente
-        if (error && error.message === "User already registered") {
-          const { error: signInError } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-          
-          if (signInError) {
+        // Si el usuario ya existe pero no está confirmado, reenviar email
+        if (error?.message?.toLowerCase().includes('already') || error?.code === 'user_already_exists') {
+          try {
+            await supabase.auth.resend({
+              type: 'signup',
+              email,
+              options: { emailRedirectTo: redirectTo }
+            });
+            
+            // Mostrar modal de confirmación
+            setRegisteredEmail(email);
+            setShowEmailConfirmModal(true);
+            toast({
+              title: "Correo reenviado",
+              description: "Verifica tu bandeja de entrada y spam",
+            });
+          } catch (resendError: any) {
             toast({
               title: "Error",
-              description: "Este correo ya está registrado. Verifica tu contraseña.",
+              description: "No pudimos reenviar el correo. Intenta nuevamente.",
               variant: "destructive",
             });
-            return;
           }
-          
-          toast({
-            title: "Bienvenido de nuevo",
-            description: "Accediendo a tu cuenta",
-          });
           return;
         }
 
         if (error) {
           toast({
             title: "Error",
-            description: "No pudimos enviar el correo de confirmación. Intenta nuevamente o contáctanos.",
+            description: "No pudimos enviar el correo de confirmación. Intenta nuevamente.",
             variant: "destructive",
           });
           throw error;
         }
 
-        // Mostrar modal de confirmación
+        // Mostrar modal de confirmación para registro exitoso
         setRegisteredEmail(email);
         setShowEmailConfirmModal(true);
         
-        // No redirigir automáticamente, esperar confirmación por email
       } else {
+        // Login flow
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -143,6 +148,28 @@ export default function Auth() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendEmail = async () => {
+    try {
+      const redirectTo = 'https://tumayordomo.app/auth/callback';
+      await supabase.auth.resend({
+        type: 'signup',
+        email: registeredEmail,
+        options: { emailRedirectTo: redirectTo }
+      });
+      
+      toast({
+        title: "Correo reenviado",
+        description: "Revisa tu bandeja de entrada y spam",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "No pudimos reenviar el correo. Intenta nuevamente.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -403,21 +430,29 @@ export default function Auth() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Confirma tu correo</DialogTitle>
-            <DialogDescription className="text-base pt-2">
-              Hemos enviado un correo a <span className="font-semibold text-primary">{registeredEmail}</span> con un enlace para activar tu cuenta. Por favor, revisa tu bandeja de entrada y spam, luego haz clic en el enlace para continuar.
+            <DialogDescription className="text-base pt-2 space-y-2">
+              <p>Te enviamos un email a <span className="font-semibold text-primary">{registeredEmail}</span> con un enlace para activar tu cuenta.</p>
+              <p>Revisa bandeja de entrada y spam.</p>
             </DialogDescription>
           </DialogHeader>
-          <div className="flex justify-end pt-4">
+          <div className="flex flex-col gap-3 pt-4">
             <Button
               onClick={() => {
                 setShowEmailConfirmModal(false);
                 setEmail("");
                 setPassword("");
               }}
-              className="w-full sm:w-auto"
+              className="w-full"
             >
               Entendido
             </Button>
+            <button
+              type="button"
+              onClick={handleResendEmail}
+              className="text-sm font-semibold text-primary hover:text-accent transition-colors underline"
+            >
+              Reenviar correo
+            </button>
           </div>
         </DialogContent>
       </Dialog>

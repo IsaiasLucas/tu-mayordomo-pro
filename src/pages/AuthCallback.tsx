@@ -11,15 +11,26 @@ export default function AuthCallback() {
       try {
         // Exchange code for session
         const url = window.location.href;
-        await supabase.auth.exchangeCodeForSession(url);
+        const { error } = await supabase.auth.exchangeCodeForSession(url);
         
-        // Wait a moment for auth state to update
-        setTimeout(() => {
-          window.location.replace('/');
-        }, 1500);
+        if (error) {
+          console.error('Error exchanging code:', error);
+          // Redirect to auth if there's an error
+          setTimeout(() => {
+            navigate('/auth');
+          }, 2000);
+          return;
+        }
+
+        // Import and execute sync
+        const { syncUserProfile } = await import('@/lib/syncUserProfile');
+        await syncUserProfile();
+        
+        // Redirect to home - the useAuth hook will handle profile fetching
+        window.location.replace('/inicio');
       } catch (error) {
         console.error('Error en callback:', error);
-        // Si hay error, redirigir a auth después de un momento
+        // If error, redirect to auth
         setTimeout(() => {
           navigate('/auth');
         }, 2000);
