@@ -58,9 +58,13 @@ export default function GastosView({ profile }: GastosViewProps) {
           .eq('user_id', user.id)
           .maybeSingle();
 
-        if (usuario?.telefono && usuario.telefono.trim() !== '') {
-          setPhone(usuario.telefono);
-          localStorage.setItem("tm_phone", usuario.telefono);
+        const phoneFromProfile = (profile?.phone_personal || profile?.phone_empresa || '').toString();
+        const effectivePhone = (usuario?.telefono?.trim() || '').toString() || phoneFromProfile;
+
+        if (effectivePhone) {
+          const digits = effectivePhone.replace(/\D/g, '');
+          setPhone(digits);
+          localStorage.setItem('tm_phone', digits);
         }
       } catch (error) {
         console.error('Error checking usuario phone:', error);
@@ -68,7 +72,7 @@ export default function GastosView({ profile }: GastosViewProps) {
     };
 
     checkUsuarioPhone();
-  }, []);
+  }, [profile]);
 
   useEffect(() => {
     const fetchData = async () => {

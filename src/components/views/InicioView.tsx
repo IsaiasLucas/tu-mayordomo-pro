@@ -148,11 +148,14 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
         setPerfil(usuario || null);
         setPerfilLoaded(true);
 
-        // Check if telefono exists and is not empty
-        if (usuario?.telefono && usuario.telefono.trim() !== '') {
-          const phoneDigits = usuario.telefono;
-          const cachedPhone = localStorage.getItem("tm_phone")?.replace(/\D/g, "");
-          
+        // Prefer phone from profiles if available, fallback to usuarios.telefono
+        const phoneFromProfile = (profile?.phone_personal || profile?.phone_empresa || '').toString();
+        const effectivePhone = (usuario?.telefono?.trim() || '').toString() || phoneFromProfile.replace(/\D/g, '');
+
+        if (effectivePhone) {
+          const phoneDigits = effectivePhone.replace(/\D/g, '');
+          const cachedPhone = localStorage.getItem('tm_phone')?.replace(/\D/g, '');
+
           // Clear cache if phone changed (different user)
           if (cachedPhone && cachedPhone !== phoneDigits) {
             localStorage.removeItem('tm_movimientos_cache');
@@ -160,14 +163,14 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
             setMovimientos([]);
             setAllMovimientos([]);
           }
-          
+
           setPhone(phoneDigits);
-          localStorage.setItem("tm_phone", phoneDigits);
-          
+          localStorage.setItem('tm_phone', phoneDigits);
+
           // Initial load
           fetchMovimientos();
           fetchAllMovimientos();
-          
+
           // Setup Realtime subscriptions for recent and all movements
           const recentChannel = supabase
             .channel('inicio-gastos-recent')
@@ -181,7 +184,7 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
               async (payload) => {
                 const { data: { user } } = await supabase.auth.getUser();
                 if (!user) return;
-                
+
                 if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
                   fetchMovimientosUpdate();
                 }
@@ -201,7 +204,7 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
               async (payload) => {
                 const { data: { user } } = await supabase.auth.getUser();
                 if (!user) return;
-                
+
                 // Refetch if change is for current user
                 if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
                   fetchAllMovimientosUpdate();
@@ -209,21 +212,21 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
               }
             )
             .subscribe();
-          
+
           // Silent polling every 5 seconds
           const pollingInterval = setInterval(() => {
             fetchMovimientosUpdate();
             fetchAllMovimientosUpdate();
           }, 5000);
-          
+
           return () => {
             supabase.removeChannel(recentChannel);
             supabase.removeChannel(allChannel);
             clearInterval(pollingInterval);
           };
         } else {
-          console.log('No telefono found in usuarios table');
-          localStorage.removeItem("tm_phone");
+          // No phone anywhere -> keep cache clean, but still allow UI to render
+          localStorage.removeItem('tm_phone');
           localStorage.removeItem('tm_movimientos_cache');
           localStorage.removeItem('tm_all_movimientos_cache');
           setMovimientos([]);
@@ -373,7 +376,9 @@ const formatMovimientoDate = (mov: any) => {
   return formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm");
 };
 
-  const showWhatsappCard = perfilLoaded && (!perfil?.telefono || perfil.telefono.trim() === '');
+  // Show WhatsApp card only if neither profiles nor usuarios have a phone
+  const combinedPhone = ((profile?.phone_personal || profile?.phone_empresa || perfil?.telefono || '') as string).toString();
+  const showWhatsappCard = perfilLoaded && combinedPhone.trim() === '';
 
   // No skeleton - keep previous content or show empty state
   // Removed skeleton loading to prevent flash screens
