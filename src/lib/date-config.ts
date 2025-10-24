@@ -111,3 +111,11 @@ export function monthRangeUTCFromSantiago(ym: string) {
 
   return { startISO, endISO };
 }
+
+// Get date range in America/Santiago timezone for any date range
+export function getRangeInTz(timezone: string, startDate: Date, endDate: Date) {
+  const fromISO = fromZonedTime(formatInTimeZone(startDate, timezone, "yyyy-MM-dd'T'00:00:00"), timezone).toISOString();
+  const toISO = fromZonedTime(formatInTimeZone(endDate, timezone, "yyyy-MM-dd'T'23:59:59"), timezone).toISOString();
+  
+  return { fromISO, toISO };
+}

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths, eachDayOfInterval, parseISO } from "date-fns";
-import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
+import { formatInTimeZone } from "date-fns-tz";
 import { es } from "date-fns/locale";
 import { CHILE_TIMEZONE, chileDateOptions, formatDatabaseDate } from "@/lib/date-config";
 import jsPDF from "jspdf";
@@ -63,20 +63,18 @@ export default function ReportesView() {
   const COLORS = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#6366F1', '#14B8A6', '#F97316', '#EF4444'];
 
   const fetchMovimientos = async (startDate: Date, endDate: Date): Promise<Movimiento[]> => {
-    const phone = profile?.phone_personal || profile?.phone_empresa;
-    if (!phone) return [];
+    if (!user) return [];
 
     try {
-      const phoneDigits = phone.replace(/\D/g, "");
-      const startISO = fromZonedTime(`${format(startDate, 'yyyy-MM-dd')}T00:00:00`, CHILE_TIMEZONE).toISOString();
-      const endISO = fromZonedTime(`${format(endDate, 'yyyy-MM-dd')}T23:59:59`, CHILE_TIMEZONE).toISOString();
+      const startDateStr = format(startDate, 'yyyy-MM-dd');
+      const endDateStr = format(endDate, 'yyyy-MM-dd');
       
-      const { data: gastos, error } = await (supabase as any)
+      const { data: gastos, error } = await supabase
         .from('gastos')
         .select('*')
-        .eq('telefono', phoneDigits)
-        .gte('fecha', format(startDate, 'yyyy-MM-dd'))
-        .lte('fecha', format(endDate, 'yyyy-MM-dd'))
+        .eq('user_id', user.id)
+        .gte('fecha', startDateStr)
+        .lte('fecha', endDateStr)
         .order('fecha', { ascending: false });
 
       if (error) throw error;
@@ -144,9 +142,7 @@ export default function ReportesView() {
 
   useEffect(() => {
     const loadPeriodData = async () => {
-      if (!isPro) return;
-      const phone = profile?.phone_personal || profile?.phone_empresa;
-      if (!phone) return;
+      if (!isPro || !user) return;
       
       const now = new Date();
       let startDate: Date;
@@ -190,7 +186,20 @@ export default function ReportesView() {
     };
 
     loadPeriodData();
-  }, [isPro, profile, selectedPeriod, customStartDate, customEndDate]);
+    
+    // Refetch when tab becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        loadPeriodData();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isPro, user, selectedPeriod, customStartDate, customEndDate]);
 
   const generatePDF = (movimientos: Movimiento[], tipo: string, periodo: string) => {
     const doc = new jsPDF();
@@ -265,11 +274,10 @@ export default function ReportesView() {
   const generar = async (
     tipo: "semanal" | "mensual" | "custom" | "semanal_actual" | "mensual_actual"
   ) => {
-    const phone = profile?.phone_personal || profile?.phone_empresa;
-    if (!user || !phone) {
+    if (!user) {
       toast({
         title: "Error",
-        description: "Es necesario tener un teléfono registrado para generar reportes.",
+        description: "Debes iniciar sesión para generar reportes.",
         variant: "destructive",
       });
       return;
@@ -333,7 +341,7 @@ export default function ReportesView() {
         .from('reportes')
         .insert({
           user_id: user.id,
-          phone: phone,
+          phone: profile?.phone_personal || profile?.phone_empresa || '',
           tipo: tipoDb,
           periodo: periodo,
           data: { movimientos_count: movimientos.length }
