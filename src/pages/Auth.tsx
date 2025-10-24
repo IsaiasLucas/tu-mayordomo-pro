@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Eye, EyeOff, Sparkles, TrendingUp, Shield, Zap } from "lucide-react";
 import fintechHero from "@/assets/fintech-hero.png";
+import geminisLogo from "@/assets/geminis-logo.png";
 
 export default function Auth() {
   const [loading, setLoading] = useState(false);
@@ -367,7 +368,7 @@ export default function Auth() {
                 </Button>
               </form>
 
-              <div className="mt-6 sm:mt-8 lg:mt-10 pt-5 sm:pt-6 border-t border-border/30">
+              <div className="mt-6 sm:mt-8 lg:mt-10 pt-5 sm:pt-6 border-t border-border/30 space-y-4">
                 <div className="flex items-center justify-center gap-2">
                   <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
                   <p className="text-xs sm:text-sm text-center text-muted-foreground font-medium">
@@ -382,6 +383,16 @@ export default function Auth() {
                       "Protección de nivel bancario"
                     )}
                   </p>
+                </div>
+                
+                {/* Apoiadores */}
+                <div className="flex flex-col items-center gap-2">
+                  <p className="text-xs text-muted-foreground/70 font-medium">Apoyadores</p>
+                  <img 
+                    src={geminisLogo} 
+                    alt="Geminis" 
+                    className="h-4 sm:h-5 w-auto opacity-60 hover:opacity-100 transition-opacity"
+                  />
                 </div>
               </div>
             </div>
