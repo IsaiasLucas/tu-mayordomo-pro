@@ -1,11 +1,11 @@
 {
-  "name": "Tu Mayordomo",
-  "short_name": "Mayordomo",
+  "name": "Tu Mayordomo - Gestión Financiera",
+  "short_name": "Tu Mayordomo",
   "description": "Controla tus finanzas personales con Tu Mayordomo. Registra gastos, crea presupuestos y obtén reportes detallados.",
-  "start_url": "/?source=pwa",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#F8F5FF",
-  "theme_color": "#6E2CF4",
+  "background_color": "#8E5BFF",
+  "theme_color": "#8E5BFF",
   "orientation": "portrait-primary",
   "icons": [
     {

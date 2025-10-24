@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
-import { useAuth } from "@/providers/AuthProvider";
 import Navigation from "@/components/Navigation";
 import InicioView from "@/components/views/InicioView";
 import GastosView from "@/components/views/GastosView";
@@ -12,12 +11,13 @@ import CompleteProfileModal from "@/components/CompleteProfileModal";
 import InstallPrompt from "@/components/InstallPrompt";
 import { TabKeepAlive } from "@/components/TabKeepAlive";
 import { useActiveTab, ActiveTab } from "@/store/appState";
+import { useProfile } from "@/hooks/useProfile";
 
 const Index = () => {
   const navigate = useNavigate();
   const { isHydrating, isAuthorized, isAuthenticated, isPro, profile } = useAuthGuard();
-  const { refreshProfile } = useAuth();
   const { activeTab, setActiveTab } = useActiveTab();
+  const { refreshProfile } = useProfile();
   const [showProfileModal, setShowProfileModal] = useState(false);
   
   // Keep track of which tabs have been mounted
@@ -36,30 +36,10 @@ const Index = () => {
       setMountedTabs(prev => new Set(prev).add(activeTab));
     }
     
-    // Comprehensive scroll lock cleanup on tab change
-    const cleanupScrollLock = () => {
-      document.body.classList.remove('modal-open');
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-    };
-    
-    cleanupScrollLock();
-    
-    // Restore scroll position for the active tab
-    const scrollKey = `scroll-${activeTab}`;
-    const savedScroll = sessionStorage.getItem(scrollKey);
-    if (savedScroll) {
-      requestAnimationFrame(() => {
-        window.scrollTo(0, parseInt(savedScroll, 10));
-      });
-    }
-    
-    return () => {
-      // Save scroll position when leaving tab
-      sessionStorage.setItem(scrollKey, window.scrollY.toString());
-    };
+    // Cleanup scroll lock on tab change
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.position = '';
   }, [activeTab, isHydrating, isAuthorized]);
 
   // Keep showing previous content while hydrating
@@ -77,21 +57,10 @@ const Index = () => {
   };
 
   return (
-    <div className="page w-full" style={{ minHeight: '100dvh', background: '#FFFFFF', position: 'relative', margin: 0, padding: 0 }}>
+    <div className="page w-full" style={{ minHeight: '100dvh', background: 'transparent', position: 'relative' }}>
       <Navigation isPro={isPro} />
       
-      <main style={{ 
-        paddingTop: 'max(1rem, env(safe-area-inset-top))',
-        paddingBottom: 'calc(env(safe-area-inset-bottom) + 7rem)',
-        paddingLeft: 'max(1rem, env(safe-area-inset-left))',
-        paddingRight: 'max(1rem, env(safe-area-inset-right))',
-        position: 'relative', 
-        minHeight: '100dvh',
-        overflow: 'auto',
-        WebkitOverflowScrolling: 'touch',
-        width: '100%',
-        margin: 0
-      }}>
+      <main style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))', position: 'relative', minHeight: '100dvh' }}>
         {/* Keep all mounted tabs alive to prevent re-mount flicker */}
         {mountedTabs.has('inicio') && (
           <TabKeepAlive tabId="inicio" isActive={activeTab === 'inicio'}>

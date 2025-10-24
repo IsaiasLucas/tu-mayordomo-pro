@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "./useAuth";
 
 // Cache simples para reportes
 const reportesCache = new Map<string, { data: any[], timestamp: number }>();

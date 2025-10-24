@@ -140,20 +140,8 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => {
-      if (!isOpen) {
-        // Clean up scroll lock before closing
-        document.body.classList.remove('modal-open');
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        handleCancel();
-      }
-    }}>
-      <DialogContent 
-        className="sm:max-w-md max-h-[90vh] overflow-y-auto" 
-        onInteractOutside={(e) => e.preventDefault()} 
-        onEscapeKeyDown={(e) => e.preventDefault()}
-      >
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleCancel()}>
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
         <DialogHeader>
           <div className="flex items-center gap-2 sm:gap-3 mb-2">
             <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg flex-shrink-0">

@@ -1,87 +1,114 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/providers/AuthProvider";
 
-export interface ProfileData {
+interface ProfileData {
+  telefono: string | null;
+  profile_complete: boolean;
+  plan: string;
   user_id: string;
-  email: string;
   phone_personal: string | null;
   phone_empresa: string | null;
   display_name: string | null;
-  plan: string;
   entidad: string;
-  whatsapp_configured: boolean;
+  usuario_profile_complete: boolean;
 }
 
-const profileCache = new Map<string, { data: ProfileData | null; timestamp: number }>();
-const CACHE_DURATION = 10000; // 10 seconds
+let cachedProfile: ProfileData | null = null;
+let profilePromise: Promise<ProfileData | null> | null = null;
 
-export function useProfile() {
-  const { user } = useAuth();
-  const [profile, setProfile] = useState<ProfileData | null>(() => {
-    if (user) {
-      // Verify cached data belongs to current user
-      const currentUserId = localStorage.getItem('tm_current_user_id');
-      if (currentUserId === user.id) {
-        const cached = profileCache.get(user.id);
-        if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-          return cached.data;
-        }
-      } else {
-        // Clear cache if user changed
-        profileCache.clear();
-      }
-    }
-    return null;
-  });
-  const [loading, setLoading] = useState(true);
+export const useProfile = () => {
+  const [profile, setProfile] = useState<ProfileData | null>(cachedProfile);
+  const [loading, setLoading] = useState(!cachedProfile);
 
-  const fetchProfile = useCallback(async (showLoading = true) => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      if (showLoading) setLoading(true);
-      
-      const cached = profileCache.get(user.id);
-      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-        setProfile(cached.data);
+  useEffect(() => {
+    const loadProfile = async () => {
+      // If already loading, wait for it
+      if (profilePromise) {
+        const data = await profilePromise;
+        setProfile(data);
         setLoading(false);
         return;
       }
 
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('user_id, email, phone_personal, phone_empresa, display_name, plan, entidad, whatsapp_configured')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) throw error;
-      
-      profileCache.set(user.id, { data, timestamp: Date.now() });
+      // Start loading
+      profilePromise = fetchProfile();
+      const data = await profilePromise;
+      cachedProfile = data;
       setProfile(data);
-    } catch (err) {
-      console.error('Error fetching profile:', err);
-      setProfile(null);
-    } finally {
       setLoading(false);
+      profilePromise = null;
+    };
+
+    if (!cachedProfile) {
+      loadProfile();
     }
-  }, [user]);
+  }, []);
 
-  const refetch = useCallback(() => {
-    if (user) {
-      profileCache.delete(user.id);
+  const fetchProfile = async (): Promise<ProfileData | null> => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      // Fetch both profiles and usuarios in parallel
+      const [profileResult, usuarioResult] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('user_id, plan, profile_complete, phone_personal, phone_empresa, display_name, entidad')
+          .eq('user_id', user.id)
+          .maybeSingle(),
+        supabase
+          .from('usuarios')
+          .select('telefono, profile_complete')
+          .eq('user_id', user.id)
+          .maybeSingle()
+      ]);
+
+      if (profileResult.error && profileResult.error.code !== 'PGRST116') {
+        console.error('Error fetching profile:', profileResult.error);
+        return null;
+      }
+
+      const profileData = profileResult.data;
+      const usuarioData = usuarioResult.data;
+
+      return {
+        telefono: usuarioData?.telefono || null,
+        profile_complete: profileData?.profile_complete || false,
+        plan: profileData?.plan || 'free',
+        user_id: user.id,
+        phone_personal: profileData?.phone_personal || null,
+        phone_empresa: profileData?.phone_empresa || null,
+        display_name: profileData?.display_name || null,
+        entidad: profileData?.entidad || 'personal',
+        usuario_profile_complete: usuarioData?.profile_complete || false
+      };
+    } catch (error) {
+      console.error('Error in fetchProfile:', error);
+      return null;
     }
-    return fetchProfile(false);
-  }, [user, fetchProfile]);
+  };
 
-  useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
+  const refreshProfile = async () => {
+    setLoading(true);
+    profilePromise = fetchProfile();
+    const data = await profilePromise;
+    cachedProfile = data;
+    setProfile(data);
+    setLoading(false);
+    profilePromise = null;
+  };
 
-  const needsWhatsAppConfig = !profile?.phone_personal && !profile?.phone_empresa;
+  return {
+    profile,
+    loading,
+    refreshProfile,
+    isPro: profile?.plan === 'pro' || profile?.plan === 'mensal' || profile?.plan === 'anual',
+    hasPhone: !!profile?.telefono && profile.telefono.trim() !== ''
+  };
+};
 
-  return { profile, loading, refetch, needsWhatsAppConfig };
-}
+// Clear cache on logout
+export const clearProfileCache = () => {
+  cachedProfile = null;
+  profilePromise = null;
+};

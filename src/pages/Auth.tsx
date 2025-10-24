@@ -8,7 +8,6 @@ import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Eye, EyeOff, Sparkles, TrendingUp, Shield, Zap } from "lucide-react";
 import fintechHero from "@/assets/fintech-hero.png";
-import apoiadoresImage from "@/assets/apoiadores.png";
 
 export default function Auth() {
   const [loading, setLoading] = useState(false);
@@ -22,34 +21,17 @@ export default function Auth() {
   const [resetLoading, setResetLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Add auth-page class to body/html/root on mount
-  useEffect(() => {
-    document.documentElement.classList.add('auth-page');
-    document.body.classList.add('auth-page');
-    document.getElementById('root')?.classList.add('auth-page');
-
-    return () => {
-      document.documentElement.classList.remove('auth-page');
-      document.body.classList.remove('auth-page');
-      document.getElementById('root')?.classList.remove('auth-page');
-    };
-  }, []);
-
   useEffect(() => {
     let mounted = true;
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (mounted && session) {
-        // User is already authenticated, redirect to app
-        console.log('[Auth] User already authenticated, redirecting to /inicio');
         window.location.replace("/inicio");
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (mounted && session) {
-        // Authentication successful, redirect to app
-        console.log('[Auth] Authentication successful, redirecting to /inicio');
         window.location.replace("/inicio");
       }
     });
@@ -207,19 +189,7 @@ export default function Auth() {
   };
 
   return (
-    <div 
-      className="w-full relative overflow-y-auto overflow-x-hidden font-['Inter']" 
-      style={{ 
-        background: 'linear-gradient(180deg, #A46BFF 0%, #8E5BFF 100%)',
-        minHeight: '100dvh',
-        height: '100%',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0
-      }}
-    >
+    <div className="w-full min-h-screen-ios relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ background: 'transparent', paddingTop: 'max(1rem, env(safe-area-inset-top))', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
       {/* Premium animated mesh background */}
       <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: 'var(--gradient-mesh)' }} />
       
@@ -228,16 +198,7 @@ export default function Auth() {
       <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-accent/25 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '6s', animationDelay: '1s', filter: 'blur(100px)' }} />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-lilac/20 rounded-full blur-3xl pointer-events-none" style={{ filter: 'blur(120px)' }} />
       
-      <div 
-        className="h-full flex flex-col lg:flex-row items-center justify-center relative z-10 gap-6 lg:gap-12"
-        style={{
-          paddingTop: 'max(1.5rem, env(safe-area-inset-top))',
-          paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))',
-          paddingLeft: '1rem',
-          paddingRight: '1rem',
-          minHeight: '100dvh'
-        }}
-      >
+      <div className="min-h-screen-ios flex flex-col lg:flex-row items-center justify-center px-4 py-6 sm:p-6 lg:p-12 relative z-10 gap-6 lg:gap-12">
         <div className="w-full mx-auto grid lg:grid-cols-2 gap-6 lg:gap-16 items-center" style={{ maxWidth: '1280px' }}>
           {/* Left side - Hero & Branding */}
           <div className="hidden lg:flex flex-col space-y-6 lg:space-y-8 text-white">
@@ -427,16 +388,6 @@ export default function Auth() {
                     )}
                   </p>
                 </div>
-              </div>
-
-              {/* Apoiadores section */}
-              <div className="mt-4 pt-4 flex flex-col items-center gap-2">
-                <p className="text-xs text-muted-foreground font-medium">Apoiadores</p>
-                <img 
-                  src={apoiadoresImage} 
-                  alt="Apoiadores" 
-                  className="h-8 sm:h-10 w-auto object-contain opacity-70"
-                />
               </div>
             </div>
           </div>

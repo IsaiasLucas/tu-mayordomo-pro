@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -85,59 +85,44 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
   const isPro = profile?.plan === 'pro' || profile?.plan === 'premium';
   const isEmpresa = profile?.entidad === 'empresa';
   
-  // Defensive rendering: safe profile construction with fallbacks
+
   const userProfile = {
     name: profile?.display_name || user?.user_metadata?.nombre || user?.email?.split('@')[0] || "Usuario",
     email: user?.email || "",
     phone: profile?.phone_personal || user?.user_metadata?.telefone || "No registrado",
     location: "Chile",
-    joinDate: user?.created_at 
-      ? new Date(user.created_at).toLocaleDateString('es-CL', { year: 'numeric', month: 'long' }) 
-      : "Fecha no disponible",
+    joinDate: new Date(user?.created_at || new Date()).toLocaleDateString('es-CL', { 
+      year: 'numeric', 
+      month: 'long' 
+    }),
     planType: profile?.plan || "free",
     totalTransactions: 0,
-    monthsActive: user?.created_at 
-      ? Math.ceil((new Date().getTime() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24 * 30))
-      : 0
+    monthsActive: Math.ceil((new Date().getTime() - new Date(user?.created_at || new Date()).getTime()) / (1000 * 60 * 60 * 24 * 30))
   };
 
   useEffect(() => {
     if (isEmpresa && user?.id) {
-      fetchInvitationCodes().catch((error) => {
-        console.error('Failed to fetch invitation codes:', error);
-        // Non-blocking error - just log it
-      });
+      fetchInvitationCodes();
     }
   }, [isEmpresa, user?.id]);
 
   const fetchInvitationCodes = async () => {
     try {
-      if (!user?.id) return;
-      
       const { data, error } = await supabase
         .from('invitation_codes')
         .select('*')
-        .eq('company_id', user.id)
+        .eq('company_id', user?.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       setInvitationCodes(data || []);
     } catch (error) {
       console.error('Error fetching invitation codes:', error);
-      // Non-blocking error - don't show toast to avoid disrupting UX
     }
   };
 
-  // Early return with loading state instead of crash
   if (!user) {
-    return (
-      <div className="screen flex items-center justify-center min-h-screen p-4">
-        <Card className="p-8 text-center max-w-md w-full">
-          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Cargando perfil...</p>
-        </Card>
-      </div>
-    );
+    return <div className="p-4">Cargando perfil...</div>;
   }
 
   const formatCLP = (amount: number) => {
@@ -156,12 +141,8 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
       // Clear state immediately (optimistic)
       localStorage.removeItem('app.activeTab');
       
-      // Perform logout with timeout
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Logout timeout')), 10000)
-      );
-      
-      await Promise.race([signOut(), timeoutPromise]);
+      // Perform logout
+      await signOut();
       
       // Navigate directly - no intermediate screens
       window.location.replace("/auth");
@@ -169,26 +150,14 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
       console.error("Error signing out:", error);
       // Even on error, force redirect to auth
       window.location.replace("/auth");
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleExportData = async () => {
     try {
-      // Defensive check for profile
-      if (!profile || !user) {
-        toast({
-          title: "Error",
-          description: "No hay datos de perfil disponibles para exportar.",
-          variant: "destructive",
-        });
-        return;
-      }
-
       // Filter out sensitive and technical fields from profile
-      const filteredProfile = {
-        email: profile.email || user.email,
+      const filteredProfile = profile ? {
+        email: profile.email,
         display_name: profile.display_name,
         phone_personal: profile.phone_personal,
         phone_empresa: profile.phone_empresa,
@@ -197,13 +166,13 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
         whatsapp_configured: profile.whatsapp_configured,
         created_at: profile.created_at,
         updated_at: profile.updated_at,
-      };
+      } : null;
 
       const dataToExport = {
         profile: filteredProfile,
         user: {
-          email: user.email,
-          created_at: user.created_at,
+          email: user?.email,
+          created_at: user?.created_at,
         },
         exported_at: new Date().toISOString(),
       };
@@ -223,7 +192,6 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
         description: "Tus datos fueron exportados con éxito.",
       });
     } catch (error) {
-      console.error('Export data error:', error);
       toast({
         title: "Error al exportar",
         description: "No fue posible exportar tus datos. Intenta nuevamente.",
@@ -296,17 +264,9 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
   const handleDeleteAccount = async () => {
     setLoading(true);
     try {
-      // Ensure we have a fresh session/token with timeout
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Session timeout')), 5000)
-      );
-      
-      const { data: sessionData } = await Promise.race([
-        supabase.auth.getSession(),
-        timeoutPromise
-      ]) as any;
-      
-      const accessToken = sessionData?.session?.access_token;
+      // Ensure we have a fresh session/token
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
 
       if (!accessToken) {
         // No valid session: force sign out and redirect
@@ -315,16 +275,10 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
         return;
       }
 
-      // Call edge function to delete user completely with timeout
-      const deletePromise = supabase.functions.invoke('delete-user', {
+      // Call edge function to delete user completely
+      const { error } = await supabase.functions.invoke('delete-user', {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      
-      const deleteTimeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Delete timeout')), 10000)
-      );
-      
-      const { error } = await Promise.race([deletePromise, deleteTimeout]) as any;
 
       if (error) throw error;
 
@@ -334,6 +288,7 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
       });
 
       // Always sign out and redirect after deletion
+      // Clear all localStorage data
       localStorage.removeItem('tm_phone');
       localStorage.removeItem('tm_nombre');
       
@@ -347,7 +302,6 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
         description: error?.message || "Intenta nuevamente más tarde.",
         variant: "destructive",
       });
-      
       // Clear all localStorage data
       localStorage.removeItem('tm_phone');
       localStorage.removeItem('tm_nombre');

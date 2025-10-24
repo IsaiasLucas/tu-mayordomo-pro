@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth } from './useAuth';
+import { useProfile } from './useProfile';
 
 interface AuthGuardState {
   isHydrating: boolean;
@@ -14,7 +15,8 @@ interface AuthGuardState {
  * Returns null for isAuthorized until hydration completes
  */
 export const useAuthGuard = () => {
-  const { isAuthenticated, loading, profile, isPro } = useAuth();
+  const { isAuthenticated, loading: authLoading, user, session } = useAuth();
+  const { profile, loading: profileLoading, isPro } = useProfile();
   
   const [state, setState] = useState<AuthGuardState>({
     isHydrating: true,
@@ -25,7 +27,8 @@ export const useAuthGuard = () => {
   });
 
   useEffect(() => {
-    const isHydrating = loading;
+    // Only mark as hydrated when both auth AND profile are loaded
+    const isHydrating = authLoading || profileLoading;
     const isAuthorized = !isHydrating && isAuthenticated;
 
     setState({
@@ -35,7 +38,7 @@ export const useAuthGuard = () => {
       isPro,
       profile,
     });
-  }, [loading, isAuthenticated, isPro, profile]);
+  }, [authLoading, profileLoading, isAuthenticated, isPro, profile]);
 
   return state;
 };

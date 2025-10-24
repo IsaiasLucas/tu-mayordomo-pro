@@ -1,7 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Button } from './ui/button';
-import { errorTracker } from '@/lib/errorTracking';
 
 interface Props {
   children: ReactNode;
@@ -23,15 +22,9 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log error silently with errorTracker
-    errorTracker.error('React error boundary caught error', error, 'ErrorBoundary');
+    console.error('ErrorBoundary caught error:', error, errorInfo);
     
-    // Ensure scroll is not locked after error
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
-    document.body.style.position = '';
-    
-    // Log to sessionStorage for debugging (non-intrusive)
+    // Log to external service if needed (non-intrusive)
     try {
       const errorLog = {
         error: error.message,
@@ -47,17 +40,13 @@ export class ErrorBoundary extends Component<Props, State> {
 
   private handleReset = () => {
     this.setState({ hasError: false, error: null });
-    // Ensure scroll is not locked before reload
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
-    document.body.style.position = '';
     window.location.href = '/';
   };
 
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-background p-4" style={{ overflow: 'auto' }}>
+        <div className="min-h-screen flex items-center justify-center bg-background p-4">
           <div className="max-w-md w-full bg-card border border-border rounded-2xl p-6 text-center space-y-4">
             <div className="flex justify-center">
               <div className="bg-destructive/10 rounded-full p-3">
@@ -69,19 +58,9 @@ export class ErrorBoundary extends Component<Props, State> {
                 Algo salió mal
               </h2>
               <p className="text-sm text-muted-foreground">
-                La aplicación encontró un error inesperado. No te preocupes, tus datos están seguros.
+                La aplicación encontró un error inesperado. Por favor, intenta nuevamente.
               </p>
             </div>
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="text-left">
-                <summary className="cursor-pointer text-sm font-medium mb-2">
-                  Detalles técnicos
-                </summary>
-                <pre className="text-xs bg-muted p-2 rounded overflow-auto max-h-32">
-                  {this.state.error.message}
-                </pre>
-              </details>
-            )}
             <Button 
               onClick={this.handleReset}
               className="w-full rounded-xl"

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useReportes } from "@/hooks/useReportes";
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -66,7 +66,6 @@ export default function ReportesView() {
     if (!user) return [];
 
     try {
-      // Use same date filtering as GastosView for consistency
       const startDateStr = format(startDate, 'yyyy-MM-dd');
       const endDateStr = format(endDate, 'yyyy-MM-dd');
       
@@ -79,13 +78,6 @@ export default function ReportesView() {
         .order('fecha', { ascending: false });
 
       if (error) throw error;
-      
-      console.log('[ReportesView] Fetched movements:', {
-        startDate: startDateStr,
-        endDate: endDateStr,
-        count: gastos?.length || 0
-      });
-      
       return gastos || [];
     } catch (error) {
       console.error("Error al cargar movimientos:", error);
@@ -195,20 +187,14 @@ export default function ReportesView() {
 
     loadPeriodData();
     
-    // Refetch when tab becomes visible or when date range changes
+    // Refetch when tab becomes visible
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        console.log('[ReportesView] Tab visible, refetching data');
         loadPeriodData();
       }
     };
     
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    // Cleanup scroll lock on mount
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
-    document.body.style.position = '';
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -392,11 +378,7 @@ export default function ReportesView() {
 
   if (!isPro) {
     return (
-      <main className="screen px-4 py-5 animate-fade-in" style={{ 
-        overflow: 'auto', 
-        WebkitOverflowScrolling: 'touch',
-        minHeight: '100dvh'
-      }}>
+      <main className="screen px-4 py-5 animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <Card className="shadow-card border-0">
           <CardContent className="p-8 sm:p-12 text-center">
             <div className="flex justify-center mb-6">
@@ -418,11 +400,7 @@ export default function ReportesView() {
   }
 
   return (
-    <main className="screen px-5 py-6 space-y-7 max-w-7xl mx-auto animate-fade-in" style={{ 
-      overflow: 'auto', 
-      WebkitOverflowScrolling: 'touch',
-      minHeight: '100dvh'
-    }}>
+    <main className="screen px-5 py-6 space-y-7 max-w-7xl mx-auto animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
       {/* Header */}
       <div className="space-y-3">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
