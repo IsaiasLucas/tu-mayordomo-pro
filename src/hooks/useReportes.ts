@@ -21,7 +21,7 @@ export function useReportes() {
   const [error, setError] = useState<any>(null);
 
   const fetchReportes = useCallback(async () => {
-    if (!user || !profile?.phone_personal) {
+    if (!user) {
       setLoading(false);
       return;
     }

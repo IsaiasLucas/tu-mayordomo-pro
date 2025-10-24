@@ -107,7 +107,7 @@ export default function Auth() {
         setShowEmailConfirmModal(true);
         
       } else {
-        // Login flow
+        // Login flow - SIEMPRE usar auth.users como fuente de verdad
         const redirectTo = 'https://tumayordomo.app/auth/callback';
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
@@ -149,7 +149,18 @@ export default function Auth() {
           return;
         }
 
-        // Sync identity después de signin exitoso
+        // Login exitoso - sincronizar profiles/usuarios por user_id
+        const user = data.user;
+        if (!user) {
+          toast({
+            title: "Error",
+            description: "No se pudo obtener los datos del usuario.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Sync identity: reconciliar profiles/usuarios por auth.uid()
         await syncUserProfile();
 
         toast({
@@ -157,7 +168,7 @@ export default function Auth() {
           description: "Cargando tus datos...",
         });
 
-        // Redirigir a inicio
+        // Redirigir a inicio para cargar gastos/plan/perfil por user_id
         window.location.replace('/inicio');
       }
     } catch (error: any) {
