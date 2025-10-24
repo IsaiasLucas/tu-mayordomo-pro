@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
+import { syncUserProfile } from "@/lib/syncUserProfile";
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     // Listen for auth changes FIRST to avoid missing events
@@ -15,8 +17,9 @@ export const useAuth = () => {
       setUser(session?.user ?? null);
 
       if (session?.user) {
-        // Defer any Supabase calls to avoid deadlocks
-        setTimeout(() => {
+        // Defer sync and profile fetch to avoid deadlocks
+        setTimeout(async () => {
+          await performSync();
           fetchProfile(session.user!.id);
         }, 0);
       } else {
@@ -26,10 +29,11 @@ export const useAuth = () => {
     });
 
     // Then get the initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        await performSync();
         fetchProfile(session.user.id);
       } else {
         setLoading(false);
@@ -38,6 +42,18 @@ export const useAuth = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const performSync = async () => {
+    if (syncing) return;
+    setSyncing(true);
+    try {
+      await syncUserProfile();
+    } catch (error) {
+      console.error('Error syncing profile:', error);
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -115,6 +131,7 @@ export const useAuth = () => {
     profile,
     loading,
     signOut,
-    isAuthenticated: !!session
+    isAuthenticated: !!session,
+    syncProfile: performSync
   };
 };

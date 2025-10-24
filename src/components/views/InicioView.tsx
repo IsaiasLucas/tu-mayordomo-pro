@@ -378,6 +378,7 @@ const formatMovimientoDate = (mov: any) => {
   return formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm");
 };
 
+  // Show WhatsApp card only if profile loaded and phone is NULL or empty
   const showWhatsappCard = perfilLoaded && (!perfil?.telefono || perfil.telefono.trim() === '');
 
   // Skeleton loading state

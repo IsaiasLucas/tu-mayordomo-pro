@@ -49,17 +49,18 @@ export default function Auth() {
       return;
     }
 
-
     setLoading(true);
 
     try {
+      const { syncUserProfile } = await import('@/lib/syncUserProfile');
+      
       if (isSignUp) {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-            options: {
-              emailRedirectTo: `${window.location.origin}/`,
-            }
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+          }
         });
 
         // Si el usuario ya existe, intentar hacer login automáticamente
@@ -88,23 +89,9 @@ export default function Auth() {
 
         if (error) throw error;
 
-        // Ensure usuarios row has correct defaults
+        // Sync profile after signup
         if (data.user) {
-          const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
-          await supabase
-            .from('usuarios')
-            .upsert({
-              user_id: data.user.id,
-              telefono: '',
-              plan: 'free',
-              reporte_mensual: true,
-              reporte_semanal: true,
-              usage_count: 0,
-              usage_month: currentMonth,
-              created_at: new Date().toISOString()
-            }, {
-              onConflict: 'user_id'
-            });
+          await syncUserProfile();
         }
 
         toast({
@@ -119,6 +106,9 @@ export default function Auth() {
         });
 
         if (error) throw error;
+
+        // Sync profile after signin
+        await syncUserProfile();
 
         toast({
           title: "Inicio de sesión exitoso",
