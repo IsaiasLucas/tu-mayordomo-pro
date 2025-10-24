@@ -20,9 +20,16 @@ export function useProfile() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(() => {
     if (user) {
-      const cached = profileCache.get(user.id);
-      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-        return cached.data;
+      // Verify cached data belongs to current user
+      const currentUserId = localStorage.getItem('tm_current_user_id');
+      if (currentUserId === user.id) {
+        const cached = profileCache.get(user.id);
+        if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+          return cached.data;
+        }
+      } else {
+        // Clear cache if user changed
+        profileCache.clear();
       }
     }
     return null;

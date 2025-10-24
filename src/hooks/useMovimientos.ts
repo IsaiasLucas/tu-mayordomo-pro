@@ -22,12 +22,19 @@ export function useMovimientos() {
   const { user } = useAuth();
   const [movimientos, setMovimientos] = useState<Movimiento[]>(() => {
     if (user) {
-      const now = getCurrentDateInSantiago();
-      const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-      const cacheKey = `${user.id}-${mes}`;
-      const cached = movimientosCache.get(cacheKey);
-      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-        return cached.data;
+      // Verify cached data belongs to current user
+      const currentUserId = localStorage.getItem('tm_current_user_id');
+      if (currentUserId === user.id) {
+        const now = getCurrentDateInSantiago();
+        const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const cacheKey = `${user.id}-${mes}`;
+        const cached = movimientosCache.get(cacheKey);
+        if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+          return cached.data;
+        }
+      } else {
+        // Clear cache if user changed
+        movimientosCache.clear();
       }
     }
     return [];

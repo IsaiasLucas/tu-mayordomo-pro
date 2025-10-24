@@ -40,12 +40,16 @@ export default function Auth() {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (mounted && session) {
+        // User is already authenticated, redirect to app
+        console.log('[Auth] User already authenticated, redirecting to /inicio');
         window.location.replace("/inicio");
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (mounted && session) {
+        // Authentication successful, redirect to app
+        console.log('[Auth] Authentication successful, redirecting to /inicio');
         window.location.replace("/inicio");
       }
     });

@@ -148,6 +148,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // Clear all caches when user changes (login/logout/switch account)
+      const previousUserId = localStorage.getItem('tm_current_user_id');
+      const currentUserId = session?.user?.id || null;
+      
+      if (previousUserId !== currentUserId) {
+        // User changed - clear all cached data
+        console.log('[AuthProvider] User changed, clearing caches');
+        localStorage.removeItem('tm_phone');
+        localStorage.removeItem('tm_nombre');
+        localStorage.removeItem('tm_movimientos_cache');
+        localStorage.removeItem('tm_all_movimientos_cache');
+        localStorage.removeItem('tm_show_balance');
+        sessionStorage.removeItem('profilePopupShown');
+        
+        // Update current user id
+        if (currentUserId) {
+          localStorage.setItem('tm_current_user_id', currentUserId);
+        } else {
+          localStorage.removeItem('tm_current_user_id');
+        }
+      }
+
       setSession(session);
       setUser(session?.user ?? null);
 
@@ -169,6 +191,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      // Check if this is a different user than cached
+      const previousUserId = localStorage.getItem('tm_current_user_id');
+      const currentUserId = session?.user?.id || null;
+      
+      if (previousUserId && currentUserId && previousUserId !== currentUserId) {
+        // Different user logged in - clear caches
+        console.log('[AuthProvider] Different user detected on load, clearing caches');
+        localStorage.removeItem('tm_phone');
+        localStorage.removeItem('tm_nome');
+        localStorage.removeItem('tm_movimientos_cache');
+        localStorage.removeItem('tm_all_movimientos_cache');
+        sessionStorage.removeItem('profilePopupShown');
+      }
+      
+      if (currentUserId) {
+        localStorage.setItem('tm_current_user_id', currentUserId);
+      }
+
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -189,12 +229,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     try {
+      // Clear ALL user-specific data
       localStorage.removeItem('tm_phone');
       localStorage.removeItem('tm_nombre');
       localStorage.removeItem('tm_movimientos_cache');
       localStorage.removeItem('tm_all_movimientos_cache');
       localStorage.removeItem('tm_show_balance');
       localStorage.removeItem('app.activeTab');
+      localStorage.removeItem('tm_current_user_id');
       sessionStorage.removeItem('profilePopupShown');
       
       await supabase.auth.signOut();
