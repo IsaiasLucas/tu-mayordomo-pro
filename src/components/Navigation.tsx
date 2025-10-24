@@ -7,7 +7,7 @@ interface NavigationProps {
   isPro: boolean;
 }
 
-const Navigation = ({ isPro }: NavigationProps) => {
+const Navigation = ({ isPro = false }: NavigationProps) => {
   const { activeTab, setActiveTab } = useActiveTab();
   
   const navigationItems = [{
