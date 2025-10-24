@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import Navigation from "@/components/Navigation";
@@ -19,11 +19,23 @@ const Index = () => {
   const [currentView, setCurrentView] = useState("inicio");
   const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const validViews = new Set(["inicio", "gastos", "reportes", "planes", "perfil"]);
 
   // Debug: Log current view changes
   useEffect(() => {
     console.log('📍 Current view changed to:', currentView);
   }, [currentView]);
+
+  // Sync currentView with URL ?tab= param
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab');
+    if (tab && validViews.has(tab) && tab !== currentView) {
+      console.log('🔗 Syncing currentView from URL:', tab);
+      setCurrentView(tab);
+    }
+  }, [location.search]);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -60,6 +72,10 @@ const Index = () => {
     // Use View Transitions API if available for seamless swaps
     const nav = () => {
       console.log('Setting currentView to:', target);
+      const nextSearch = `?tab=${target}`;
+      if (location.search !== nextSearch) {
+        navigate({ pathname: location.pathname, search: nextSearch }, { replace: false });
+      }
       setCurrentView(target);
     };
     // @ts-ignore - experimental API
@@ -79,8 +95,11 @@ const Index = () => {
   };
 
   const renderCurrentView = () => {
+    console.log('🎬 renderCurrentView called with currentView:', currentView);
+    
     switch (currentView) {
       case "inicio":
+        console.log('🏠 Rendering InicioView');
         return (
           <ViewTransition viewKey="inicio">
             <InicioView 
@@ -91,12 +110,14 @@ const Index = () => {
           </ViewTransition>
         );
       case "gastos":
+        console.log('💰 Rendering GastosView');
         return (
           <ViewTransition viewKey="gastos">
             <GastosView profile={profile} />
           </ViewTransition>
         );
       case "reportes":
+        console.log('📊 Rendering ReportesView (isPro:', isPro, ')');
         // This should never render for non-pro due to guard; render Planes when not pro without state changes
         return (
           <ViewTransition viewKey="reportes">
@@ -104,18 +125,21 @@ const Index = () => {
           </ViewTransition>
         );
       case "planes":
+        console.log('👑 Rendering PlanesView');
         return (
           <ViewTransition viewKey="planes">
             <PlanesView />
           </ViewTransition>
         );
       case "perfil":
+        console.log('👤 Rendering PerfilView');
         return (
           <ViewTransition viewKey="perfil">
             <PerfilView onViewChange={handleViewChange} />
           </ViewTransition>
         );
       default:
+        console.log('❓ Default case, rendering InicioView');
         return (
           <ViewTransition viewKey="inicio">
             <InicioView 
@@ -137,7 +161,9 @@ const Index = () => {
       />
       
       <main className="pb-24" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
-        {renderCurrentView()}
+        <div key={currentView} className="w-full">
+          {renderCurrentView()}
+        </div>
       </main>
 
       <CompleteProfileModal
