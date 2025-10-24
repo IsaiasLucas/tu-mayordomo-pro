@@ -7,8 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths, eachDayOfInterval, parseISO } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { es } from "date-fns/locale";
-import * as dateConfig from "@/lib/date-config";
-const { CHILE_TIMEZONE, chileDateOptions, formatDatabaseDate } = dateConfig;
+import { CHILE_TIMEZONE, chileDateOptions } from "@/lib/date-config";
+import { formatDatabaseDate } from "@/lib/date-config";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Download, FileText, Loader2, PieChart, Lock, Calendar, TrendingUp, TrendingDown, Activity, BarChart3, DollarSign, Receipt } from "lucide-react";
@@ -68,13 +68,17 @@ export default function ReportesView() {
     if (!phone) return [];
 
     try {
-      const { data: gastos, error } = await supabase
+      const phoneDigits = phone.replace(/\D/g, "");
+      const startISO = fromZonedTime(`${format(startDate, 'yyyy-MM-dd')}T00:00:00`, CHILE_TIMEZONE).toISOString();
+      const endISO = fromZonedTime(`${format(endDate, 'yyyy-MM-dd')}T23:59:59`, CHILE_TIMEZONE).toISOString();
+      
+      const { data: gastos, error } = await (supabase as any)
         .from('gastos')
         .select('*')
-        .eq('user_id', user!.id)
+        .eq('telefono', phoneDigits)
         .gte('fecha', format(startDate, 'yyyy-MM-dd'))
         .lte('fecha', format(endDate, 'yyyy-MM-dd'))
-        .order('created_at', { ascending: false });
+        .order('fecha', { ascending: false });
 
       if (error) throw error;
       return gastos || [];
@@ -142,6 +146,8 @@ export default function ReportesView() {
   useEffect(() => {
     const loadPeriodData = async () => {
       if (!isPro) return;
+      const phone = profile?.phone_personal || profile?.phone_empresa;
+      if (!phone) return;
       
       const now = new Date();
       let startDate: Date;
@@ -841,7 +847,7 @@ export default function ReportesView() {
                           ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
                           : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
                       )}>
-                        {formatDatabaseDate((mov as any).created_at || mov.fecha, "dd/MM HH:mm")}
+                        {formatDatabaseDate(mov.fecha, "dd/MM HH:mm")}
                        </span>
                       {mov.categoria && (
                         <span className="text-xs text-muted-foreground">• {mov.categoria}</span>
