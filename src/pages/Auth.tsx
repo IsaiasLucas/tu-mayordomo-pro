@@ -110,13 +110,18 @@ export default function Auth() {
 
         if (error) throw error;
 
-        // Sync profile after signin
+        // Sync identity después de signin
         await syncUserProfile();
 
         toast({
-          title: "Inicio de sesión exitoso",
-          description: "Bienvenido de nuevo",
+          title: "✅ Acceso exitoso",
+          description: "Cargando tus datos...",
         });
+
+        // Navegar a inicio después de sync
+        setTimeout(() => {
+          navigate('/inicio');
+        }, 500);
       }
     } catch (error: any) {
       // Log detailed error only in development

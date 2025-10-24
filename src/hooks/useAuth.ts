@@ -16,22 +16,16 @@ export const useAuth = () => {
       setSession(session);
       setUser(session?.user ?? null);
 
-      if (event === 'SIGNED_IN' && session?.user) {
-        // Cuando el usuario completa el registro por email, hacer refetch global
-        setTimeout(async () => {
-          await performSync();
-          fetchProfile(session.user!.id);
-          
-          // Redirigir a home si estamos en callback
-          if (window.location.pathname === '/auth/callback') {
-            window.location.replace('/');
-          }
-        }, 0);
-      } else if (session?.user) {
+      if (session?.user) {
         // Defer sync and profile fetch to avoid deadlocks
         setTimeout(async () => {
           await performSync();
-          fetchProfile(session.user!.id);
+          await fetchProfile(session.user!.id);
+          
+          // Redirigir a home si estamos en callback o auth
+          if (window.location.pathname === '/auth/callback' || window.location.pathname === '/auth') {
+            window.location.replace('/inicio');
+          }
         }, 0);
       } else {
         setProfile(null);
@@ -39,13 +33,13 @@ export const useAuth = () => {
       }
     });
 
-    // Then get the initial session
+    // Then get the initial session (boot con sesión válida)
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
         await performSync();
-        fetchProfile(session.user.id);
+        await fetchProfile(session.user.id);
       } else {
         setLoading(false);
       }
