@@ -41,11 +41,18 @@ export const useAuth = () => {
 
   const fetchProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
+      // Add timeout to prevent infinite hangs
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Profile fetch timeout')), 10000)
+      );
+      
+      const fetchPromise = supabase
         .from('profiles')
         .select('*')
         .eq('user_id', userId)
         .maybeSingle();
+      
+      const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching profile:', error);
@@ -72,30 +79,59 @@ export const useAuth = () => {
 
   const checkSubscriptionStatus = async () => {
     try {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      // Add timeout
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Session timeout')), 5000)
+      );
+      
+      const sessionPromise = supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await Promise.race([
+        sessionPromise, 
+        timeoutPromise
+      ]) as any;
+      
       if (sessionError || !session) {
         console.error('Session error:', sessionError);
         return;
       }
 
-      const { error: invokeError } = await supabase.functions.invoke("check-subscription", {
+      // Add timeout for subscription check
+      const checkTimeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Subscription check timeout')), 10000)
+      );
+      
+      const checkPromise = supabase.functions.invoke("check-subscription", {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
       });
+      
+      const { error: invokeError } = await Promise.race([
+        checkPromise,
+        checkTimeout
+      ]) as any;
 
       if (invokeError) {
         console.error('Check subscription error:', invokeError);
         return;
       }
       
-      // Refresh profile after check
+      // Refresh profile after check with timeout
       if (session.user) {
-        const { data: updatedProfile, error: profileError } = await supabase
+        const profileTimeout = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Profile update timeout')), 5000)
+        );
+        
+        const profilePromise = supabase
           .from('profiles')
           .select('*')
           .eq('user_id', session.user.id)
           .maybeSingle();
+        
+        const { data: updatedProfile, error: profileError } = await Promise.race([
+          profilePromise,
+          profileTimeout
+        ]) as any;
         
         if (!profileError && updatedProfile) {
           setProfile(updatedProfile);

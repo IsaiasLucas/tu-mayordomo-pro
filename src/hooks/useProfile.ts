@@ -46,11 +46,22 @@ export const useProfile = () => {
 
   const fetchProfile = async (): Promise<ProfileData | null> => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      // Add timeout
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('User fetch timeout')), 5000)
+      );
+      
+      const userPromise = supabase.auth.getUser();
+      const { data: { user } } = await Promise.race([userPromise, timeoutPromise]) as any;
+      
       if (!user) return null;
 
-      // Fetch both profiles and usuarios in parallel
-      const [profileResult, usuarioResult] = await Promise.all([
+      // Fetch both profiles and usuarios in parallel with timeout
+      const fetchTimeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Profile data fetch timeout')), 10000)
+      );
+      
+      const fetchPromise = Promise.all([
         supabase
           .from('profiles')
           .select('user_id, plan, profile_complete, phone_personal, phone_empresa, display_name, entidad')
@@ -62,6 +73,11 @@ export const useProfile = () => {
           .eq('user_id', user.id)
           .maybeSingle()
       ]);
+      
+      const [profileResult, usuarioResult] = await Promise.race([
+        fetchPromise,
+        fetchTimeout
+      ]) as any;
 
       if (profileResult.error && profileResult.error.code !== 'PGRST116') {
         console.error('Error fetching profile:', profileResult.error);
