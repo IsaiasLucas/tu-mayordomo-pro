@@ -561,6 +561,13 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
     { label: "Meses activo", value: userProfile.monthsActive, icon: Calendar },
   ];
 
+  // Ensure no persistent scroll lock when this view mounts
+  useEffect(() => {
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+  }, []);
+
   return (
     <div className="screen space-y-6 animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch', minHeight: '100dvh' }}>
       {/* Profile Header */}
