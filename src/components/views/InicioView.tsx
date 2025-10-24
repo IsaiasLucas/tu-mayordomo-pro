@@ -72,6 +72,11 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
       }
     };
 
+    // Cleanup scroll lock on mount
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+
     checkAndShowProfilePopup();
   }, [perfilLoaded, profile, onOpenProfileModal]);
 
@@ -381,7 +386,11 @@ const formatMovimientoDate = (mov: any) => {
   // WhatsApp configuration card
   if (showWhatsappCard) {
     return (
-      <main className="screen px-6 py-6 space-y-6 animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      <main className="screen px-6 py-6 space-y-6 animate-fade-in" style={{ 
+        overflow: 'auto', 
+        WebkitOverflowScrolling: 'touch',
+        minHeight: '100dvh'
+      }}>
         <Card className="shadow-card rounded-2xl border-2 border-primary">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
@@ -406,7 +415,11 @@ const formatMovimientoDate = (mov: any) => {
   }
 
   return (
-    <main className="screen px-6 py-6 space-y-6 animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+    <main className="screen px-6 py-6 space-y-6 animate-fade-in" style={{ 
+      overflow: 'auto', 
+      WebkitOverflowScrolling: 'touch',
+      minHeight: '100dvh'
+    }}>
       {/* Saldo do Mês */}
       <div className="bg-gradient-to-br from-primary to-primary-glow text-primary-foreground rounded-2xl p-7 shadow-card">
         <p className="text-base opacity-75 mb-2">Saldo del Mes</p>

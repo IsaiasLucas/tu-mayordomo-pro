@@ -36,10 +36,30 @@ const Index = () => {
       setMountedTabs(prev => new Set(prev).add(activeTab));
     }
     
-    // Cleanup scroll lock on tab change
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
-    document.body.style.position = '';
+    // Comprehensive scroll lock cleanup on tab change
+    const cleanupScrollLock = () => {
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+    };
+    
+    cleanupScrollLock();
+    
+    // Restore scroll position for the active tab
+    const scrollKey = `scroll-${activeTab}`;
+    const savedScroll = sessionStorage.getItem(scrollKey);
+    if (savedScroll) {
+      requestAnimationFrame(() => {
+        window.scrollTo(0, parseInt(savedScroll, 10));
+      });
+    }
+    
+    return () => {
+      // Save scroll position when leaving tab
+      sessionStorage.setItem(scrollKey, window.scrollY.toString());
+    };
   }, [activeTab, isHydrating, isAuthorized]);
 
   // Keep showing previous content while hydrating
@@ -60,7 +80,14 @@ const Index = () => {
     <div className="page w-full" style={{ minHeight: '100dvh', background: '#FFFFFF', position: 'relative' }}>
       <Navigation isPro={isPro} />
       
-      <main style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))', position: 'relative', minHeight: '100dvh' }}>
+      <main style={{ 
+        paddingTop: 'max(1rem, env(safe-area-inset-top))',
+        paddingBottom: 'calc(env(safe-area-inset-bottom) + 7rem)',
+        position: 'relative', 
+        minHeight: '100dvh',
+        overflow: 'auto',
+        WebkitOverflowScrolling: 'touch'
+      }}>
         {/* Keep all mounted tabs alive to prevent re-mount flicker */}
         {mountedTabs.has('inicio') && (
           <TabKeepAlive tabId="inicio" isActive={activeTab === 'inicio'}>

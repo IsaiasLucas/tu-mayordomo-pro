@@ -59,6 +59,8 @@ body {
   -webkit-tap-highlight-color: transparent;
   /* White background for internal pages */
   background: #FFFFFF;
+  /* Add bottom padding for tab bar + safe area */
+  padding-bottom: calc(env(safe-area-inset-bottom) + 6rem);
 }
 
 #root {

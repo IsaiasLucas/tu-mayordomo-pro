@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./App.tsx";
 import "./index.css";
 import { initMobileViewport } from "./lib/mobileViewport";
@@ -11,6 +12,22 @@ initMobileViewport();
 
 // Initialize error tracking
 errorTracker.info('Application starting', 'Main');
+
+// Create QueryClient with optimal settings for production PWA
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+      refetchOnWindowFocus: false, // Prevent unnecessary refetches
+    },
+  },
+});
+
+// Global scroll restoration - prevent automatic scroll on navigation
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
 
 // Global error handlers - enhanced with silent tracking
 window.addEventListener('unhandledrejection', (event) => {
@@ -38,7 +55,9 @@ window.addEventListener('error', (event) => {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ErrorBoundary>
-      <App />
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
     </ErrorBoundary>
   </StrictMode>
 );

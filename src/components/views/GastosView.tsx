@@ -277,7 +277,11 @@ const tableData = (data.items || []).map(mov => [
   const totalPages = Math.ceil((data.items || []).length / itemsPerPage);
 
   return (
-    <div className="screen p-4 sm:p-5 md:p-7 space-y-4 sm:space-y-5 md:space-y-7 animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+    <div className="screen p-4 sm:p-5 md:p-7 space-y-4 sm:space-y-5 md:space-y-7 animate-fade-in" style={{ 
+      overflow: 'auto', 
+      WebkitOverflowScrolling: 'touch',
+      minHeight: '100dvh'
+    }}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-5">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Gastos</h1>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center w-full sm:w-auto">
