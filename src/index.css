@@ -37,21 +37,11 @@ html {
   -webkit-overflow-scrolling: touch;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  /* iOS safe area - purple gradient background */
-  background: linear-gradient(180deg, #A46BFF 0%, #8E5BFF 100%);
-  background-attachment: fixed;
+  /* iOS safe area insets */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* Fixed background layer for seamless gradient */
-html::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(180deg, #A46BFF 0%, #8E5BFF 100%);
-  z-index: -1;
-  pointer-events: none;
+  /* White background for internal pages */
+  background: #FFFFFF;
 }
 
 body {
@@ -67,8 +57,8 @@ body {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   -webkit-tap-highlight-color: transparent;
-  /* Transparent background - inherit from html */
-  background: transparent;
+  /* White background for internal pages */
+  background: #FFFFFF;
 }
 
 #root {
@@ -88,8 +78,8 @@ body {
   padding-top: 0;
   /* Bottom padding handled by html/body */
   padding-bottom: 0;
-  /* Transparent background - inherit from html */
-  background: transparent;
+  /* White background for internal pages */
+  background: #FFFFFF;
 }
 
 /* Prevent pull-to-refresh on mobile */

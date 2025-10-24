@@ -189,7 +189,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="w-full min-h-screen-ios relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ background: 'transparent', paddingTop: 'max(1rem, env(safe-area-inset-top))', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+    <div className="w-full min-h-screen-ios relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ background: 'linear-gradient(180deg, #A46BFF 0%, #8E5BFF 100%)', paddingTop: 'max(1rem, env(safe-area-inset-top))', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
       {/* Premium animated mesh background */}
       <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: 'var(--gradient-mesh)' }} />
       
