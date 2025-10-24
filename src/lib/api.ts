@@ -25,13 +25,3 @@ export const fmtCLP = (n: number) =>
     currency: "CLP",
     maximumFractionDigits: 0,
   }).format(Number(n || 0));
-
-export const getTel = () =>
-  (typeof window !== "undefined" && localStorage.getItem("telefono")) || "";
-
-export const setTel = (raw: string) => {
-  const digits = raw.trim().replace(/\D/g, "");
-  const tel = digits.startsWith("56") ? digits : "56" + digits;
-  localStorage.setItem("telefono", tel);
-  return tel;
-};

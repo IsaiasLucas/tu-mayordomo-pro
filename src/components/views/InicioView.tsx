@@ -63,8 +63,14 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
       // Check if popup was already shown in this session
       if (sessionStorage.getItem('profilePopupShown')) return;
 
-      // Only show popup if profile is not complete (new account)
-      const showPopup = profile.usuario_profile_complete === false || !profile.telefono;
+      // Only show popup if profile is truly incomplete (both checks must be false)
+      // Don't show if user already has whatsapp configured and profile complete
+      const profileNotComplete = profile.profile_complete === false;
+      const whatsappNotConfigured = profile.whatsapp_configured === false;
+      const hasNoPhone = !profile.phone_personal && !profile.phone_empresa;
+      
+      // Show popup only if profile is not complete AND (whatsapp not configured OR no phone)
+      const showPopup = profileNotComplete && (whatsappNotConfigured || hasNoPhone);
 
       if (showPopup) {
         onOpenProfileModal();
@@ -130,7 +136,7 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
   const variacionDiaria = calcularVariacionDiaria();
 
   useEffect(() => {
-    const checkUsuarioPhone = async () => {
+    const checkUsuarioData = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
@@ -148,46 +154,53 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
         setPerfil(usuario || null);
         setPerfilLoaded(true);
 
-        // Check if telefono exists and is not empty
+        // Use user_id as cache key instead of phone
+        const currentUserId = user.id;
+        const cachedUserId = localStorage.getItem("tm_user_id");
+        
+        // Clear cache if user changed (different user logged in)
+        if (cachedUserId && cachedUserId !== currentUserId) {
+          localStorage.removeItem('tm_movimientos_cache');
+          localStorage.removeItem('tm_all_movimientos_cache');
+          localStorage.removeItem('tm_phone');
+          localStorage.removeItem('tm_nombre');
+          setMovimientos([]);
+          setAllMovimientos([]);
+        }
+        
+        // Store current user_id
+        localStorage.setItem("tm_user_id", currentUserId);
+        
+        // Store phone if available (for display purposes only, not for queries)
         if (usuario?.telefono && usuario.telefono.trim() !== '') {
-          const phoneDigits = usuario.telefono;
-          const cachedPhone = localStorage.getItem("tm_phone")?.replace(/\D/g, "");
-          
-          // Clear cache if phone changed (different user)
-          if (cachedPhone && cachedPhone !== phoneDigits) {
-            localStorage.removeItem('tm_movimientos_cache');
-            localStorage.removeItem('tm_all_movimientos_cache');
-            setMovimientos([]);
-            setAllMovimientos([]);
-          }
-          
-          setPhone(phoneDigits);
-          localStorage.setItem("tm_phone", phoneDigits);
-          
-          // Initial load
-          fetchMovimientos();
-          fetchAllMovimientos();
-          
-          // Setup Realtime subscriptions for recent and all movements
-          const recentChannel = supabase
-            .channel('inicio-gastos-recent')
-            .on(
-              'postgres_changes',
-              {
-                event: '*',
-                schema: 'public',
-                table: 'gastos'
-              },
-              async (payload) => {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) return;
-                
-                if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
-                  fetchMovimientosUpdate();
-                }
+          setPhone(usuario.telefono);
+          localStorage.setItem("tm_phone", usuario.telefono);
+        }
+        
+        // Initial load - now based on user_id, not phone
+        fetchMovimientos();
+        fetchAllMovimientos();
+        
+        // Setup Realtime subscriptions for recent and all movements
+        const recentChannel = supabase
+          .channel('inicio-gastos-recent')
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'gastos'
+            },
+            async (payload) => {
+              const { data: { user } } = await supabase.auth.getUser();
+              if (!user) return;
+              
+              if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
+                fetchMovimientosUpdate();
               }
-            )
-            .subscribe();
+            }
+          )
+          .subscribe();
 
           const allChannel = supabase
             .channel('inicio-gastos-all')
@@ -221,21 +234,13 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
             supabase.removeChannel(allChannel);
             clearInterval(pollingInterval);
           };
-        } else {
-          console.log('No telefono found in usuarios table');
-          localStorage.removeItem("tm_phone");
-          localStorage.removeItem('tm_movimientos_cache');
-          localStorage.removeItem('tm_all_movimientos_cache');
-          setMovimientos([]);
-          setAllMovimientos([]);
-        }
       } catch (error) {
-        console.error('Error checking usuario phone:', error);
+        console.error('Error checking usuario data:', error);
         setPerfilLoaded(true);
       }
     };
 
-    checkUsuarioPhone();
+    checkUsuarioData();
   }, [profile]);
 
   // Listen for changes in showBalance preference

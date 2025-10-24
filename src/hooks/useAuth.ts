@@ -93,12 +93,13 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
-    // Clear all localStorage data on logout
+    // Clear all localStorage and sessionStorage data on logout
     localStorage.removeItem('tm_phone');
     localStorage.removeItem('tm_nombre');
     localStorage.removeItem('tm_movimientos_cache');
     localStorage.removeItem('tm_all_movimientos_cache');
     localStorage.removeItem('tm_show_balance');
+    localStorage.removeItem('telefono'); // Remove old phone storage
     sessionStorage.removeItem('profilePopupShown');
     
     // Clear profile cache

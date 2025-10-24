@@ -24,9 +24,18 @@ export function useFacturas(accountId?: string) {
   const fetchFacturas = async () => {
     try {
       setLoading(true);
+      
+      // Get authenticated user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
       let query = supabase
         .from('facturas_boletas')
         .select('*')
+        .eq('user_id', user.id)
         .order('fecha_documento', { ascending: false });
 
       if (accountId) {
