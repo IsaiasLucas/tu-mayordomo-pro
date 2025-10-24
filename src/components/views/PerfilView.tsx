@@ -137,17 +137,19 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
   const handleSignOut = async () => {
     try {
       setLoading(true);
+      
+      // Clear state immediately (optimistic)
+      localStorage.removeItem('app.activeTab');
+      
+      // Perform logout
       await signOut();
-      // Use window.location for reliable redirect
-      window.location.href = "/auth";
+      
+      // Navigate directly - no intermediate screens
+      window.location.replace("/auth");
     } catch (error) {
       console.error("Error signing out:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo cerrar sesión. Intenta nuevamente.",
-        variant: "destructive",
-      });
-      setLoading(false);
+      // Even on error, force redirect to auth
+      window.location.replace("/auth");
     }
   };
 

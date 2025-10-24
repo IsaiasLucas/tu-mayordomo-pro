@@ -375,20 +375,8 @@ const formatMovimientoDate = (mov: any) => {
 
   const showWhatsappCard = perfilLoaded && (!perfil?.telefono || perfil.telefono.trim() === '');
 
-  // Skeleton loading state
-  if (!perfilLoaded) {
-    return (
-      <main className="px-6 py-6 pb-32 space-y-6 animate-fade-in">
-        <Skeleton className="h-36 w-full rounded-2xl" />
-        <Skeleton className="h-28 w-full rounded-2xl" />
-        <div className="grid grid-cols-2 gap-5">
-          <Skeleton className="h-28 w-full rounded-2xl" />
-          <Skeleton className="h-28 w-full rounded-2xl" />
-        </div>
-        <Skeleton className="h-56 w-full rounded-2xl" />
-      </main>
-    );
-  }
+  // No skeleton - keep previous content or show empty state
+  // Removed skeleton loading to prevent flash screens
 
   // WhatsApp configuration card
   if (showWhatsappCard) {
@@ -505,16 +493,9 @@ const formatMovimientoDate = (mov: any) => {
               </AlertDescription>
             </Alert>
           ) : loadingMovimientos ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center justify-between p-4 sm:p-5 rounded-lg sm:rounded-xl border">
-                  <div className="flex-1 space-y-2 sm:space-y-2.5">
-                    <Skeleton className="h-4 sm:h-5 w-24 sm:w-28" />
-                    <Skeleton className="h-5 sm:h-6 w-36 sm:w-44" />
-                  </div>
-                  <Skeleton className="h-6 sm:h-7 w-20 sm:w-24" />
-                </div>
-              ))}
+            // No skeleton - show empty state or keep previous
+            <div className="text-center py-8 sm:py-10 text-muted-foreground text-base sm:text-lg">
+              Cargando movimientos...
             </div>
           ) : movimientos.length === 0 ? (
             <div className="text-center py-8 sm:py-10 text-muted-foreground text-base sm:text-lg">

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { useProfile } from "@/hooks/useProfile";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 import Navigation from "@/components/Navigation";
 import InicioView from "@/components/views/InicioView";
 import GastosView from "@/components/views/GastosView";
@@ -10,112 +9,87 @@ import PlanesView from "@/components/views/PlanesView";
 import PerfilView from "@/components/views/PerfilView";
 import CompleteProfileModal from "@/components/CompleteProfileModal";
 import InstallPrompt from "@/components/InstallPrompt";
-import { ViewTransition } from "@/components/ViewTransition";
-import { Skeleton } from "@/components/ui/skeleton";
+import { TabKeepAlive } from "@/components/TabKeepAlive";
 import { useActiveTab, ActiveTab } from "@/store/appState";
+import { useProfile } from "@/hooks/useProfile";
+
 const Index = () => {
-  const { isAuthenticated, loading: authLoading } = useAuth();
-  const { profile, loading: profileLoading, isPro, refreshProfile } = useProfile();
-  const { activeTab, setActiveTab } = useActiveTab();
-  const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
-  // Redirect if not authenticated
+  const { isHydrating, isAuthorized, isAuthenticated, isPro, profile } = useAuthGuard();
+  const { activeTab, setActiveTab } = useActiveTab();
+  const { refreshProfile } = useProfile();
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  
+  // Keep track of which tabs have been mounted
+  const [mountedTabs, setMountedTabs] = useState<Set<ActiveTab>>(new Set(['inicio']));
+
+  // Redirect if not authenticated (only after hydration completes)
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate("/auth");
+    if (!isHydrating && !isAuthenticated) {
+      navigate("/auth", { replace: true });
     }
-  }, [isAuthenticated, authLoading, navigate]);
+  }, [isHydrating, isAuthenticated, navigate]);
 
-  // Removed URL sync: single source of truth is global app.activeTab
+  // Mount tab when it becomes active
+  useEffect(() => {
+    if (!isHydrating && isAuthorized) {
+      setMountedTabs(prev => new Set(prev).add(activeTab));
+    }
+  }, [activeTab, isHydrating, isAuthorized]);
 
-  // Show loading skeleton while auth or profile are loading
-  if (authLoading || profileLoading) {
-    return (
-      <div className="w-full bg-background" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)' }}>
-        <div className="px-6 py-6 pb-32 space-y-6">
-          <Skeleton className="h-36 w-full rounded-2xl" />
-          <Skeleton className="h-28 w-full rounded-2xl" />
-          <div className="grid grid-cols-2 gap-5">
-            <Skeleton className="h-28 w-full rounded-2xl" />
-            <Skeleton className="h-28 w-full rounded-2xl" />
-          </div>
-          <Skeleton className="h-56 w-full rounded-2xl" />
-        </div>
-      </div>
-    );
+  // Keep showing previous content while hydrating
+  if (isHydrating && !isAuthenticated) {
+    return null; // First load, nothing to show
   }
 
   const handleViewChange = (view: string) => {
-    const set = () => setActiveTab(view as ActiveTab);
-    // @ts-ignore - experimental API
-    const startVT = (document as any).startViewTransition;
-    if (typeof startVT === 'function') {
-      startVT(set);
-    } else {
-      set();
-    }
-  };
-  const handleModalClose = async () => {
-    setShowProfileModal(false);
-    // Refresh profile after modal closes
-    await refreshProfile();
+    setActiveTab(view as ActiveTab);
   };
 
-  const renderCurrentView = () => {
-    switch (activeTab) {
-      case "inicio":
-        return (
-          <ViewTransition viewKey="inicio">
-            <InicioView 
-              profile={profile}
-              onOpenProfileModal={() => setShowProfileModal(true)} 
-              onViewChange={handleViewChange} 
-            />
-          </ViewTransition>
-        );
-      case "gastos":
-        return (
-          <ViewTransition viewKey="gastos">
-            <GastosView profile={profile} />
-          </ViewTransition>
-        );
-      case "reportes":
-        return (
-          <ViewTransition viewKey="reportes">
-            <ReportesView />
-          </ViewTransition>
-        );
-      case "planes":
-        return (
-          <ViewTransition viewKey="planes">
-            <PlanesView />
-          </ViewTransition>
-        );
-      case "perfil":
-        return (
-          <ViewTransition viewKey="perfil">
-            <PerfilView onViewChange={handleViewChange} />
-          </ViewTransition>
-        );
-      default:
-        return (
-          <ViewTransition viewKey="inicio">
-            <InicioView 
-              profile={profile}
-              onOpenProfileModal={() => setShowProfileModal(true)} 
-              onViewChange={handleViewChange} 
-            />
-          </ViewTransition>
-        );
-    }
+  const handleModalClose = async () => {
+    setShowProfileModal(false);
+    await refreshProfile();
   };
 
   return (
     <div className="w-full bg-background overflow-y-auto overflow-x-hidden" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)' }}>
       <Navigation isPro={isPro} />
       
-      <main key={activeTab} className="pb-24" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
-        {renderCurrentView()}
+      <main className="pb-24" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
+        {/* Keep all mounted tabs alive to prevent re-mount flicker */}
+        {mountedTabs.has('inicio') && (
+          <TabKeepAlive tabId="inicio" isActive={activeTab === 'inicio'}>
+            <InicioView 
+              profile={profile}
+              onOpenProfileModal={() => setShowProfileModal(true)} 
+              onViewChange={handleViewChange} 
+            />
+          </TabKeepAlive>
+        )}
+        
+        {mountedTabs.has('gastos') && (
+          <TabKeepAlive tabId="gastos" isActive={activeTab === 'gastos'}>
+            <GastosView profile={profile} />
+          </TabKeepAlive>
+        )}
+        
+        {mountedTabs.has('reportes') && (
+          <TabKeepAlive tabId="reportes" isActive={activeTab === 'reportes'}>
+            <ReportesView />
+          </TabKeepAlive>
+        )}
+        
+        {mountedTabs.has('planes') && (
+          <TabKeepAlive tabId="planes" isActive={activeTab === 'planes'}>
+            <PlanesView />
+          </TabKeepAlive>
+        )}
+        
+        {mountedTabs.has('perfil') && (
+          <TabKeepAlive tabId="perfil" isActive={activeTab === 'perfil'}>
+            <PerfilView onViewChange={handleViewChange} />
+          </TabKeepAlive>
+        )}
       </main>
 
       <CompleteProfileModal

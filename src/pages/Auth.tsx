@@ -22,20 +22,25 @@ export default function Auth() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let mounted = true;
+
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate("/inicio");
+      if (mounted && session) {
+        window.location.replace("/inicio");
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        navigate("/inicio");
+      if (mounted && session) {
+        window.location.replace("/inicio");
       }
     });
 
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

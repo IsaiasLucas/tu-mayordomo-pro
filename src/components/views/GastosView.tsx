@@ -335,29 +335,8 @@ const tableData = (data.items || []).map(mov => [
         </CardHeader>
         <CardContent className="px-5 sm:px-7">
           {loading ? (
-            <div className="space-y-3">
-              <div className="overflow-x-auto -mx-4 sm:mx-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Fecha</TableHead>
-                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5">Descripción</TableHead>
-                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Tipo</TableHead>
-                      <TableHead className="text-right text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Monto</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                      <TableRow key={i}>
-                        <TableCell className="py-4 sm:py-5"><Skeleton className="h-5 sm:h-6 w-24 sm:w-28" /></TableCell>
-                        <TableCell className="py-4 sm:py-5"><Skeleton className="h-5 sm:h-6 w-40 sm:w-48" /></TableCell>
-                        <TableCell className="py-4 sm:py-5"><Skeleton className="h-6 sm:h-7 w-20 sm:w-24" /></TableCell>
-                        <TableCell className="text-right py-4 sm:py-5"><Skeleton className="h-5 sm:h-6 w-20 sm:w-24 ml-auto" /></TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+            <div className="text-center py-8 sm:py-10 text-muted-foreground text-base sm:text-lg">
+              Cargando movimientos...
             </div>
           ) : (
             <>
