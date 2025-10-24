@@ -37,7 +37,7 @@ const Navigation = ({
       {/* WhatsApp Floating Button - Only on Inicio */}
       {currentView === "inicio" && (
         <div 
-          className="fixed z-50 flex justify-end items-center px-4"
+          className="fixed z-[100] flex justify-end items-center px-4 pointer-events-auto"
           style={{ 
             bottom: 'calc(env(safe-area-inset-bottom) + 6.5rem)',
             right: '1rem'
@@ -63,7 +63,7 @@ const Navigation = ({
 
       {/* Navigation Bar */}
       <div 
-        className="fixed left-0 right-0 z-50 flex justify-center items-center px-4"
+        className="fixed left-0 right-0 z-[100] flex justify-center items-center px-4 pointer-events-auto"
         style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}
       >
       <nav className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-[1.5rem] shadow-2xl transition-all duration-300 ease-out">
@@ -85,6 +85,8 @@ const Navigation = ({
             return (
               <button
                 key={item.id}
+                type="button"
+                aria-label={item.label}
                 onClick={handleClick}
                 className={cn(
                   "flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ease-out touch-manipulation relative",
