@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Eye, EyeOff, Sparkles, TrendingUp, Shield, Zap } from "lucide-react";
 import fintechHero from "@/assets/fintech-hero.png";
+import apoiadoresImage from "@/assets/apoiadores.png";
 
 export default function Auth() {
   const [loading, setLoading] = useState(false);
@@ -388,6 +389,16 @@ export default function Auth() {
                     )}
                   </p>
                 </div>
+              </div>
+
+              {/* Apoiadores section */}
+              <div className="mt-4 pt-4 flex flex-col items-center gap-2">
+                <p className="text-xs text-muted-foreground font-medium">Apoiadores</p>
+                <img 
+                  src={apoiadoresImage} 
+                  alt="Apoiadores" 
+                  className="h-8 sm:h-10 w-auto object-contain opacity-70"
+                />
               </div>
             </div>
           </div>
