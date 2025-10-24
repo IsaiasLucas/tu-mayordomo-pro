@@ -61,6 +61,34 @@ export const useAuth = () => {
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching profile:', error);
         setProfile(null);
+      } else if (!data) {
+        // Attempt to re-link existing data to this user based on email
+        try {
+          const { data: sessionData } = await supabase.auth.getSession();
+          const session = sessionData?.session;
+          if (session) {
+            await supabase.functions.invoke('link-user-data', {
+              headers: { Authorization: `Bearer ${session.access_token}` },
+            });
+            // Re-fetch profile after potential link
+            const { data: linked, error: linkFetchErr } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('user_id', userId)
+              .maybeSingle();
+            if (!linkFetchErr) {
+              setProfile(linked);
+            } else {
+              console.error('Re-fetch after link failed:', linkFetchErr);
+              setProfile(null);
+            }
+          } else {
+            setProfile(null);
+          }
+        } catch (e) {
+          console.error('Link user data failed:', e);
+          setProfile(null);
+        }
       } else {
         setProfile(data);
         
