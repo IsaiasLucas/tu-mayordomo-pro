@@ -2,9 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Page/Screen containers with bottom padding for tab bar */
+.page,
+.screen,
+main {
+  min-height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  scroll-padding-bottom: calc(72px + env(safe-area-inset-bottom));
+}
+
 /* Custom CSS variable for real viewport height (fixes iOS address bar issue) */
 :root {
   --vh: 1vh;
+  --tabbar-height: 72px;
 }
 
 /* Mobile viewport fix - Full-screen PWA behavior */
@@ -14,6 +27,7 @@ html {
   min-height: 100vh;
   min-height: 100svh;
   min-height: 100dvh;
+  height: auto;
   margin: 0;
   padding: 0;
   overflow-x: hidden;
@@ -44,6 +58,7 @@ body {
   min-height: 100vh;
   min-height: 100svh;
   min-height: 100dvh;
+  height: auto;
   margin: 0;
   padding: 0;
   overflow-x: hidden;
@@ -100,6 +115,16 @@ body {
 /* Modal body lock */
 body.modal-open {
   overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* Hidden overlays must not block touches */
+.app-modal-overlay[hidden],
+.overlay-hidden,
+[data-state="closed"] {
+  display: none !important;
+  pointer-events: none !important;
 }
 
 /* Prevent horizontal overflow */

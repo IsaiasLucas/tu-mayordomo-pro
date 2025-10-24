@@ -35,6 +35,11 @@ const Index = () => {
     if (!isHydrating && isAuthorized) {
       setMountedTabs(prev => new Set(prev).add(activeTab));
     }
+    
+    // Cleanup scroll lock on tab change
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.position = '';
   }, [activeTab, isHydrating, isAuthorized]);
 
   // Keep showing previous content while hydrating
@@ -52,10 +57,10 @@ const Index = () => {
   };
 
   return (
-    <div className="w-full bg-background overflow-y-auto overflow-x-hidden" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)' }}>
+    <div className="page w-full bg-background" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)' }}>
       <Navigation isPro={isPro} />
       
-      <main className="pb-24" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
+      <main style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
         {/* Keep all mounted tabs alive to prevent re-mount flicker */}
         {mountedTabs.has('inicio') && (
           <TabKeepAlive tabId="inicio" isActive={activeTab === 'inicio'}>

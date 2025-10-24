@@ -33,6 +33,8 @@ const AlertDialogContent = React.forwardRef<
     document.body.classList.add('modal-open');
     return () => {
       document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+      document.body.style.position = '';
     };
   }, []);
 
