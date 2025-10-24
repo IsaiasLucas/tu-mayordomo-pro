@@ -86,6 +86,11 @@ body {
   background-position: center;
 }
 
+/* Modal body lock */
+body.modal-open {
+  overflow: hidden;
+}
+
 /* Prevent horizontal overflow */
 * {
   max-width: 100%;
