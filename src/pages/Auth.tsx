@@ -381,7 +381,7 @@ export default function Auth() {
                   <img 
                     src={geminisLogo} 
                     alt="Geminis" 
-                    className="h-28 sm:h-32 w-auto opacity-90 hover:opacity-100 transition-opacity -mt-1"
+                    className="h-28 sm:h-32 w-auto opacity-90 hover:opacity-100 transition-opacity -mt-3"
                   />
                 </div>
               </div>
