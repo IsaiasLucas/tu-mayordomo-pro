@@ -7,11 +7,13 @@
 .screen,
 main {
   min-height: 100dvh;
-  overflow-y: auto;
+  overflow-y: auto !important;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   padding-bottom: calc(var(--tabbar-height, 72px) + env(safe-area-inset-bottom));
   scroll-padding-bottom: calc(var(--tabbar-height, 72px) + env(safe-area-inset-bottom));
+  /* Ensure scroll is never disabled */
+  touch-action: pan-y;
 }
 
 /* Custom CSS variable for real viewport height (fixes iOS address bar issue) */
@@ -104,9 +106,15 @@ body {
 
 /* Modal body lock */
 body.modal-open {
-  overflow: hidden;
+  overflow: hidden !important;
   position: fixed;
   width: 100%;
+}
+
+/* Remove modal lock on close */
+body:not(.modal-open) {
+  overflow: auto !important;
+  position: relative;
 }
 
 /* Hidden overlays must not block touches */

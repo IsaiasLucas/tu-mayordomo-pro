@@ -378,7 +378,7 @@ export default function ReportesView() {
 
   if (!isPro) {
     return (
-      <main className="px-4 py-5 animate-fade-in">
+      <main className="screen px-4 py-5 animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <Card className="shadow-card border-0">
           <CardContent className="p-8 sm:p-12 text-center">
             <div className="flex justify-center mb-6">
@@ -400,7 +400,7 @@ export default function ReportesView() {
   }
 
   return (
-    <main className="px-5 py-6 space-y-7 pb-28 max-w-7xl mx-auto animate-fade-in">
+    <main className="screen px-5 py-6 space-y-7 max-w-7xl mx-auto animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
       {/* Header */}
       <div className="space-y-3">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">

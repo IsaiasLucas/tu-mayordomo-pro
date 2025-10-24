@@ -256,7 +256,7 @@ export default function PlanesView() {
   const currentPlan = profile?.plan || "free";
   const hasActivePlan = currentPlan !== "free";
   const isProPlan = currentPlan === "mensal" || currentPlan === "anual" || currentPlan !== "free" && currentPlan !== "";
-  return <main className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50 to-blue-50 p-4 pb-20 animate-fade-in">
+  return <main className="screen min-h-screen bg-gradient-to-br from-gray-50 via-purple-50 to-blue-50 p-4 animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
       {/* Header */}
       <div className="text-center mb-10 pt-4 animate-fade-in">
         <div className="inline-flex items-center gap-2 mb-3 bg-white px-4 py-2 rounded-full shadow-sm">

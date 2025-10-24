@@ -57,10 +57,10 @@ const Index = () => {
   };
 
   return (
-    <div className="page w-full" style={{ minHeight: '100dvh', background: 'transparent' }}>
+    <div className="page w-full" style={{ minHeight: '100dvh', background: 'transparent', position: 'relative' }}>
       <Navigation isPro={isPro} />
       
-      <main style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
+      <main style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))', position: 'relative', minHeight: '100dvh' }}>
         {/* Keep all mounted tabs alive to prevent re-mount flicker */}
         {mountedTabs.has('inicio') && (
           <TabKeepAlive tabId="inicio" isActive={activeTab === 'inicio'}>

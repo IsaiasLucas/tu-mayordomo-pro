@@ -381,7 +381,7 @@ const formatMovimientoDate = (mov: any) => {
   // WhatsApp configuration card
   if (showWhatsappCard) {
     return (
-      <main className="px-6 py-6 pb-32 space-y-6 animate-fade-in">
+      <main className="screen px-6 py-6 space-y-6 animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <Card className="shadow-card rounded-2xl border-2 border-primary">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
@@ -406,7 +406,7 @@ const formatMovimientoDate = (mov: any) => {
   }
 
   return (
-    <main className="px-6 py-6 pb-32 space-y-6 animate-fade-in">
+    <main className="screen px-6 py-6 space-y-6 animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
       {/* Saldo do Mês */}
       <div className="bg-gradient-to-br from-primary to-primary-glow text-primary-foreground rounded-2xl p-7 shadow-card">
         <p className="text-base opacity-75 mb-2">Saldo del Mes</p>

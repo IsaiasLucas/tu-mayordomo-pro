@@ -9,15 +9,13 @@ interface TabKeepAliveProps {
 /**
  * Keeps tab content mounted but hidden when not active
  * Prevents re-mount flicker and preserves state
+ * Uses position/visibility instead of display:none to preserve scroll
  */
 export const TabKeepAlive = memo(({ children, tabId, isActive }: TabKeepAliveProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (containerRef.current) {
-      // Keep in DOM but hide with CSS
-      containerRef.current.style.display = isActive ? 'block' : 'none';
-      
       // Accessibility: hide from screen readers when not active
       containerRef.current.setAttribute('aria-hidden', String(!isActive));
       
@@ -35,9 +33,16 @@ export const TabKeepAlive = memo(({ children, tabId, isActive }: TabKeepAlivePro
       ref={containerRef}
       data-tab-id={tabId}
       style={{
-        display: isActive ? 'block' : 'none',
+        // Use position/visibility instead of display:none to preserve scroll
+        position: isActive ? 'relative' : 'absolute',
+        visibility: isActive ? 'visible' : 'hidden',
+        opacity: isActive ? 1 : 0,
+        pointerEvents: isActive ? 'auto' : 'none',
         width: '100%',
-        height: '100%',
+        minHeight: '100%',
+        top: 0,
+        left: 0,
+        zIndex: isActive ? 1 : -1,
       }}
     >
       {children}
