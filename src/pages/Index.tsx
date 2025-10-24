@@ -77,16 +77,20 @@ const Index = () => {
   };
 
   return (
-    <div className="page w-full" style={{ minHeight: '100dvh', background: '#FFFFFF', position: 'relative' }}>
+    <div className="page w-full" style={{ minHeight: '100dvh', background: '#FFFFFF', position: 'relative', margin: 0, padding: 0 }}>
       <Navigation isPro={isPro} />
       
       <main style={{ 
         paddingTop: 'max(1rem, env(safe-area-inset-top))',
         paddingBottom: 'calc(env(safe-area-inset-bottom) + 7rem)',
+        paddingLeft: 'max(1rem, env(safe-area-inset-left))',
+        paddingRight: 'max(1rem, env(safe-area-inset-right))',
         position: 'relative', 
         minHeight: '100dvh',
         overflow: 'auto',
-        WebkitOverflowScrolling: 'touch'
+        WebkitOverflowScrolling: 'touch',
+        width: '100%',
+        margin: 0
       }}>
         {/* Keep all mounted tabs alive to prevent re-mount flicker */}
         {mountedTabs.has('inicio') && (
