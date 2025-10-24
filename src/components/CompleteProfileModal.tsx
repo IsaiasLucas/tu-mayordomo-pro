@@ -84,33 +84,33 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
       // Extract only digits for usuarios table
       const phoneDigits = whatsapp.replace(/\D/g, "");
 
-      // Update usuarios table with telefono, nombre, tipo_cuenta, and profile_complete
-      const { error: usuariosError } = await supabase
-        .from('usuarios')
-        .update({
-          telefono: phoneDigits,
-          nombre: nombre,
-          tipo_cuenta: tipo.toLowerCase(),
-          profile_complete: true
-        })
-        .eq('user_id', user.id);
+      // Update both tables in parallel
+      const [usuariosResult, profileResult] = await Promise.all([
+        supabase
+          .from('usuarios')
+          .update({
+            telefono: phoneDigits,
+            nombre: nombre,
+            tipo_cuenta: tipo.toLowerCase(),
+            profile_complete: true
+          })
+          .eq('user_id', user.id),
+        
+        supabase
+          .from('profiles')
+          .update({
+            display_name: nombre,
+            phone_personal: tipo === "Personal" ? whatsapp : null,
+            phone_empresa: tipo === "Empresa" ? whatsapp : null,
+            entidad: tipo.toLowerCase(),
+            whatsapp_configured: true,
+            profile_complete: true
+          })
+          .eq('user_id', user.id)
+      ]);
 
-      if (usuariosError) throw usuariosError;
-
-      // Save to Supabase profile with phone_personal or phone_empresa based on tipo
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          display_name: nombre,
-          phone_personal: tipo === "Personal" ? whatsapp : null,
-          phone_empresa: tipo === "Empresa" ? whatsapp : null,
-          entidad: tipo.toLowerCase(),
-          whatsapp_configured: true,
-          profile_complete: true
-        })
-        .eq('user_id', user.id);
-
-      if (profileError) throw profileError;
+      if (usuariosResult.error) throw usuariosResult.error;
+      if (profileResult.error) throw profileResult.error;
 
       toast({
         title: "✅ Perfil completado",

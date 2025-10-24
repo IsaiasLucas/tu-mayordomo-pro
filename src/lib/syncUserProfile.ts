@@ -1,9 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Sincroniza el perfil del usuario autenticado con la tabla usuarios.
- * Reconcilia registros antiguos (sin user_id) en el primer login.
- * No borra nada, solo vincula o crea perfil mínimo.
+ * Sincroniza automáticamente las tablas profiles y usuarios al iniciar sesión.
+ * Reconcilia registros antiguos (sin user_id) buscando por email o teléfono.
+ * No borra nada, solo vincula o crea registros cuando faltan.
  */
 export async function syncUserProfile() {
   try {
@@ -14,91 +14,6 @@ export async function syncUserProfile() {
       return null;
     }
 
-    // 2. Intentar cargar perfil por user_id
-    const { data: existingProfile, error: profileError } = await supabase
-      .from('usuarios')
-      .select('id, user_id, nombre, telefono, plan, plan_expires_at, profile_complete')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    // Si encontró el perfil, retornarlo
-    if (existingProfile) {
-      console.log('Profile found by user_id:', existingProfile.id);
-      return existingProfile;
-    }
-
-    console.log('No profile found by user_id, attempting reconciliation...');
-
-    // 3. Reconciliar registro antiguo (sin user_id)
-    let oldProfileId: string | null = null;
-
-    // 3a. Intentar por email (si está en columna 'nombre')
-    if (user.email) {
-      const { data: profileByEmail } = await supabase
-        .from('usuarios')
-        .select('id, user_id')
-        .ilike('nombre', user.email)
-        .is('user_id', null)
-        .limit(1)
-        .maybeSingle();
-
-      if (profileByEmail) {
-        oldProfileId = profileByEmail.id;
-        console.log('Found old profile by email:', oldProfileId);
-      }
-    }
-
-    // 3b. Intentar por teléfono (si existe en user metadata)
-    if (!oldProfileId) {
-      const phoneFromMeta = user.user_metadata?.phone || user.phone;
-      if (phoneFromMeta) {
-        // Normalizar teléfono (solo números)
-        const normalizedPhone = phoneFromMeta.replace(/[^0-9]/g, '');
-        
-        const { data: profileByPhone } = await supabase
-          .from('usuarios')
-          .select('id, user_id, telefono')
-          .is('user_id', null)
-          .limit(100);
-
-        // Buscar match en los resultados normalizados
-        const match = profileByPhone?.find(p => 
-          p.telefono && p.telefono.replace(/[^0-9]/g, '') === normalizedPhone
-        );
-
-        if (match) {
-          oldProfileId = match.id;
-          console.log('Found old profile by phone:', oldProfileId);
-        }
-      }
-    }
-
-    // 4. Si encontró registro antiguo, vincularlo
-    if (oldProfileId) {
-      const { error: updateError } = await supabase
-        .from('usuarios')
-        .update({ user_id: user.id })
-        .eq('id', oldProfileId);
-
-      if (updateError) {
-        console.error('Error updating old profile:', updateError);
-      } else {
-        console.log('Successfully linked old profile to user_id');
-        
-        // Retornar el perfil actualizado
-        const { data: updatedProfile } = await supabase
-          .from('usuarios')
-          .select('id, user_id, nombre, telefono, plan, plan_expires_at, profile_complete')
-          .eq('id', oldProfileId)
-          .single();
-
-        return updatedProfile;
-      }
-    }
-
-    // 5. Si no existe registro, crear perfil mínimo
-    console.log('Creating new minimal profile...');
-    
     const displayName = user.user_metadata?.full_name || 
                        user.user_metadata?.nombre || 
                        user.email?.split('@')[0] || 
@@ -106,29 +21,151 @@ export async function syncUserProfile() {
     
     const phoneFromMeta = user.user_metadata?.phone || user.phone || '';
 
-    const { data: newProfile, error: insertError } = await supabase
-      .from('usuarios')
-      .insert({
-        user_id: user.id,
-        nombre: displayName,
-        telefono: phoneFromMeta,
-        plan: 'free',
-        profile_complete: false,
-        reporte_mensual: true,
-        reporte_semanal: true,
-        usage_count: 0,
-        usage_month: new Date().toISOString().slice(0, 7)
-      })
-      .select('id, user_id, nombre, telefono, plan, plan_expires_at, profile_complete')
-      .single();
+    // 2. SINCRONIZAR TABLA PROFILES
+    const { data: existingProfiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', user.id)
+      .maybeSingle();
 
-    if (insertError) {
-      console.error('Error creating new profile:', insertError);
-      return null;
+    if (!existingProfiles) {
+      console.log('No profile found by user_id, attempting reconciliation...');
+      
+      // Buscar perfil antiguo por email
+      let oldProfile = null;
+      if (user.email) {
+        const { data: profileByEmail } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('email', user.email)
+          .is('user_id', null)
+          .maybeSingle();
+
+        oldProfile = profileByEmail;
+      }
+
+      // Buscar por teléfono si no encontró por email
+      if (!oldProfile && phoneFromMeta) {
+        const normalizedPhone = phoneFromMeta.replace(/[^0-9]/g, '');
+        const { data: allProfiles } = await supabase
+          .from('profiles')
+          .select('*')
+          .is('user_id', null)
+          .limit(100);
+
+        oldProfile = allProfiles?.find(p => 
+          (p.phone_personal && p.phone_personal.replace(/[^0-9]/g, '') === normalizedPhone) ||
+          (p.phone_empresa && p.phone_empresa.replace(/[^0-9]/g, '') === normalizedPhone)
+        );
+      }
+
+      // Si encontró perfil antiguo, vincularlo
+      if (oldProfile) {
+        console.log('Found old profile, linking to user_id:', oldProfile.id);
+        await supabase
+          .from('profiles')
+          .update({ user_id: user.id })
+          .eq('id', oldProfile.id);
+      } else {
+        // Crear nuevo perfil en profiles
+        console.log('Creating new profile in profiles table...');
+        await supabase
+          .from('profiles')
+          .insert({
+            user_id: user.id,
+            email: user.email || '',
+            display_name: displayName,
+            phone_personal: phoneFromMeta,
+            plan: 'free',
+            profile_complete: false,
+            whatsapp_configured: false,
+            entidad: 'personal'
+          });
+      }
     }
 
-    console.log('Created new profile:', newProfile.id);
-    return newProfile;
+    // 3. SINCRONIZAR TABLA USUARIOS
+    const { data: existingUsuarios, error: usuariosError } = await supabase
+      .from('usuarios')
+      .select('*')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (!existingUsuarios) {
+      console.log('No usuarios record found by user_id, attempting reconciliation...');
+      
+      // Buscar registro antiguo por email en nombre
+      let oldUsuario = null;
+      if (user.email) {
+        const { data: usuarioByEmail } = await supabase
+          .from('usuarios')
+          .select('*')
+          .ilike('nombre', user.email)
+          .is('user_id', null)
+          .maybeSingle();
+
+        oldUsuario = usuarioByEmail;
+      }
+
+      // Buscar por teléfono si no encontró por email
+      if (!oldUsuario && phoneFromMeta) {
+        const normalizedPhone = phoneFromMeta.replace(/[^0-9]/g, '');
+        const { data: allUsuarios } = await supabase
+          .from('usuarios')
+          .select('*')
+          .is('user_id', null)
+          .limit(100);
+
+        oldUsuario = allUsuarios?.find(u => 
+          u.telefono && u.telefono.replace(/[^0-9]/g, '') === normalizedPhone
+        );
+      }
+
+      // Si encontró registro antiguo, vincularlo
+      if (oldUsuario) {
+        console.log('Found old usuarios record, linking to user_id:', oldUsuario.id);
+        await supabase
+          .from('usuarios')
+          .update({ user_id: user.id })
+          .eq('id', oldUsuario.id);
+      } else {
+        // Crear nuevo registro en usuarios
+        console.log('Creating new record in usuarios table...');
+        await supabase
+          .from('usuarios')
+          .insert({
+            user_id: user.id,
+            nombre: displayName,
+            telefono: phoneFromMeta,
+            plan: 'free',
+            profile_complete: false,
+            reporte_mensual: true,
+            reporte_semanal: true,
+            usage_count: 0,
+            usage_month: new Date().toISOString().slice(0, 7)
+          });
+      }
+    }
+
+    // 4. Retornar perfil unificado
+    const [profileResult, usuarioResult] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single(),
+      supabase
+        .from('usuarios')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
+    ]);
+
+    console.log('Sync completed successfully');
+    return {
+      profile: profileResult.data,
+      usuario: usuarioResult.data
+    };
 
   } catch (error) {
     console.error('Error in syncUserProfile:', error);
