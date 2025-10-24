@@ -122,7 +122,7 @@ const Index = () => {
         isPro={isPro}
       />
       
-      <main className="pb-24" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
+      <main key={currentView} className="pb-24" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
         {renderCurrentView()}
       </main>
 
