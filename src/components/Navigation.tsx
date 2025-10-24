@@ -1,7 +1,6 @@
 import { Home, Receipt, BarChart3, Crown, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useActiveTab, ActiveTab } from "@/store/appState";
-import { useCallback } from "react";
 
 interface NavigationProps {
   isPro: boolean;
@@ -9,7 +8,6 @@ interface NavigationProps {
 
 const Navigation = ({ isPro }: NavigationProps) => {
   const { activeTab, setActiveTab } = useActiveTab();
-  
   const navigationItems = [{
     id: "inicio",
     label: "Inicio",
@@ -32,15 +30,6 @@ const Navigation = ({ isPro }: NavigationProps) => {
     label: "Perfil",
     icon: User
   }];
-  
-  // Debounced navigation to prevent double-renders
-  const handleNavigation = useCallback((target: ActiveTab) => {
-    // Prevent re-navigation to same tab
-    if (activeTab === target) return;
-    
-    setActiveTab(target);
-  }, [activeTab, setActiveTab]);
-  
   return (
     <>
        {/* WhatsApp Floating Button - Only on Inicio */}
@@ -72,10 +61,10 @@ const Navigation = ({ isPro }: NavigationProps) => {
 
       {/* Navigation Bar */}
       <div 
-        className="fixed left-0 right-0 z-[9999] flex justify-center items-center px-4 pointer-events-none"
+        className="fixed left-0 right-0 z-[9999] flex justify-center items-center px-4"
         style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}
       >
-      <nav className="bg-card/90 backdrop-blur-xl border border-border/40 rounded-[1.5rem] shadow-2xl transition-all duration-300 ease-out pointer-events-auto">
+      <nav className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-[1.5rem] shadow-2xl transition-all duration-300 ease-out pointer-events-auto">
         <div className="flex items-center justify-center gap-1.5 px-4 py-2.5">
             {navigationItems.map(item => {
               const Icon = item.icon;
@@ -83,16 +72,16 @@ const Navigation = ({ isPro }: NavigationProps) => {
               const isLocked = item.requiresPro && !isPro;
               
               const handleClick = () => {
-                // Silent redirect to plans if locked
                 const target = isLocked ? 'planes' : (item.id as ActiveTab);
-                handleNavigation(target);
+                try { console.log('[Nav] setActiveTab', { from: activeTab, to: target, isLocked, isPro }); } catch {}
+                setActiveTab(target);
               };
             
             return (
                 <button
                   type="button"
                   key={item.id}
-                  onClick={handleClick}
+                  onClick={(e) => { e.preventDefault(); handleClick(); }}
                   aria-pressed={isActive}
                   aria-label={item.label}
                   className={cn(

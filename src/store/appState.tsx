@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, useCallback, useRef } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 
 export type ActiveTab = 'inicio' | 'gastos' | 'reportes' | 'planes' | 'perfil';
 
@@ -21,32 +21,12 @@ export const ActiveTabProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return 'inicio';
   });
 
-  // Debounce navigation to prevent double-renders
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const lastTabRef = useRef<ActiveTab>(activeTabState);
+  const setActiveTab = (tab: ActiveTab) => {
+    setActiveTabState(tab);
+    try { localStorage.setItem('app.activeTab', tab); } catch {}
+  };
 
-  const setActiveTab = useCallback((tab: ActiveTab) => {
-    // Skip if same as current
-    if (lastTabRef.current === tab) return;
-    
-    // Clear any pending navigation
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-
-    // Debounce navigation (prevents double-tap issues)
-    debounceTimerRef.current = setTimeout(() => {
-      lastTabRef.current = tab;
-      setActiveTabState(tab);
-      try { 
-        localStorage.setItem('app.activeTab', tab); 
-      } catch (e) {
-        console.error('Failed to save tab to localStorage:', e);
-      }
-    }, 50); // 50ms debounce
-  }, []);
-
-  const value = useMemo(() => ({ activeTab: activeTabState, setActiveTab }), [activeTabState, setActiveTab]);
+  const value = useMemo(() => ({ activeTab: activeTabState, setActiveTab }), [activeTabState]);
 
   return (
     <ActiveTabContext.Provider value={value}>

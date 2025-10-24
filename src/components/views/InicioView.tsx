@@ -148,14 +148,11 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
         setPerfil(usuario || null);
         setPerfilLoaded(true);
 
-        // Prefer phone from profiles if available, fallback to usuarios.telefono
-        const phoneFromProfile = (profile?.phone_personal || profile?.phone_empresa || '').toString();
-        const effectivePhone = (usuario?.telefono?.trim() || '').toString() || phoneFromProfile.replace(/\D/g, '');
-
-        if (effectivePhone) {
-          const phoneDigits = effectivePhone.replace(/\D/g, '');
-          const cachedPhone = localStorage.getItem('tm_phone')?.replace(/\D/g, '');
-
+        // Check if telefono exists and is not empty
+        if (usuario?.telefono && usuario.telefono.trim() !== '') {
+          const phoneDigits = usuario.telefono;
+          const cachedPhone = localStorage.getItem("tm_phone")?.replace(/\D/g, "");
+          
           // Clear cache if phone changed (different user)
           if (cachedPhone && cachedPhone !== phoneDigits) {
             localStorage.removeItem('tm_movimientos_cache');
@@ -163,14 +160,14 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
             setMovimientos([]);
             setAllMovimientos([]);
           }
-
+          
           setPhone(phoneDigits);
-          localStorage.setItem('tm_phone', phoneDigits);
-
+          localStorage.setItem("tm_phone", phoneDigits);
+          
           // Initial load
           fetchMovimientos();
           fetchAllMovimientos();
-
+          
           // Setup Realtime subscriptions for recent and all movements
           const recentChannel = supabase
             .channel('inicio-gastos-recent')
@@ -184,7 +181,7 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
               async (payload) => {
                 const { data: { user } } = await supabase.auth.getUser();
                 if (!user) return;
-
+                
                 if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
                   fetchMovimientosUpdate();
                 }
@@ -204,7 +201,7 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
               async (payload) => {
                 const { data: { user } } = await supabase.auth.getUser();
                 if (!user) return;
-
+                
                 // Refetch if change is for current user
                 if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
                   fetchAllMovimientosUpdate();
@@ -212,21 +209,21 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
               }
             )
             .subscribe();
-
+          
           // Silent polling every 5 seconds
           const pollingInterval = setInterval(() => {
             fetchMovimientosUpdate();
             fetchAllMovimientosUpdate();
           }, 5000);
-
+          
           return () => {
             supabase.removeChannel(recentChannel);
             supabase.removeChannel(allChannel);
             clearInterval(pollingInterval);
           };
         } else {
-          // No phone anywhere -> keep cache clean, but still allow UI to render
-          localStorage.removeItem('tm_phone');
+          console.log('No telefono found in usuarios table');
+          localStorage.removeItem("tm_phone");
           localStorage.removeItem('tm_movimientos_cache');
           localStorage.removeItem('tm_all_movimientos_cache');
           setMovimientos([]);
@@ -376,17 +373,27 @@ const formatMovimientoDate = (mov: any) => {
   return formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm");
 };
 
-  // Show WhatsApp card only if neither profiles nor usuarios have a phone
-  const combinedPhone = ((profile?.phone_personal || profile?.phone_empresa || perfil?.telefono || '') as string).toString();
-  const showWhatsappCard = perfilLoaded && combinedPhone.trim() === '';
+  const showWhatsappCard = perfilLoaded && (!perfil?.telefono || perfil.telefono.trim() === '');
 
-  // No skeleton - keep previous content or show empty state
-  // Removed skeleton loading to prevent flash screens
+  // Skeleton loading state
+  if (!perfilLoaded) {
+    return (
+      <main className="px-6 py-6 pb-32 space-y-6 animate-fade-in">
+        <Skeleton className="h-36 w-full rounded-2xl" />
+        <Skeleton className="h-28 w-full rounded-2xl" />
+        <div className="grid grid-cols-2 gap-5">
+          <Skeleton className="h-28 w-full rounded-2xl" />
+          <Skeleton className="h-28 w-full rounded-2xl" />
+        </div>
+        <Skeleton className="h-56 w-full rounded-2xl" />
+      </main>
+    );
+  }
 
   // WhatsApp configuration card
   if (showWhatsappCard) {
     return (
-      <main className="screen px-6 py-6 space-y-6 animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      <main className="px-6 py-6 pb-32 space-y-6 animate-fade-in">
         <Card className="shadow-card rounded-2xl border-2 border-primary">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
@@ -411,7 +418,7 @@ const formatMovimientoDate = (mov: any) => {
   }
 
   return (
-    <main className="screen px-6 py-6 space-y-6 animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+    <main className="px-6 py-6 pb-32 space-y-6 animate-fade-in">
       {/* Saldo do Mês */}
       <div className="bg-gradient-to-br from-primary to-primary-glow text-primary-foreground rounded-2xl p-7 shadow-card">
         <p className="text-base opacity-75 mb-2">Saldo del Mes</p>
@@ -498,9 +505,16 @@ const formatMovimientoDate = (mov: any) => {
               </AlertDescription>
             </Alert>
           ) : loadingMovimientos ? (
-            // No skeleton - show empty state or keep previous
-            <div className="text-center py-8 sm:py-10 text-muted-foreground text-base sm:text-lg">
-              Cargando movimientos...
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center justify-between p-4 sm:p-5 rounded-lg sm:rounded-xl border">
+                  <div className="flex-1 space-y-2 sm:space-y-2.5">
+                    <Skeleton className="h-4 sm:h-5 w-24 sm:w-28" />
+                    <Skeleton className="h-5 sm:h-6 w-36 sm:w-44" />
+                  </div>
+                  <Skeleton className="h-6 sm:h-7 w-20 sm:w-24" />
+                </div>
+              ))}
             </div>
           ) : movimientos.length === 0 ? (
             <div className="text-center py-8 sm:py-10 text-muted-foreground text-base sm:text-lg">

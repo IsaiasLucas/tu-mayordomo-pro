@@ -9,13 +9,13 @@
     <meta name="keywords" content="finanzas personales, control gastos, presupuestos, CLP, Chile, mayordomo financiero">
     
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#8E5BFF" />
+    <meta name="theme-color" content="#9d6dd3" />
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Tu Mayordomo">
     
     <!-- iOS Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Tu Mayordomo">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     
@@ -25,12 +25,6 @@
     <!-- Manifest -->
     <link rel="manifest" href="/manifest.json">
 
-    <!-- Resource Hints for Performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://thqxmvjkncyizixbmuwu.supabase.co" crossorigin>
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    <link rel="dns-prefetch" href="https://thqxmvjkncyizixbmuwu.supabase.co">
     
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website" />
@@ -48,36 +42,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Performance Hint -->
-  <meta name="format-detection" content="telephone=no">
 </head>
 
   <body>
-    <noscript>
-      <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
-        <h1>JavaScript Required</h1>
-        <p>Tu Mayordomo requiere JavaScript para funcionar. Por favor, habilita JavaScript en tu navegador.</p>
-      </div>
-    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Service Worker Registration with Error Handling -->
+    <!-- Service Worker Registration -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/service-worker.js')
             .then((registration) => {
-              console.log('SW registered:', registration.scope);
-              
-              // Check for updates periodically
-              setInterval(() => {
-                registration.update();
-              }, 60 * 60 * 1000); // Check every hour
+              console.log('SW registered: ', registration);
             })
-            .catch((error) => {
-              console.error('SW registration failed:', error);
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
             });
         });
       }

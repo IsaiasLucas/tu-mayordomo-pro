@@ -60,19 +60,6 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
   const { user, profile, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  
-  // Guard: if no user, show loading instead of rendering full component
-  if (!user) {
-    return (
-      <div className="screen flex items-center justify-center p-4" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
-        <div className="text-center space-y-3">
-          <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
-          <p className="text-muted-foreground">Cargando perfil...</p>
-        </div>
-      </div>
-    );
-  }
-  
   const [showBalance, setShowBalance] = useState(() => {
     const saved = localStorage.getItem("tm_show_balance");
     return saved === null ? true : saved === "true";
@@ -120,13 +107,11 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
   }, [isEmpresa, user?.id]);
 
   const fetchInvitationCodes = async () => {
-    if (!user?.id) return;
-    
     try {
       const { data, error } = await supabase
         .from('invitation_codes')
         .select('*')
-        .eq('company_id', user.id)
+        .eq('company_id', user?.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -135,6 +120,10 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
       console.error('Error fetching invitation codes:', error);
     }
   };
+
+  if (!user) {
+    return <div className="p-4">Cargando perfil...</div>;
+  }
 
   const formatCLP = (amount: number) => {
     return new Intl.NumberFormat('es-CL', {
@@ -147,21 +136,18 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
 
   const handleSignOut = async () => {
     try {
-      // Clear state first
-      localStorage.removeItem('app.activeTab');
-      
-      // Sign out from Supabase
+      setLoading(true);
       await signOut();
-      
-      // Small delay to ensure signOut completes
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Hard redirect to auth page
+      // Use window.location for reliable redirect
       window.location.href = "/auth";
     } catch (error) {
       console.error("Error signing out:", error);
-      // Force redirect even on error
-      window.location.href = "/auth";
+      toast({
+        title: "Error",
+        description: "No se pudo cerrar sesión. Intenta nuevamente.",
+        variant: "destructive",
+      });
+      setLoading(false);
     }
   };
 
@@ -573,15 +559,8 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
     { label: "Meses activo", value: userProfile.monthsActive, icon: Calendar },
   ];
 
-  // Ensure no persistent scroll lock when this view mounts
-  useEffect(() => {
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
-    document.body.style.position = '';
-  }, []);
-
   return (
-    <div className="screen space-y-6 animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch', minHeight: '100dvh' }}>
+    <div className="space-y-6 pb-20 animate-fade-in">
       {/* Profile Header */}
       <Card className="bg-gradient-to-br from-purple-600 via-purple-500 to-blue-600 text-white shadow-xl rounded-2xl overflow-hidden">
         {/* Header Content */}
@@ -788,10 +767,11 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
                 <Button 
                   variant="outline" 
                   onClick={handleSignOut}
+                  disabled={loading}
                   className="w-full h-11 sm:h-12 rounded-2xl text-sm sm:text-base font-semibold justify-start touch-manipulation"
                 >
                   <LogOut className="h-4 w-4 mr-2 flex-shrink-0" />
-                  Salir
+                  {loading ? "Cerrando sesión..." : "Salir"}
                 </Button>
               </div>
             </div>

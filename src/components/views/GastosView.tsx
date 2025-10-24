@@ -58,13 +58,9 @@ export default function GastosView({ profile }: GastosViewProps) {
           .eq('user_id', user.id)
           .maybeSingle();
 
-        const phoneFromProfile = (profile?.phone_personal || profile?.phone_empresa || '').toString();
-        const effectivePhone = (usuario?.telefono?.trim() || '').toString() || phoneFromProfile;
-
-        if (effectivePhone) {
-          const digits = effectivePhone.replace(/\D/g, '');
-          setPhone(digits);
-          localStorage.setItem('tm_phone', digits);
+        if (usuario?.telefono && usuario.telefono.trim() !== '') {
+          setPhone(usuario.telefono);
+          localStorage.setItem("tm_phone", usuario.telefono);
         }
       } catch (error) {
         console.error('Error checking usuario phone:', error);
@@ -72,7 +68,7 @@ export default function GastosView({ profile }: GastosViewProps) {
     };
 
     checkUsuarioPhone();
-  }, [profile]);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -255,7 +251,7 @@ const tableData = (data.items || []).map(mov => [
 
   if (!phone) {
     return (
-      <div className="screen p-6 animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      <div className="p-6 animate-fade-in">
         <Card className="shadow-card rounded-2xl border-2 border-primary">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
@@ -281,7 +277,7 @@ const tableData = (data.items || []).map(mov => [
   const totalPages = Math.ceil((data.items || []).length / itemsPerPage);
 
   return (
-    <div className="screen p-4 sm:p-5 md:p-7 space-y-4 sm:space-y-5 md:space-y-7 animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+    <div className="p-4 sm:p-5 md:p-7 space-y-4 sm:space-y-5 md:space-y-7 pb-24 sm:pb-28 animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-5">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Gastos</h1>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center w-full sm:w-auto">
@@ -339,8 +335,29 @@ const tableData = (data.items || []).map(mov => [
         </CardHeader>
         <CardContent className="px-5 sm:px-7">
           {loading ? (
-            <div className="text-center py-8 sm:py-10 text-muted-foreground text-base sm:text-lg">
-              Cargando movimientos...
+            <div className="space-y-3">
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Fecha</TableHead>
+                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5">Descripción</TableHead>
+                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Tipo</TableHead>
+                      <TableHead className="text-right text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Monto</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                      <TableRow key={i}>
+                        <TableCell className="py-4 sm:py-5"><Skeleton className="h-5 sm:h-6 w-24 sm:w-28" /></TableCell>
+                        <TableCell className="py-4 sm:py-5"><Skeleton className="h-5 sm:h-6 w-40 sm:w-48" /></TableCell>
+                        <TableCell className="py-4 sm:py-5"><Skeleton className="h-6 sm:h-7 w-20 sm:w-24" /></TableCell>
+                        <TableCell className="text-right py-4 sm:py-5"><Skeleton className="h-5 sm:h-6 w-20 sm:w-24 ml-auto" /></TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           ) : (
             <>

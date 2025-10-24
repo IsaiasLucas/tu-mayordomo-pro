@@ -22,25 +22,20 @@ export default function Auth() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let mounted = true;
-
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (mounted && session) {
-        window.location.replace("/inicio");
+      if (session) {
+        navigate("/inicio");
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (mounted && session) {
-        window.location.replace("/inicio");
+      if (session) {
+        navigate("/inicio");
       }
     });
 
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,7 +161,7 @@ export default function Auth() {
     setResetLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/auth/reset`,
+        redirectTo: `${window.location.origin}/auth?reset=true`,
       });
 
       if (error) throw error;
@@ -189,7 +184,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="w-full min-h-screen-ios relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ background: 'transparent', paddingTop: 'max(1rem, env(safe-area-inset-top))', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+    <div className="w-full relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)', background: 'var(--gradient-hero)', paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
       {/* Premium animated mesh background */}
       <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: 'var(--gradient-mesh)' }} />
       
@@ -198,8 +193,8 @@ export default function Auth() {
       <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-accent/25 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '6s', animationDelay: '1s', filter: 'blur(100px)' }} />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-lilac/20 rounded-full blur-3xl pointer-events-none" style={{ filter: 'blur(120px)' }} />
       
-      <div className="min-h-screen-ios flex flex-col lg:flex-row items-center justify-center px-4 py-6 sm:p-6 lg:p-12 relative z-10 gap-6 lg:gap-12">
-        <div className="w-full mx-auto grid lg:grid-cols-2 gap-6 lg:gap-16 items-center" style={{ maxWidth: '1280px' }}>
+      <div className="flex flex-col lg:flex-row items-center justify-center px-4 py-6 sm:p-6 lg:p-12 relative z-10 gap-6 lg:gap-12" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)' }}>
+        <div className="w-full max-w-7xl mx-auto grid lg:grid-cols-2 gap-6 lg:gap-16 items-center">
           {/* Left side - Hero & Branding */}
           <div className="hidden lg:flex flex-col space-y-6 lg:space-y-8 text-white">
             {/* Hero Title - Desktop only */}

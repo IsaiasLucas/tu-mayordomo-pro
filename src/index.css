@@ -2,81 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Page/Screen containers with bottom padding for tab bar */
-.page,
-.screen,
-main {
-  min-height: 100dvh;
-  overflow-y: auto !important;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: calc(var(--tabbar-height, 72px) + env(safe-area-inset-bottom));
-  scroll-padding-bottom: calc(var(--tabbar-height, 72px) + env(safe-area-inset-bottom));
-  /* Ensure scroll is never disabled */
-  touch-action: pan-y;
-}
-
 /* Custom CSS variable for real viewport height (fixes iOS address bar issue) */
 :root {
   --vh: 1vh;
-  --tabbar-height: 72px;
 }
 
 /* Mobile viewport fix - Full-screen PWA behavior */
 html {
   width: 100%;
-  max-width: 100%;
-  min-height: 100dvh;
-  height: auto;
+  height: 100%;
+  height: calc(var(--vh, 1vh) * 100);
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  position: relative;
+  overflow: hidden;
+  position: fixed;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
-  /* iOS safe area - purple gradient background */
-  background: linear-gradient(180deg, #A46BFF 0%, #8E5BFF 100%);
-  background-attachment: fixed;
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* Fixed background layer for seamless gradient */
-html::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(180deg, #A46BFF 0%, #8E5BFF 100%);
-  z-index: -1;
-  pointer-events: none;
 }
 
 body {
   width: 100%;
-  max-width: 100%;
-  min-height: 100dvh;
-  height: auto;
+  height: 100%;
+  height: calc(var(--vh, 1vh) * 100);
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  position: relative;
+  overflow: hidden;
+  position: fixed;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
-  -webkit-tap-highlight-color: transparent;
-  /* Transparent background - inherit from html */
-  background: transparent;
 }
 
 #root {
   width: 100%;
-  max-width: 100%;
-  min-height: 100vh;
-  min-height: 100svh;
-  min-height: 100dvh;
+  height: 100%;
+  height: calc(var(--vh, 1vh) * 100);
+  min-height: calc(var(--vh, 1vh) * 100);
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
@@ -86,55 +47,13 @@ body {
   padding-right: env(safe-area-inset-right);
   /* No top padding - content extends behind status bar */
   padding-top: 0;
-  /* Bottom padding handled by html/body */
+  /* Bottom padding handled by navigation */
   padding-bottom: 0;
-  /* Transparent background - inherit from html */
-  background: transparent;
 }
 
 /* Prevent pull-to-refresh on mobile */
 body {
   overscroll-behavior-y: contain;
-}
-
-/* Full viewport height utilities */
-.min-h-screen-ios {
-  min-height: 100vh;
-  min-height: 100svh;
-  min-height: 100dvh;
-}
-
-/* Modal body lock */
-body.modal-open {
-  overflow: hidden !important;
-  position: fixed;
-  width: 100%;
-}
-
-/* Remove modal lock on close */
-body:not(.modal-open) {
-  overflow: auto !important;
-  position: relative;
-}
-
-/* Hidden overlays must not block touches */
-.app-modal-overlay[hidden],
-.overlay-hidden,
-[data-state="closed"] {
-  display: none !important;
-  pointer-events: none !important;
-}
-
-/* Prevent horizontal overflow */
-* {
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-html,
-body,
-#root {
-  overflow-x: hidden !important;
 }
 
 /* Smooth scrolling and remove tap highlight */
@@ -177,15 +96,6 @@ nav button {
 @supports (-webkit-touch-callout: none) {
   body {
     height: -webkit-fill-available;
-    min-height: -webkit-fill-available;
-  }
-  
-  #root {
-    min-height: -webkit-fill-available;
-  }
-  
-  .min-h-screen-ios {
-    min-height: -webkit-fill-available;
   }
 }
 

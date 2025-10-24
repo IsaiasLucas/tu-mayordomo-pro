@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths, eachDayOfInterval, parseISO } from "date-fns";
-import { formatInTimeZone } from "date-fns-tz";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { es } from "date-fns/locale";
 import { CHILE_TIMEZONE, chileDateOptions, formatDatabaseDate } from "@/lib/date-config";
 import jsPDF from "jspdf";
@@ -63,18 +63,20 @@ export default function ReportesView() {
   const COLORS = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#6366F1', '#14B8A6', '#F97316', '#EF4444'];
 
   const fetchMovimientos = async (startDate: Date, endDate: Date): Promise<Movimiento[]> => {
-    if (!user) return [];
+    const phone = profile?.phone_personal || profile?.phone_empresa;
+    if (!phone) return [];
 
     try {
-      const startDateStr = format(startDate, 'yyyy-MM-dd');
-      const endDateStr = format(endDate, 'yyyy-MM-dd');
+      const phoneDigits = phone.replace(/\D/g, "");
+      const startISO = fromZonedTime(`${format(startDate, 'yyyy-MM-dd')}T00:00:00`, CHILE_TIMEZONE).toISOString();
+      const endISO = fromZonedTime(`${format(endDate, 'yyyy-MM-dd')}T23:59:59`, CHILE_TIMEZONE).toISOString();
       
-      const { data: gastos, error } = await supabase
+      const { data: gastos, error } = await (supabase as any)
         .from('gastos')
         .select('*')
-        .eq('user_id', user.id)
-        .gte('fecha', startDateStr)
-        .lte('fecha', endDateStr)
+        .eq('telefono', phoneDigits)
+        .gte('fecha', format(startDate, 'yyyy-MM-dd'))
+        .lte('fecha', format(endDate, 'yyyy-MM-dd'))
         .order('fecha', { ascending: false });
 
       if (error) throw error;
@@ -142,7 +144,9 @@ export default function ReportesView() {
 
   useEffect(() => {
     const loadPeriodData = async () => {
-      if (!isPro || !user) return;
+      if (!isPro) return;
+      const phone = profile?.phone_personal || profile?.phone_empresa;
+      if (!phone) return;
       
       const now = new Date();
       let startDate: Date;
@@ -186,20 +190,7 @@ export default function ReportesView() {
     };
 
     loadPeriodData();
-    
-    // Refetch when tab becomes visible
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        loadPeriodData();
-      }
-    };
-    
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [isPro, user, selectedPeriod, customStartDate, customEndDate]);
+  }, [isPro, profile, selectedPeriod, customStartDate, customEndDate]);
 
   const generatePDF = (movimientos: Movimiento[], tipo: string, periodo: string) => {
     const doc = new jsPDF();
@@ -274,10 +265,11 @@ export default function ReportesView() {
   const generar = async (
     tipo: "semanal" | "mensual" | "custom" | "semanal_actual" | "mensual_actual"
   ) => {
-    if (!user) {
+    const phone = profile?.phone_personal || profile?.phone_empresa;
+    if (!user || !phone) {
       toast({
         title: "Error",
-        description: "Debes iniciar sesión para generar reportes.",
+        description: "Es necesario tener un teléfono registrado para generar reportes.",
         variant: "destructive",
       });
       return;
@@ -341,7 +333,7 @@ export default function ReportesView() {
         .from('reportes')
         .insert({
           user_id: user.id,
-          phone: profile?.phone_personal || profile?.phone_empresa || '',
+          phone: phone,
           tipo: tipoDb,
           periodo: periodo,
           data: { movimientos_count: movimientos.length }
@@ -378,7 +370,7 @@ export default function ReportesView() {
 
   if (!isPro) {
     return (
-      <main className="screen px-4 py-5 animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      <main className="px-4 py-5 animate-fade-in">
         <Card className="shadow-card border-0">
           <CardContent className="p-8 sm:p-12 text-center">
             <div className="flex justify-center mb-6">
@@ -400,7 +392,7 @@ export default function ReportesView() {
   }
 
   return (
-    <main className="screen px-5 py-6 space-y-7 max-w-7xl mx-auto animate-fade-in" style={{ overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+    <main className="px-5 py-6 space-y-7 pb-28 max-w-7xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="space-y-3">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
