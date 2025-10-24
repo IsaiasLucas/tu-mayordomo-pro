@@ -65,9 +65,9 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
 
       // Only show popup if profile is truly incomplete (both checks must be false)
       // Don't show if user already has whatsapp configured and profile complete
-      const profileNotComplete = profile.profile_complete === false;
-      const whatsappNotConfigured = profile.whatsapp_configured === false;
-      const hasNoPhone = !profile.phone_personal && !profile.phone_empresa;
+      const profileNotComplete = profile?.profile_complete === false;
+      const whatsappNotConfigured = profile?.whatsapp_configured === false;
+      const hasNoPhone = !(profile?.phone_personal || profile?.phone_empresa || perfil?.telefono);
       
       // Show popup only if profile is not complete AND (whatsapp not configured OR no phone)
       const showPopup = profileNotComplete && (whatsappNotConfigured || hasNoPhone);
@@ -79,7 +79,7 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
     };
 
     checkAndShowProfilePopup();
-  }, [perfilLoaded, profile, onOpenProfileModal]);
+  }, [perfilLoaded, profile, perfil, onOpenProfileModal]);
 
   // Calculate from ALL movimientos of the month
   const ingresos = allMovimientos
@@ -378,9 +378,9 @@ const formatMovimientoDate = (mov: any) => {
   return formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm");
 };
 
-  // Show WhatsApp card only if profile loaded and phone is NULL or empty
-  const showWhatsappCard = perfilLoaded && (!perfil?.telefono || perfil.telefono.trim() === '');
-
+  // Show WhatsApp card only if profile loaded and phone is NULL or empty (profiles or usuarios)
+  const effectivePhone = profile?.phone_personal || profile?.phone_empresa || perfil?.telefono;
+  const showWhatsappCard = perfilLoaded && (!effectivePhone || effectivePhone.trim() === '');
   // Skeleton loading state
   if (!perfilLoaded) {
     return (
