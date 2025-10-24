@@ -20,6 +20,11 @@ const Index = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
 
+  // Debug: Log current view changes
+  useEffect(() => {
+    console.log('📍 Current view changed to:', currentView);
+  }, [currentView]);
+
   // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -45,16 +50,25 @@ const Index = () => {
   }
 
   const handleViewChange = (view: string) => {
+    console.log('🔄 handleViewChange called with:', view);
+    console.log('Current isPro status:', isPro);
+    
     // Guard for Reportes - redirect immediately to Planes if not pro
     const target = view === "reportes" && !isPro ? "planes" : view;
+    console.log('Target view after guard:', target);
 
     // Use View Transitions API if available for seamless swaps
-    const nav = () => setCurrentView(target);
+    const nav = () => {
+      console.log('Setting currentView to:', target);
+      setCurrentView(target);
+    };
     // @ts-ignore - experimental API
     const startVT = (document as any).startViewTransition;
     if (typeof startVT === 'function') {
+      console.log('Using View Transition API');
       startVT(nav);
     } else {
+      console.log('Fallback: Direct state update');
       nav();
     }
   };

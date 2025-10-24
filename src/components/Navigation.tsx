@@ -74,6 +74,7 @@ const Navigation = ({
             const isLocked = item.requiresPro && !isPro;
             
             const handleClick = () => {
+              console.log('🖱️ Navigation item clicked:', item.id, 'isLocked:', isLocked);
               if (isLocked) {
                 onViewChange('planes');
               } else {
