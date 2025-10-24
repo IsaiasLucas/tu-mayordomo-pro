@@ -63,10 +63,15 @@ const Navigation = ({ isPro = false }: NavigationProps) => {
 
       {/* Navigation Bar */}
       <div 
-        className="fixed left-0 right-0 z-[9999] flex justify-center items-center px-4 pointer-events-none"
-        style={{ bottom: 0 }}
+        className="fixed left-0 right-0 z-[9999] flex justify-center items-center pointer-events-none"
+        style={{ 
+          bottom: 0,
+          paddingLeft: 'max(16px, env(safe-area-inset-left))',
+          paddingRight: 'max(16px, env(safe-area-inset-right))',
+          paddingBottom: 'env(safe-area-inset-bottom)'
+        }}
       >
-      <nav className="bg-card/90 backdrop-blur-xl border border-border/40 rounded-[1.5rem] shadow-2xl transition-all duration-300 ease-out pointer-events-auto" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <nav className="bg-card/90 backdrop-blur-xl border border-border/40 rounded-[1.5rem] shadow-2xl transition-all duration-300 ease-out pointer-events-auto mb-2">
         <div className="flex items-center justify-center gap-1.5 px-4 py-2.5">
           {navigationItems.map(item => {
               const Icon = item.icon;
