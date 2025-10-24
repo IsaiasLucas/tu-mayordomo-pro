@@ -57,7 +57,7 @@ const Index = () => {
   };
 
   return (
-    <div className="page w-full bg-background" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)' }}>
+    <div className="page w-full" style={{ minHeight: '100dvh', background: 'transparent' }}>
       <Navigation isPro={isPro} />
       
       <main style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
