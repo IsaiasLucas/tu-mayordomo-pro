@@ -9,6 +9,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Eye, EyeOff, Sparkles, TrendingUp, Shield, Zap } from "lucide-react";
 import fintechHero from "@/assets/fintech-hero.png";
 import geminisLogo from "@/assets/geminis-logo.png";
+import { z } from "zod";
+
+// Security: Input validation schema for authentication
+const authSchema = z.object({
+  email: z.string()
+    .trim()
+    .toLowerCase()
+    .email('Email inválido')
+    .max(255, 'Email demasiado largo'),
+  password: z.string()
+    .min(8, 'La contraseña debe tener al menos 8 caracteres')
+    .max(72, 'La contraseña es demasiado larga')
+});
 
 export default function Auth() {
   const [loading, setLoading] = useState(false);
@@ -42,15 +55,20 @@ export default function Auth() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
+    
+    // Security: Validate input before processing
+    const validationResult = authSchema.safeParse({ email, password });
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
       toast({
-        title: "Error",
-        description: "Por favor completa email y contraseña",
+        title: "Error de validación",
+        description: firstError.message,
         variant: "destructive",
       });
       return;
     }
 
+    const { email: validEmail, password: validPassword } = validationResult.data;
     setLoading(true);
 
     try {
@@ -60,8 +78,8 @@ export default function Auth() {
         const redirectTo = 'https://tumayordomo.app/auth/callback';
         
         const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
+          email: validEmail,
+          password: validPassword,
           options: {
             emailRedirectTo: redirectTo
           }
@@ -72,12 +90,12 @@ export default function Auth() {
           try {
             await supabase.auth.resend({
               type: 'signup',
-              email,
+              email: validEmail,
               options: { emailRedirectTo: redirectTo }
             });
             
             // Mostrar modal de confirmación
-            setRegisteredEmail(email);
+            setRegisteredEmail(validEmail);
             setShowEmailConfirmModal(true);
             toast({
               title: "Correo reenviado",
@@ -103,15 +121,15 @@ export default function Auth() {
         }
 
         // Mostrar modal de confirmación para registro exitoso
-        setRegisteredEmail(email);
+        setRegisteredEmail(validEmail);
         setShowEmailConfirmModal(true);
         
       } else {
         // Login flow - SIEMPRE usar auth.users como fuente de verdad
         const redirectTo = 'https://tumayordomo.app/auth/callback';
         const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+          email: validEmail,
+          password: validPassword,
         });
 
         if (error) {
@@ -122,14 +140,14 @@ export default function Auth() {
             // Email no confirmado - reenviar
             await supabase.auth.resend({ 
               type: 'signup', 
-              email, 
+              email: validEmail, 
               options: { emailRedirectTo: redirectTo }
             });
-            setRegisteredEmail(email);
+            setRegisteredEmail(validEmail);
             setShowEmailConfirmModal(true);
             toast({
               title: "Confirma tu correo",
-              description: `Te enviamos un email a ${email} para activar tu cuenta.`,
+              description: `Te enviamos un email a ${validEmail} para activar tu cuenta.`,
             });
           } else if (msg.includes('invalid') || msg.includes('credentials') || code === 'invalid_credentials') {
             // Credenciales incorrectas - ofrecer reset

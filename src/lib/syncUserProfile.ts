@@ -137,11 +137,16 @@ export async function syncUserProfile() {
       const phoneToMatch = finalProfile.phone_personal || finalProfile.phone_empresa;
       const normalizedPhone = phoneToMatch.replace(/[^0-9]/g, '');
       
-      console.log('Linking old gastos by phone...');
+      // Security: Only link gastos from the last 90 days to prevent recycled phone number data leakage
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+      
+      console.log('Linking old gastos by phone (last 90 days)...');
       const { data: gastosToLink } = await supabase
         .from('gastos')
-        .select('id, telefono')
+        .select('id, telefono, created_at')
         .is('user_id', null)
+        .gte('created_at', threeMonthsAgo.toISOString())
         .limit(1000);
       
       const gastosIds = gastosToLink
@@ -154,7 +159,8 @@ export async function syncUserProfile() {
           .update({ user_id: uid })
           .in('id', gastosIds);
         
-        console.log(`Linked ${gastosIds.length} gastos to user_id`);
+        // Audit logging for security tracking
+        console.log(`[SECURITY] Linked ${gastosIds.length} gastos by phone for user ${uid}`);
       }
     }
 
