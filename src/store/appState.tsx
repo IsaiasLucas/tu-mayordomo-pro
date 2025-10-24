@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, useCallback, useRef } from "react";
+import React, { createContext, useContext, useMemo, useState, useCallback, useRef } from "react";
 
 export type ActiveTab = 'inicio' | 'gastos' | 'reportes' | 'planes' | 'perfil';
 
