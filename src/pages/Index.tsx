@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useAuth } from "@/providers/AuthProvider";
 import Navigation from "@/components/Navigation";
 import InicioView from "@/components/views/InicioView";
 import GastosView from "@/components/views/GastosView";
@@ -11,13 +12,12 @@ import CompleteProfileModal from "@/components/CompleteProfileModal";
 import InstallPrompt from "@/components/InstallPrompt";
 import { TabKeepAlive } from "@/components/TabKeepAlive";
 import { useActiveTab, ActiveTab } from "@/store/appState";
-import { useProfile } from "@/hooks/useProfile";
 
 const Index = () => {
   const navigate = useNavigate();
   const { isHydrating, isAuthorized, isAuthenticated, isPro, profile } = useAuthGuard();
+  const { refreshProfile } = useAuth();
   const { activeTab, setActiveTab } = useActiveTab();
-  const { refreshProfile } = useProfile();
   const [showProfileModal, setShowProfileModal] = useState(false);
   
   // Keep track of which tabs have been mounted
