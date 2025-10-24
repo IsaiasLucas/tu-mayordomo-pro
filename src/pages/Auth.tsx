@@ -386,7 +386,7 @@ export default function Auth() {
                 </div>
                 
                 {/* Apoiadores */}
-                <div className="flex flex-col items-center gap-1">
+                <div className="flex flex-col items-center gap-0.5">
                   <p className="text-xs text-muted-foreground/80 font-semibold">Apoyadores</p>
                   <img 
                     src={geminisLogo} 
