@@ -108,14 +108,48 @@ export default function Auth() {
         
       } else {
         // Login flow
-        const { error } = await supabase.auth.signInWithPassword({
+        const redirectTo = 'https://tumayordomo.app/auth/callback';
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
-        if (error) throw error;
+        if (error) {
+          const msg = (error.message || '').toLowerCase();
+          const code = error.code || '';
+          
+          if (msg.includes('email not confirmed') || code === 'email_not_confirmed') {
+            // Email no confirmado - reenviar
+            await supabase.auth.resend({ 
+              type: 'signup', 
+              email, 
+              options: { emailRedirectTo: redirectTo }
+            });
+            setRegisteredEmail(email);
+            setShowEmailConfirmModal(true);
+            toast({
+              title: "Confirma tu correo",
+              description: `Te enviamos un email a ${email} para activar tu cuenta.`,
+            });
+          } else if (msg.includes('invalid') || msg.includes('credentials') || code === 'invalid_credentials') {
+            // Credenciales incorrectas - ofrecer reset
+            toast({
+              title: "Credenciales incorrectas",
+              description: "Verifica tu correo y contraseña.",
+              variant: "destructive",
+            });
+            setShowResetDialog(true);
+          } else {
+            toast({
+              title: "Error",
+              description: "No pudimos iniciar sesión. Intenta de nuevo.",
+              variant: "destructive",
+            });
+          }
+          return;
+        }
 
-        // Sync identity después de signin
+        // Sync identity después de signin exitoso
         await syncUserProfile();
 
         toast({
@@ -123,10 +157,8 @@ export default function Auth() {
           description: "Cargando tus datos...",
         });
 
-        // Navegar a inicio después de sync
-        setTimeout(() => {
-          navigate('/inicio');
-        }, 500);
+        // Redirigir a inicio
+        window.location.replace('/inicio');
       }
     } catch (error: any) {
       // Log detailed error only in development
