@@ -14,6 +14,14 @@ export default function EmailConfirm() {
 
   useEffect(() => {
     const confirmEmail = async () => {
+      // Redirigir recuperación de contraseña a /reset-password
+      const fullUrl = window.location.href;
+      const isRecovery = fullUrl.includes('type=recovery');
+      if (isRecovery) {
+        const target = `${window.location.origin}/reset-password${window.location.search}${window.location.hash}`;
+        window.location.replace(target);
+        return;
+      }
       const params = new URLSearchParams(window.location.search);
       const code = params.get('code');
 

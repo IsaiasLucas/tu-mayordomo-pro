@@ -9,9 +9,17 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Exchange code for session
-        const url = window.location.href;
-        const { error } = await supabase.auth.exchangeCodeForSession(url);
+        // Si es recuperación de contraseña, reenviar a /reset-password preservando tokens
+        const fullUrl = window.location.href;
+        const isRecovery = fullUrl.includes('type=recovery');
+        if (isRecovery) {
+          const target = `${window.location.origin}/reset-password${window.location.search}${window.location.hash}`;
+          window.location.replace(target);
+          return;
+        }
+
+        // Exchange code for session (signup/login flows)
+        const { error } = await supabase.auth.exchangeCodeForSession(fullUrl);
         
         if (error) {
           console.error('Error exchanging code:', error);
