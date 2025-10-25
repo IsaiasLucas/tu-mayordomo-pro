@@ -76,7 +76,7 @@ export default function Auth() {
       const { syncUserProfile } = await import('@/lib/syncUserProfile');
       
       if (isSignUp) {
-        const redirectTo = 'https://tumayordomo.app/auth/confirm';
+        const redirectTo = 'https://tumayordomo.app/verified';
         
         const { data, error } = await supabase.auth.signUp({
           email: validEmail,
@@ -88,7 +88,7 @@ export default function Auth() {
 
         // Si el usuario ya existe pero no está confirmado, reenviar email
         if (error?.message?.toLowerCase().includes('already') || error?.code === 'user_already_exists') {
-          const confirmRedirectTo = 'https://tumayordomo.app/auth/confirm';
+          const confirmRedirectTo = 'https://tumayordomo.app/verified';
           try {
             await supabase.auth.resend({
               type: 'signup',
@@ -128,7 +128,7 @@ export default function Auth() {
         
       } else {
         // Login flow - SIEMPRE usar auth.users como fuente de verdad
-        const confirmRedirectTo = 'https://tumayordomo.app/auth/confirm';
+        const confirmRedirectTo = 'https://tumayordomo.app/verified';
         const { data, error } = await supabase.auth.signInWithPassword({
           email: validEmail,
           password: validPassword,
@@ -140,7 +140,7 @@ export default function Auth() {
           
           if (msg.includes('email not confirmed') || code === 'email_not_confirmed') {
             // Email no confirmado - reenviar
-            const confirmRedirectTo = 'https://tumayordomo.app/auth/confirm';
+            const confirmRedirectTo = 'https://tumayordomo.app/verified';
             await supabase.auth.resend({ 
               type: 'signup', 
               email: validEmail, 
@@ -217,7 +217,7 @@ export default function Auth() {
 
   const handleResendEmail = async () => {
     try {
-      const confirmRedirectTo = 'https://tumayordomo.app/auth/confirm';
+      const confirmRedirectTo = 'https://tumayordomo.app/verified';
       await supabase.auth.resend({
         type: 'signup',
         email: registeredEmail,
@@ -513,8 +513,7 @@ export default function Auth() {
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Confirma tu correo</DialogTitle>
             <DialogDescription className="text-base pt-2 space-y-2">
-              <p>Te enviamos un email a <span className="font-semibold text-primary">{registeredEmail}</span> con un enlace para activar tu cuenta.</p>
-              <p>Revisa bandeja de entrada y spam.</p>
+              <p>Te enviamos un correo de verificación. Revisa tu bandeja y haz clic en el enlace para confirmar tu cuenta.</p>
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-3 pt-4">
