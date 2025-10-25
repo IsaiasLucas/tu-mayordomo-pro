@@ -118,8 +118,15 @@ export default function ReportesView() {
     const timeline = days.map(day => {
       const dayStr = format(day, 'yyyy-MM-dd');
       const dayMovs = movimientos.filter(m => {
-        const movDate = format(parseISO(m.fecha), 'yyyy-MM-dd');
-        return movDate === dayStr;
+        try {
+          // Aceitar tanto datas já formatadas quanto strings ISO
+          const fechaStr = typeof m.fecha === 'string' ? m.fecha : format(m.fecha, 'yyyy-MM-dd');
+          const movDate = fechaStr.includes('T') ? format(parseISO(fechaStr), 'yyyy-MM-dd') : fechaStr.split(' ')[0];
+          return movDate === dayStr;
+        } catch (error) {
+          console.error('Error parsing date:', m.fecha, error);
+          return false;
+        }
       });
 
       const ingresos = dayMovs
@@ -138,6 +145,7 @@ export default function ReportesView() {
       };
     });
 
+    console.log('Timeline data processed:', timeline.length, 'days');
     return timeline;
   };
 
@@ -166,7 +174,10 @@ export default function ReportesView() {
         return;
       }
       
+      console.log('Loading data for period:', selectedPeriod, 'from', format(startDate, 'yyyy-MM-dd'), 'to', format(endDate, 'yyyy-MM-dd'));
       const movimientos = await fetchMovimientos(startDate, endDate);
+      console.log('Movimientos loaded:', movimientos.length);
+      
       const data = processChartData(movimientos);
       setChartData(data);
 
@@ -181,6 +192,8 @@ export default function ReportesView() {
         .filter(m => m.tipo.toLowerCase() === "egreso" || m.tipo.toLowerCase() === "despesa" || m.tipo.toLowerCase() === "gasto")
         .reduce((sum, m) => sum + Number(m.monto || 0), 0);
 
+      console.log('Totals calculated - Ingresos:', ingresos, 'Egresos:', egresos);
+      
       setTotalIngresos(ingresos);
       setTotalEgresos(egresos);
       setTotalMovimientos(movimientos.length);
