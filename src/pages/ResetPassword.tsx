@@ -21,10 +21,31 @@ export default function ResetPassword() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    let unsub: { unsubscribe: () => void } | null = null;
+
     const verifyResetLink = async () => {
       console.log("🔍 ResetPassword - Verificando URL completa:", window.location.href);
       console.log("🔍 Hash:", window.location.hash);
       console.log("🔍 Search:", window.location.search);
+
+      // 0) Atajo: Supabase puede haber establecido la sesión automáticamente
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          console.log("✅ Sesión ya activa, mostrando formulario");
+          setState("form");
+          return;
+        }
+      } catch {}
+
+      // Suscribirse brevemente para capturar la sesión si se establece tras la inicialización
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session) {
+          console.log("✅ Sesión activada por onAuthStateChange");
+          setState("form");
+        }
+      });
+      unsub = subscription;
       
       // 1) Intentar flujo estándar de Supabase (hash con tokens y type=recovery)
       const hash = window.location.hash?.replace(/^#/, "") || "";
@@ -77,19 +98,31 @@ export default function ResetPassword() {
           return;
         } catch (err) {
           console.error("❌ Error en flujo de código:", err);
-          setState("error");
-          setErrorMessage("El enlace no es válido o expiró. Solicita uno nuevo.");
-          return;
+          // Continuar para evaluar errores en la URL
         }
       }
 
-      // 3) Si no hay tokens ni código, mostrar error
+      // 3) Revisar si Supabase devolvió un error explícito en la URL
+      const urlErr = hashParams.get("error_description") || new URLSearchParams(window.location.search).get("error_description");
+      if (urlErr) {
+        const msg = decodeURIComponent(urlErr);
+        console.error("❌ Error reportado en URL:", msg);
+        setState("error");
+        setErrorMessage(msg || "El enlace no es válido o expiró. Solicita uno nuevo.");
+        return;
+      }
+
+      // 4) Si no hay tokens ni código ni error, mostrar error genérico
       console.error("❌ No se encontraron tokens ni código en la URL");
       setState("error");
       setErrorMessage("El enlace no es válido o expiró. Solicita uno nuevo.");
     };
 
     verifyResetLink();
+
+    return () => {
+      try { unsub?.unsubscribe(); } catch {}
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
