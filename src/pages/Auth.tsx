@@ -477,17 +477,17 @@ export default function Auth() {
               </div>
 
               {/* Sección de apoyadores sin fondo */}
-              <div className="py-6 sm:py-8 mt-6">
-                <p className="text-white/90 text-base sm:text-lg font-semibold text-center mb-4">
+              <div className="py-3 sm:py-4 mt-6">
+                <p className="text-white/90 text-base sm:text-lg font-semibold text-center mb-2">
                   Apoyadores
                 </p>
                 
-                {/* Logo del apoyador */}
+                {/* Logo del apoyador - 50% maior */}
                 <div className="flex items-center justify-center px-8">
                   <img 
                     src={apoyadorLogo} 
                     alt="Apoyador" 
-                    className="h-24 sm:h-28 w-auto object-contain"
+                    className="h-36 sm:h-42 w-auto object-contain"
                     style={{
                       filter: 'brightness(0) invert(1)',
                     }}
