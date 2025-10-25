@@ -47,11 +47,9 @@ export default function EmailConfirm() {
   };
 
   return (
-    <div className="w-full flex items-center justify-center" style={{ 
-      minHeight: '100dvh',
-      background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%)',
-      paddingTop: 'env(safe-area-inset-top)',
-      paddingBottom: 'env(safe-area-inset-bottom)'
+    <div className="w-full h-full flex items-center justify-center" style={{ 
+      minHeight: '-webkit-fill-available',
+      background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%)'
     }}>
       {/* Loading Dialog */}
       <Dialog open={status === 'loading'}>

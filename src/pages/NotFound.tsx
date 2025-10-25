@@ -10,10 +10,8 @@ const NotFound = () => {
 
   return (
     <div className="flex h-full w-full items-center justify-center" style={{ 
-      minHeight: '100dvh', 
-      background: 'linear-gradient(135deg, hsl(270 70% 60%) 0%, hsl(280 80% 70%) 50%, hsl(285 75% 65%) 100%)',
-      paddingTop: 'env(safe-area-inset-top)',
-      paddingBottom: 'env(safe-area-inset-bottom)'
+      minHeight: '-webkit-fill-available',
+      background: 'linear-gradient(135deg, hsl(270 70% 60%) 0%, hsl(280 80% 70%) 50%, hsl(285 75% 65%) 100%)'
     }}>
       <div className="text-center p-8 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-glass border border-white/30">
         <h1 className="mb-4 text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">404</h1>

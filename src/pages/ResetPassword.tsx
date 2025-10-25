@@ -84,11 +84,9 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="w-full relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ 
-      minHeight: '100dvh', 
-      background: 'var(--gradient-hero)',
-      paddingTop: 'env(safe-area-inset-top)',
-      paddingBottom: 'env(safe-area-inset-bottom)'
+    <div className="w-full h-full relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ 
+      minHeight: '-webkit-fill-available',
+      background: 'var(--gradient-hero)'
     }}>
       {/* Premium animated mesh background */}
       <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: 'var(--gradient-mesh)' }} />
@@ -97,7 +95,11 @@ export default function ResetPassword() {
       <div className="absolute top-20 left-20 w-96 h-96 bg-primary-glow/30 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '4s', filter: 'blur(80px)' }} />
       <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-accent/25 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '6s', animationDelay: '1s', filter: 'blur(100px)' }} />
       
-      <div className="flex items-center justify-center px-4 py-4 sm:py-6 lg:p-12 relative z-10" style={{ minHeight: 'calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom))' }}>
+      <div className="flex items-center justify-center px-4 py-4 sm:py-6 lg:p-12 relative z-10" style={{ 
+        minHeight: '-webkit-fill-available',
+        paddingTop: 'max(1rem, env(safe-area-inset-top))',
+        paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
+      }}>
         <div className="w-full max-w-md">
           <div className="bg-white/95 dark:bg-card/95 backdrop-blur-2xl rounded-3xl shadow-glass border border-white/30 p-6 sm:p-8 lg:p-10" style={{ boxShadow: 'var(--shadow-elegant)' }}>
             <div className="mb-6 sm:mb-8 text-center">

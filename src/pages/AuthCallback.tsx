@@ -41,10 +41,8 @@ export default function AuthCallback() {
   }, [navigate]);
 
   return (
-    <div className="w-full flex items-center justify-center bg-gradient-to-br from-primary/10 via-accent/5 to-background" style={{
-      minHeight: '100dvh',
-      paddingTop: 'env(safe-area-inset-top)',
-      paddingBottom: 'env(safe-area-inset-bottom)'
+    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 via-accent/5 to-background" style={{
+      minHeight: '-webkit-fill-available'
     }}>
       <div className="text-center space-y-4">
         <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
