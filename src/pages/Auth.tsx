@@ -58,6 +58,28 @@ export default function Auth() {
   const confirmRedirectUrl = `${window.location.origin}/auth/confirm`;
   const resetRedirectUrl = `${window.location.origin}/reset-password`;
 
+  // Inicializar cooldown desde localStorage (persistente entre recargas)
+  useEffect(() => {
+    try {
+      const until = parseInt(localStorage.getItem('resetCooldownUntil') || '0', 10);
+      if (until > Date.now()) {
+        setResetCooldown(Math.ceil((until - Date.now()) / 1000));
+      }
+    } catch {}
+  }, []);
+
+  // Persistir cooldown en localStorage y contador regresivo
+  useEffect(() => {
+    try {
+      if (resetCooldown > 0) {
+        const until = Date.now() + resetCooldown * 1000;
+        localStorage.setItem('resetCooldownUntil', String(until));
+      } else {
+        localStorage.removeItem('resetCooldownUntil');
+      }
+    } catch {}
+  }, [resetCooldown]);
+
   // Cooldown para evitar spam del endpoint /recover
   useEffect(() => {
     if (resetCooldown <= 0) return;
@@ -344,7 +366,7 @@ export default function Auth() {
     } catch (error: any) {
       const msg = (error?.message || '').toLowerCase();
       if (msg.includes('rate') || msg.includes('429')) {
-        setResetCooldown(120);
+        setResetCooldown(900);
         toast({
           title: "Demasiados intentos",
           description: "Has solicitado demasiados correos en poco tiempo. Inténtalo nuevamente en unos minutos.",
@@ -663,9 +685,9 @@ export default function Auth() {
               <Button
                 type="submit"
                 className="flex-1"
-                disabled={resetLoading}
+                disabled={resetLoading || resetCooldown > 0}
               >
-                {resetLoading ? "Enviando..." : "Enviar enlace"}
+                {resetLoading ? "Enviando..." : resetCooldown > 0 ? `Espera ${resetCooldown}s` : "Enviar enlace"}
               </Button>
             </div>
           </form>
