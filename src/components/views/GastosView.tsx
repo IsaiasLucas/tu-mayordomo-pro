@@ -1,35 +1,15 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
+import { useGastos } from "@/hooks/useGastos";
 import { fmtCLP } from "@/lib/api";
-import { CHILE_TIMEZONE, chileDateOptions, formatDatabaseDate, monthRangeUTCFromSantiago } from "@/lib/date-config";
+import { chileDateOptions, formatDatabaseDate } from "@/lib/date-config";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, AlertCircle } from "lucide-react";
+import { Download, AlertCircle, Loader2 } from "lucide-react";
 import { format } from "date-fns";
-import { formatInTimeZone } from "date-fns-tz";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-
-import { supabase } from "@/integrations/supabase/client";
-
-interface Movement {
-  id: string;
-  fecha: string;
-  created_at?: string;
-  descripcion: string;
-  tipo: string;
-  monto: number;
-}
-
-interface MonthData {
-  items: Movement[];
-  totalIngresos: number;
-  totalGastos: number;
-  saldo: number;
-}
 
 interface GastosViewProps {
   profile: any;
@@ -39,160 +19,24 @@ export default function GastosView({ profile }: GastosViewProps) {
   const [selectedMonth, setSelectedMonth] = useState<string>(
     format(new Date(), "yyyy-MM")
   );
-  const [phone, setPhone] = useState<string | null>(null);
-  const [data, setData] = useState<MonthData>({ items: [], totalIngresos: 0, totalGastos: 0, saldo: 0 });
-  const [loading, setLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 50;
+  const [currentPage, setCurrentPage] = useState(0);
+  
+  const { items, loading, hasMore, loadMore } = useGastos(selectedMonth, currentPage);
+  const phone = profile?.phone_personal || profile?.phone_empresa;
 
-  useEffect(() => {
-    const checkUsuarioPhone = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        // Check telefono from usuarios table
-        const { data: usuario } = await supabase
-          .from('usuarios')
-          .select('telefono')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (usuario?.telefono && usuario.telefono.trim() !== '') {
-          setPhone(usuario.telefono);
-          localStorage.setItem("tm_phone", usuario.telefono);
-        }
-      } catch (error) {
-        console.error('Error checking usuario phone:', error);
-      }
-    };
-
-    checkUsuarioPhone();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        // Get authenticated user
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          setLoading(false);
-          return;
-        }
-
-        const { startISO, endISO } = monthRangeUTCFromSantiago(selectedMonth);
+  // Calcular totais a partir dos items em cache
+  const totalIngresos = items
+    .filter((m: any) => m.tipo?.toLowerCase() === "ingreso")
+    .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
         
-        const { data: gastos, error } = await supabase
-          .from('gastos')
-          .select('*')
-          .eq('user_id', user.id)
-          .gte('fecha', selectedMonth + '-01')
-          .lte('fecha', selectedMonth + '-31')
-          .order('fecha', { ascending: false });
+  const totalGastos = items
+    .filter((m: any) => m.tipo?.toLowerCase() === "egreso" || m.tipo?.toLowerCase() === "gasto")
+    .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
 
-        if (error) throw error;
-
-        const items = gastos || [];
-        const totalIngresos = items
-          .filter((m: any) => m.tipo?.toLowerCase() === "ingreso")
-          .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
-        
-        const totalGastos = items
-          .filter((m: any) => m.tipo?.toLowerCase() === "egreso" || m.tipo?.toLowerCase() === "gasto")
-          .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
-
-        // Debug temporal para investigar huso horário
-        try {
-          const sample = (items || []).slice(0, 5).map((m: any) => ({
-            id: m.id,
-            created_at_raw: m.created_at,
-            fecha_raw: m.fecha,
-            display_fecha: formatDatabaseDate(m.fecha, "dd/MM HH:mm"),
-          }));
-          console.log("[DEBUG Gastos] sample times:", sample);
-        } catch (e) {
-          console.log("[DEBUG Gastos] logging error", e);
-        }
-
-        setData({
-          items,
-          totalIngresos,
-          totalGastos,
-          saldo: totalIngresos - totalGastos
-        });
-      } catch (error) {
-        console.error("Error fetching month data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Initial fetch
-    fetchData();
-    
-    // Setup Realtime subscription
-    const channel = supabase
-      .channel('gastos-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*', // Listen to INSERT, UPDATE, DELETE
-          schema: 'public',
-          table: 'gastos'
-        },
-        async (payload) => {
-          console.log('[Realtime] Change received:', payload);
-          
-          // Get current user
-          const { data: { user } } = await supabase.auth.getUser();
-          if (!user) return;
-          
-          // Only refetch if the change is for the current user
-          if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
-            // Silently refetch data without showing loading state
-            try {
-              const { data: gastos, error } = await supabase
-                .from('gastos')
-                .select('*')
-                .eq('user_id', user.id)
-                .gte('fecha', selectedMonth + '-01')
-                .lte('fecha', selectedMonth + '-31')
-                .order('fecha', { ascending: false });
-
-              if (error) throw error;
-
-              const items = gastos || [];
-              const totalIngresos = items
-                .filter((m: any) => m.tipo?.toLowerCase() === "ingreso")
-                .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
-              
-              const totalGastos = items
-                .filter((m: any) => m.tipo?.toLowerCase() === "egreso" || m.tipo?.toLowerCase() === "gasto")
-                .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
-
-              setData({
-                items,
-                totalIngresos,
-                totalGastos,
-                saldo: totalIngresos - totalGastos
-              });
-            } catch (error) {
-              console.error("Error refreshing data:", error);
-            }
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [selectedMonth]);
+  const saldo = totalIngresos - totalGastos;
 
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
     
     // Encabezado
     doc.setFontSize(18);
@@ -206,17 +50,17 @@ export default function GastosView({ profile }: GastosViewProps) {
     doc.text("Totales del mes", 20, 45);
     
     doc.setFontSize(10);
-    doc.text(`Ingresos: ${fmtCLP(data.totalIngresos)}`, 20, 55);
-    doc.text(`Gastos: ${fmtCLP(data.totalGastos)}`, 20, 62);
-    doc.text(`Saldo: ${fmtCLP(data.saldo)}`, 20, 69);
+    doc.text(`Ingresos: ${fmtCLP(totalIngresos)}`, 20, 55);
+    doc.text(`Gastos: ${fmtCLP(totalGastos)}`, 20, 62);
+    doc.text(`Saldo: ${fmtCLP(saldo)}`, 20, 69);
     
     // Tabla de movimientos
-const tableData = (data.items || []).map(mov => [
-  formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm"),
-  mov.descripcion,
-  mov.tipo,
-  fmtCLP(mov.monto)
-]);
+    const tableData = items.map(mov => [
+      formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm"),
+      mov.descripcion,
+      mov.tipo,
+      fmtCLP(mov.monto)
+    ]);
     
     autoTable(doc, {
       startY: 80,
@@ -248,7 +92,6 @@ const tableData = (data.items || []).map(mov => [
     doc.save(fileName);
   };
 
-
   if (!phone) {
     return (
       <div className="p-6 animate-fade-in">
@@ -269,31 +112,28 @@ const tableData = (data.items || []).map(mov => [
     );
   }
 
-  const paginatedMovements = (data.items || []).slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const totalPages = Math.ceil((data.items || []).length / itemsPerPage);
-
   return (
-    <div className="p-4 sm:p-5 md:p-7 space-y-4 sm:space-y-5 md:space-y-7 pb-24 sm:pb-28 animate-fade-in">
+    <div className="p-4 sm:p-5 md:p-7 space-y-4 sm:space-y-5 md:space-y-7 pb-24 sm:pb-28">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-5">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Gastos</h1>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center w-full sm:w-auto">
           <input
             type="month"
             value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="px-4 py-2.5 border rounded-lg w-full sm:w-auto text-base sm:text-lg h-12 sm:h-13 touch-manipulation"
+            onChange={(e) => {
+              setSelectedMonth(e.target.value);
+              setCurrentPage(0);
+            }}
+            className="px-4 py-2.5 border rounded-lg w-full sm:w-auto text-base sm:text-lg h-12 sm:h-13"
           />
-          <Button onClick={handleDownloadPDF} className="w-full sm:w-auto h-12 sm:h-13 text-base sm:text-lg touch-manipulation">
+          <Button onClick={handleDownloadPDF} className="w-full sm:w-auto h-12 sm:h-13 text-base sm:text-lg">
             <Download className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
             Descargar PDF
           </Button>
         </div>
       </div>
 
+      {/* Cards de totales - sempre mostrar do cache */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
         <Card className="rounded-xl sm:rounded-2xl">
           <CardHeader className="pb-3 px-5 sm:px-7 pt-5 sm:pt-7">
@@ -301,7 +141,7 @@ const tableData = (data.items || []).map(mov => [
           </CardHeader>
           <CardContent className="px-5 sm:px-7 pb-5 sm:pb-7">
             <div className="text-2xl sm:text-3xl font-bold text-green-600">
-              {fmtCLP(data.totalIngresos)}
+              {fmtCLP(totalIngresos)}
             </div>
           </CardContent>
         </Card>
@@ -312,7 +152,7 @@ const tableData = (data.items || []).map(mov => [
           </CardHeader>
           <CardContent className="px-5 sm:px-7 pb-5 sm:pb-7">
             <div className="text-2xl sm:text-3xl font-bold text-red-600">
-              {fmtCLP(data.totalGastos)}
+              {fmtCLP(totalGastos)}
             </div>
           </CardContent>
         </Card>
@@ -322,114 +162,86 @@ const tableData = (data.items || []).map(mov => [
             <CardTitle className="text-sm sm:text-base font-medium text-muted-foreground">Saldo</CardTitle>
           </CardHeader>
           <CardContent className="px-5 sm:px-7 pb-5 sm:pb-7">
-            <div className={`text-2xl sm:text-3xl font-bold ${data.saldo >= 0 ? 'text-primary' : 'text-red-600'}`}>
-              {fmtCLP(data.saldo)}
+            <div className={`text-2xl sm:text-3xl font-bold ${saldo >= 0 ? 'text-primary' : 'text-red-600'}`}>
+              {fmtCLP(saldo)}
             </div>
           </CardContent>
         </Card>
       </div>
 
+      {/* Tabela com skeleton leve durante revalidação */}
       <Card className="rounded-xl sm:rounded-2xl">
-        <CardHeader className="px-5 sm:px-7">
+        <CardHeader className="px-5 sm:px-7 flex flex-row items-center justify-between">
           <CardTitle className="text-xl sm:text-2xl">Movimientos del mes</CardTitle>
+          {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
         </CardHeader>
         <CardContent className="px-5 sm:px-7">
-          {loading ? (
-            <div className="space-y-3">
-              <div className="overflow-x-auto -mx-4 sm:mx-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Fecha</TableHead>
-                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5">Descripción</TableHead>
-                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Tipo</TableHead>
-                      <TableHead className="text-right text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Monto</TableHead>
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Fecha</TableHead>
+                  <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5">Descripción</TableHead>
+                  <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Tipo</TableHead>
+                  <TableHead className="text-right text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Monto</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {items.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                      {loading ? 'Cargando...' : 'Sin movimientos en este mes.'}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  items.map((mov: any) => (
+                    <TableRow key={mov.id}>
+                      <TableCell className="py-4 sm:py-5 whitespace-nowrap text-sm sm:text-base md:text-lg">
+                        {formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm")}
+                      </TableCell>
+                      <TableCell className="py-4 sm:py-5 text-sm sm:text-base md:text-lg">{mov.descripcion}</TableCell>
+                      <TableCell className="py-4 sm:py-5">
+                        <Badge
+                          variant={
+                            mov.tipo.toLowerCase().includes("ingreso") || 
+                            mov.tipo.toLowerCase().includes("receita")
+                              ? "default"
+                              : "destructive"
+                          }
+                          className="text-sm sm:text-base whitespace-nowrap"
+                        >
+                          {mov.tipo}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right font-medium py-4 sm:py-5 whitespace-nowrap text-sm sm:text-base md:text-lg">
+                        {fmtCLP(mov.monto)}
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                      <TableRow key={i}>
-                        <TableCell className="py-4 sm:py-5"><Skeleton className="h-5 sm:h-6 w-24 sm:w-28" /></TableCell>
-                        <TableCell className="py-4 sm:py-5"><Skeleton className="h-5 sm:h-6 w-40 sm:w-48" /></TableCell>
-                        <TableCell className="py-4 sm:py-5"><Skeleton className="h-6 sm:h-7 w-20 sm:w-24" /></TableCell>
-                        <TableCell className="text-right py-4 sm:py-5"><Skeleton className="h-5 sm:h-6 w-20 sm:w-24 ml-auto" /></TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Botão de carregar mais */}
+          {hasMore && (
+            <div className="flex justify-center mt-4">
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage(loadMore())}
+                disabled={loading}
+                className="w-full sm:w-auto"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Cargando...
+                  </>
+                ) : (
+                  'Cargar más'
+                )}
+              </Button>
             </div>
-          ) : (
-            <>
-              <div className="overflow-x-auto -mx-4 sm:mx-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Fecha</TableHead>
-                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5">Descripción</TableHead>
-                      <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Tipo</TableHead>
-                      <TableHead className="text-right text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Monto</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedMovements.map((mov) => (
-                      <TableRow key={mov.id}>
-        <TableCell className="py-4 sm:py-5 whitespace-nowrap text-sm sm:text-base md:text-lg">
-          {formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm")}
-        </TableCell>
-                        <TableCell className="py-4 sm:py-5 text-sm sm:text-base md:text-lg">{mov.descripcion}</TableCell>
-                        <TableCell className="py-4 sm:py-5">
-                          <Badge
-                            variant={
-                              mov.tipo.toLowerCase().includes("ingreso") || 
-                              mov.tipo.toLowerCase().includes("receita")
-                                ? "default"
-                                : "destructive"
-                            }
-                            className="text-sm sm:text-base whitespace-nowrap"
-                          >
-                            {mov.tipo}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right font-medium py-4 sm:py-5 whitespace-nowrap text-sm sm:text-base md:text-lg">
-                          {fmtCLP(mov.monto)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-
-              {paginatedMovements.length === 0 && (
-                <div className="text-center py-6 sm:py-8 text-muted-foreground text-sm sm:text-base">
-                  Sin movimientos en este mes.
-                </div>
-              )}
-
-              {totalPages > 1 && (
-                <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-3 mt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="w-full sm:w-auto h-10 text-sm sm:text-base touch-manipulation"
-                  >
-                    Anterior
-                  </Button>
-                  <span className="px-3 sm:px-4 py-2 text-sm sm:text-base">
-                    Página {currentPage} de {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="w-full sm:w-auto h-10 text-sm sm:text-base touch-manipulation"
-                  >
-                    Siguiente
-                  </Button>
-                </div>
-              )}
-            </>
           )}
         </CardContent>
       </Card>

@@ -58,6 +58,7 @@ export default function ReportesView() {
   const [selectedPeriod, setSelectedPeriod] = useState<"week" | "month" | "lastMonth" | "custom">("month");
   const [recentMovimientos, setRecentMovimientos] = useState<Movimiento[]>([]);
   
+  // Verificar plano do cache imediatamente
   const isPro = profile?.plan === "pro" || profile?.plan === "mensal" || profile?.plan === "anual";
 
   const COLORS = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#6366F1', '#14B8A6', '#F97316', '#EF4444'];
