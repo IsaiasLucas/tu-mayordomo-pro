@@ -274,7 +274,12 @@ export default function Auth() {
   };
 
   return (
-    <div className="w-full relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ minHeight: '100dvh', background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%)' }}>
+    <div className="w-full relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ 
+      minHeight: '100dvh', 
+      background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%)',
+      paddingTop: 'env(safe-area-inset-top)',
+      paddingBottom: 'env(safe-area-inset-bottom)'
+    }}>
       {/* Premium animated mesh background */}
       <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: 'var(--gradient-mesh)' }} />
       
@@ -283,7 +288,7 @@ export default function Auth() {
       <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-accent/25 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '6s', animationDelay: '1s', filter: 'blur(100px)' }} />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-lilac/20 rounded-full blur-3xl pointer-events-none" style={{ filter: 'blur(120px)' }} />
       
-      <div className="flex flex-col lg:flex-row items-center justify-center px-4 py-6 sm:p-6 lg:p-12 relative z-10 gap-6 lg:gap-12" style={{ minHeight: '100dvh' }}>
+      <div className="flex flex-col lg:flex-row items-center justify-center px-4 py-4 sm:py-6 lg:p-12 relative z-10 gap-6 lg:gap-12" style={{ minHeight: 'calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom))' }}>
         <div className="w-full max-w-7xl mx-auto grid lg:grid-cols-2 gap-6 lg:gap-16 items-center">
           {/* Left side - Hero & Branding */}
           <div className="hidden lg:flex flex-col space-y-6 lg:space-y-8 text-white">

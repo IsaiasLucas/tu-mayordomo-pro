@@ -38,7 +38,12 @@ const Index = () => {
   // Show loading skeleton while auth or profile are loading
   if (authLoading || profileLoading) {
     return (
-      <div className="w-full" style={{ minHeight: '100dvh', background: '#FFFFFF' }}>
+      <div className="w-full" style={{ 
+        minHeight: '100dvh', 
+        background: '#FFFFFF',
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)'
+      }}>
         <div className="px-6 py-6 pb-32 space-y-6">
           <Skeleton className="h-36 w-full rounded-2xl" />
           <Skeleton className="h-28 w-full rounded-2xl" />
@@ -67,7 +72,12 @@ const Index = () => {
 
   // Keep-alive: renderizar todas views, mostrar/esconder via CSS
   return (
-    <div className="w-full overflow-y-auto overflow-x-hidden" style={{ minHeight: '100dvh', background: '#FFFFFF' }}>
+    <div className="w-full overflow-y-auto overflow-x-hidden" style={{ 
+      minHeight: '100dvh', 
+      background: '#FFFFFF',
+      paddingTop: 'env(safe-area-inset-top)',
+      paddingBottom: 'env(safe-area-inset-bottom)'
+    }}>
       <Navigation isPro={isPro} />
       
       <main className="pb-24 bg-white" style={{ paddingBottom: 'max(6rem, calc(6rem + env(safe-area-inset-bottom)))' }} onClick={(e) => {

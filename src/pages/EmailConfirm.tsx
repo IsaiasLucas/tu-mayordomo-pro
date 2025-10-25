@@ -47,7 +47,12 @@ export default function EmailConfirm() {
   };
 
   return (
-    <div className="w-full h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%)' }}>
+    <div className="w-full flex items-center justify-center" style={{ 
+      minHeight: '100dvh',
+      background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%)',
+      paddingTop: 'env(safe-area-inset-top)',
+      paddingBottom: 'env(safe-area-inset-bottom)'
+    }}>
       {/* Loading Dialog */}
       <Dialog open={status === 'loading'}>
         <DialogContent className="sm:max-w-md [&>button]:hidden">

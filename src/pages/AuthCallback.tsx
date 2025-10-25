@@ -41,7 +41,11 @@ export default function AuthCallback() {
   }, [navigate]);
 
   return (
-    <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-accent/5 to-background">
+    <div className="w-full flex items-center justify-center bg-gradient-to-br from-primary/10 via-accent/5 to-background" style={{
+      minHeight: '100dvh',
+      paddingTop: 'env(safe-area-inset-top)',
+      paddingBottom: 'env(safe-area-inset-bottom)'
+    }}>
       <div className="text-center space-y-4">
         <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
         <p className="text-lg font-medium text-foreground">Confirmando tu cuenta...</p>
