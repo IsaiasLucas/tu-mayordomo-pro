@@ -120,4 +120,5 @@ export default function EmailConfirm() {
       </Dialog>
       <div className="safe-area-fill" style={{ ['--safe-area-bg' as any]: 'hsl(var(--primary-glow))' }} />
     </div>
+  );
 }

@@ -51,4 +51,5 @@ export default function AuthCallback() {
       </div>
       <div className="safe-area-fill" />
     </div>
+  );
 }
