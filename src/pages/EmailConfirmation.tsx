@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, AlertCircle, Loader2, MessageCircle } from "lucide-react";
+import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
 type VerificationState = "loading" | "success" | "error";
 
@@ -56,10 +56,6 @@ export default function EmailConfirmation() {
     navigate("/auth");
   };
 
-  const handleWhatsAppSupport = () => {
-    window.open("https://wa.me/56955264713", "_blank");
-  };
-
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-[480px] shadow-lg">
@@ -96,30 +92,14 @@ export default function EmailConfirmation() {
                 Tu correo fue confirmado correctamente. Vuelve a la app e inicia sesión de nuevo.
               </CardDescription>
               
-              <div className="space-y-3">
-                <Button
-                  onClick={handleBackToLogin}
-                  className="w-full"
-                  size="lg"
-                  aria-label="Volver a la pantalla de inicio de sesión"
-                >
-                  Volver a la app
-                </Button>
-                
-                <Button
-                  onClick={handleWhatsAppSupport}
-                  variant="outline"
-                  className="w-full"
-                  aria-label="Contactar soporte por WhatsApp"
-                >
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Necesito ayuda
-                </Button>
-              </div>
-
-              <p className="text-xs text-muted-foreground text-center mt-4">
-                Si no funciona el botón, cierra esta pestaña y abre la app manualmente.
-              </p>
+              <Button
+                onClick={handleBackToLogin}
+                className="w-full"
+                size="lg"
+                aria-label="Volver a la pantalla de inicio de sesión"
+              >
+                Volver a la app
+              </Button>
             </CardContent>
           </>
         )}
@@ -157,21 +137,7 @@ export default function EmailConfirmation() {
                 >
                   Volver a la app
                 </Button>
-
-                <Button
-                  onClick={handleWhatsAppSupport}
-                  variant="ghost"
-                  className="w-full"
-                  aria-label="Contactar soporte por WhatsApp"
-                >
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Necesito ayuda
-                </Button>
               </div>
-
-              <p className="text-xs text-muted-foreground text-center mt-4">
-                Si no funciona el botón, cierra esta pestaña y abre la app manualmente.
-              </p>
             </CardContent>
           </>
         )}
