@@ -477,8 +477,8 @@ export default function Auth() {
               </div>
 
               {/* Sección de apoyadores sin fondo */}
-              <div className="py-3 sm:py-4 mt-6">
-                <p className="text-white/90 text-base sm:text-lg font-semibold text-center mb-2">
+              <div className="py-1 mt-6">
+                <p className="text-white/90 text-base sm:text-lg font-semibold text-center mb-1">
                   Apoyadores
                 </p>
                 
