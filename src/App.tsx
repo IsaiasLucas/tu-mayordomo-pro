@@ -3,6 +3,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import EmailConfirm from "./pages/EmailConfirm";
+import EmailConfirmation from "./pages/EmailConfirmation";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "./components/ui/toaster";
@@ -21,6 +22,7 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/auth/confirm" element={<EmailConfirm />} />
+          <Route path="/confirmacion" element={<EmailConfirmation />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
