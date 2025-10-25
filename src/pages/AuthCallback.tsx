@@ -49,6 +49,6 @@ export default function AuthCallback() {
         <p className="text-lg font-medium text-foreground">Confirmando tu cuenta...</p>
         <p className="text-sm text-muted-foreground">Serás redirigido en un momento</p>
       </div>
+      <div className="safe-area-fill" />
     </div>
-  );
 }

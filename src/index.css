@@ -388,6 +388,18 @@ All colors MUST be HSL.
       padding: 0;
     }
   }
+
+  /* Safe area bottom fill overlay */
+  .safe-area-fill {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: env(safe-area-inset-bottom);
+    background: var(--safe-area-bg, #FFFFFF);
+    pointer-events: none;
+    z-index: 2147483647;
+  }
   
   /* Mobile optimizations */
   @media (max-width: 768px) {
