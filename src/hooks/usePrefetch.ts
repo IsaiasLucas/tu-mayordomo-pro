@@ -13,12 +13,17 @@ export function usePrefetch() {
     // Prefetch gastos do mês atual
     const mesAtual = getCurrentMonthKey();
     prefetch(`gastos-${user.id}-${mesAtual}-0`, async () => {
+      const [year, month] = mesAtual.split('-').map(Number);
+      const lastDay = new Date(year, month, 0);
+      const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+      const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
+      
       const { data } = await supabase
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-        .gte('fecha', mesAtual + '-01')
-        .lte('fecha', mesAtual + '-31')
+        .gte('fecha', startDate)
+        .lte('fecha', endDate)
         .order('fecha', { ascending: false })
         .limit(50);
       return data || [];

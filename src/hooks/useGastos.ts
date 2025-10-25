@@ -17,18 +17,31 @@ export function useGastos(mes?: string, page = 0) {
     async () => {
       if (!user?.id) return [];
 
-      const ym = mesKey.substring(0, 7);
+      // Calcular primeiro e último dia do mês corretamente
+      const [year, month] = mesKey.split('-').map(Number);
+      const firstDay = new Date(year, month - 1, 1);
+      const lastDay = new Date(year, month, 0);
+      
+      const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+      const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
+
+      console.log('Fetching gastos:', { user_id: user.id, startDate, endDate, page, offset });
+
       const { data: fetchData, error: fetchError } = await supabase
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-        .gte('fecha', ym + '-01')
-        .lte('fecha', ym + '-31')
+        .gte('fecha', startDate)
+        .lte('fecha', endDate)
         .order('fecha', { ascending: false })
         .range(offset, offset + PAGE_SIZE - 1);
 
-      if (fetchError) throw fetchError;
+      if (fetchError) {
+        console.error('Error fetching gastos:', fetchError);
+        throw fetchError;
+      }
 
+      console.log('Gastos fetched:', fetchData?.length, 'items');
       setHasMore((fetchData?.length || 0) === PAGE_SIZE);
       return fetchData || [];
     },
