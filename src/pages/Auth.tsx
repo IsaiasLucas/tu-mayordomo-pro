@@ -54,6 +54,9 @@ export default function Auth() {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
+  const confirmRedirectUrl = `${window.location.origin}/auth/confirm`;
+  const resetRedirectUrl = `${window.location.origin}/reset-password`;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -93,9 +96,9 @@ export default function Auth() {
         const { data, error } = await supabase.auth.signUp({
           email: validEmail,
           password: validPassword,
-          options: {
-            emailRedirectTo: 'https://tumayordomo.app/auth/confirm'
-          }
+            options: {
+              emailRedirectTo: confirmRedirectUrl
+            }
         });
 
         if (error) {
@@ -107,7 +110,7 @@ export default function Auth() {
               await supabase.auth.resend({
                 type: 'signup',
                 email: validEmail,
-                options: { emailRedirectTo: 'https://tumayordomo.app/auth/confirm' }
+                options: { emailRedirectTo: confirmRedirectUrl }
               });
               setRegisteredEmail(validEmail);
               setShowEmailConfirmModal(true);
@@ -123,7 +126,7 @@ export default function Auth() {
               await supabase.auth.resend({
                 type: 'signup',
                 email: validEmail,
-                options: { emailRedirectTo: 'https://tumayordomo.app/auth/confirm' }
+                options: { emailRedirectTo: confirmRedirectUrl }
               });
               setRegisteredEmail(validEmail);
               setShowEmailConfirmModal(true);
@@ -152,7 +155,7 @@ export default function Auth() {
             await supabase.auth.resend({
               type: 'signup',
               email: validEmail,
-              options: { emailRedirectTo: 'https://tumayordomo.app/auth/confirm' }
+               options: { emailRedirectTo: confirmRedirectUrl }
             });
             
             toast({
@@ -198,7 +201,7 @@ export default function Auth() {
             await supabase.auth.resend({ 
               type: 'signup', 
               email: validEmail, 
-              options: { emailRedirectTo: 'https://tumayordomo.app/auth/confirm' }
+              options: { emailRedirectTo: confirmRedirectUrl }
             });
             setRegisteredEmail(validEmail);
             setShowEmailConfirmModal(true);
@@ -278,7 +281,7 @@ export default function Auth() {
       await supabase.auth.resend({
         type: 'signup',
         email: registeredEmail,
-        options: { emailRedirectTo: 'https://tumayordomo.app/auth/confirm' }
+        options: { emailRedirectTo: confirmRedirectUrl }
       });
       
       toast({
@@ -308,7 +311,7 @@ export default function Auth() {
     setResetLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `https://tumayordomo.app/reset-password`,
+        redirectTo: `${resetRedirectUrl}`,
       });
 
       if (error) throw error;
