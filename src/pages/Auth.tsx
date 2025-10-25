@@ -478,12 +478,12 @@ export default function Auth() {
 
               {/* Sección de apoyadores sin fondo */}
               <div className="py-1 mt-6">
-                <p className="text-white/90 text-base sm:text-lg font-semibold text-center mb-1">
+                <p className="text-white/90 text-base sm:text-lg font-semibold text-center mb-2">
                   Apoyadores
                 </p>
                 
                 {/* Logo del apoyador - 50% maior */}
-                <div className="flex items-center justify-center px-8">
+                <div className="flex items-center justify-center">
                   <img 
                     src={apoyadorLogo} 
                     alt="Apoyador" 
