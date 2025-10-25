@@ -64,18 +64,16 @@ export default function ReportesView() {
   const COLORS = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#6366F1', '#14B8A6', '#F97316', '#EF4444'];
 
   const fetchMovimientos = async (startDate: Date, endDate: Date): Promise<Movimiento[]> => {
-    const phone = profile?.phone_personal || profile?.phone_empresa;
-    if (!phone) return [];
+    if (!user?.id) return [];
 
     try {
-      const phoneDigits = phone.replace(/\D/g, "");
       const startISO = fromZonedTime(`${format(startDate, 'yyyy-MM-dd')}T00:00:00`, CHILE_TIMEZONE).toISOString();
       const endISO = fromZonedTime(`${format(endDate, 'yyyy-MM-dd')}T23:59:59`, CHILE_TIMEZONE).toISOString();
       
       const { data: gastos, error } = await (supabase as any)
         .from('gastos')
         .select('*')
-        .eq('telefono', phoneDigits)
+        .eq('user_id', user.id)
         .gte('fecha', format(startDate, 'yyyy-MM-dd'))
         .lte('fecha', format(endDate, 'yyyy-MM-dd'))
         .order('fecha', { ascending: false });
@@ -146,8 +144,7 @@ export default function ReportesView() {
   useEffect(() => {
     const loadPeriodData = async () => {
       if (!isPro) return;
-      const phone = profile?.phone_personal || profile?.phone_empresa;
-      if (!phone) return;
+      if (!user?.id) return;
       
       const now = new Date();
       let startDate: Date;
@@ -191,7 +188,7 @@ export default function ReportesView() {
     };
 
     loadPeriodData();
-  }, [isPro, profile, selectedPeriod, customStartDate, customEndDate]);
+  }, [isPro, user, selectedPeriod, customStartDate, customEndDate]);
 
   const generatePDF = (movimientos: Movimiento[], tipo: string, periodo: string) => {
     const doc = new jsPDF();
@@ -266,15 +263,16 @@ export default function ReportesView() {
   const generar = async (
     tipo: "semanal" | "mensual" | "custom" | "semanal_actual" | "mensual_actual"
   ) => {
-    const phone = profile?.phone_personal || profile?.phone_empresa;
-    if (!user || !phone) {
+    if (!user) {
       toast({
         title: "Error",
-        description: "Es necesario tener un teléfono registrado para generar reportes.",
+        description: "Debes iniciar sesión para generar reportes.",
         variant: "destructive",
       });
       return;
     }
+
+    const phone = profile?.phone_personal || profile?.phone_empresa || user.email || '';
 
     if (tipo === "custom" && (!customStartDate || !customEndDate)) {
       toast({
