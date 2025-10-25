@@ -472,43 +472,6 @@ export default function Auth() {
                 </div>
               </div>
             </div>
-
-            {/* Sección morada de apoyadores con carrusel */}
-            <div 
-              className="rounded-b-3xl lg:rounded-b-[2rem] shadow-glass border border-white/30 border-t-0 py-6 sm:py-8"
-              style={{ 
-                background: 'linear-gradient(180deg, #6C47FF 0%, #8A64FF 100%)',
-              }}
-            >
-              <p className="text-white/90 text-xs sm:text-sm font-semibold text-center mb-4">
-                Apoyadores
-              </p>
-              
-              {/* Carrusel de logos */}
-              <div className="relative overflow-hidden h-20 sm:h-24 flex items-center justify-center px-8">
-                <style>
-                  {`
-                    @keyframes carousel-slide {
-                      0% { transform: translateX(0); opacity: 1; }
-                      45% { transform: translateX(0); opacity: 1; }
-                      50% { transform: translateX(-120%); opacity: 0; }
-                      55% { transform: translateX(120%); opacity: 0; }
-                      60% { transform: translateX(120%); opacity: 0; }
-                      100% { transform: translateX(0); opacity: 1; }
-                    }
-                  `}
-                </style>
-                <img 
-                  src={geminisLogo} 
-                  alt="Geminis" 
-                  className="h-16 sm:h-20 w-auto"
-                  style={{
-                    animation: 'carousel-slide 8s infinite ease-in-out',
-                    filter: 'brightness(0) invert(1)',
-                  }}
-                />
-              </div>
-            </div>
           </div>
         </div>
       </div>
