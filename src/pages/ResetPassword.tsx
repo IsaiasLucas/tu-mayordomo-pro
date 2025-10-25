@@ -22,31 +22,48 @@ export default function ResetPassword() {
 
   useEffect(() => {
     const verifyResetLink = async () => {
-      // Leer código de la URL
-      const code = new URLSearchParams(window.location.search).get('code');
+      // 1) Intentar flujo estándar de Supabase (hash con tokens y type=recovery)
+      const hash = window.location.hash?.replace(/^#/, "") || "";
+      const hashParams = new URLSearchParams(hash);
+      const type = hashParams.get("type");
+      const accessToken = hashParams.get("access_token");
+      const refreshToken = hashParams.get("refresh_token");
 
-      // Si no hay código, mostrar error
-      if (!code) {
-        setState("error");
-        setErrorMessage("El enlace no es válido o expiró. Solicita uno nuevo.");
-        return;
+      if (type === "recovery" && accessToken && refreshToken) {
+        try {
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (error) throw error;
+
+          // Limpiar el hash de la URL
+          window.history.replaceState(null, "", window.location.pathname + window.location.search);
+          setState("form");
+          return;
+        } catch (_) {
+          // Si falla, caer al flujo por código
+        }
       }
 
-      try {
-        // Intercambiar el código por una sesión temporal (tipo recovery)
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-        if (error) {
+      // 2) Flujo alternativo por código (?code=...)
+      const code = new URLSearchParams(window.location.search).get("code");
+      if (code) {
+        try {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+          setState("form");
+          return;
+        } catch (_) {
           setState("error");
           setErrorMessage("El enlace no es válido o expiró. Solicita uno nuevo.");
-        } else {
-          // Mostrar el formulario para nueva contraseña
-          setState("form");
+          return;
         }
-      } catch (error) {
-        setState("error");
-        setErrorMessage("El enlace no es válido o expiró. Solicita uno nuevo.");
       }
+
+      // 3) Si no hay tokens ni código, mostrar error
+      setState("error");
+      setErrorMessage("El enlace no es válido o expiró. Solicita uno nuevo.");
     };
 
     verifyResetLink();
