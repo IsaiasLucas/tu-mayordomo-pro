@@ -12,7 +12,7 @@ export function usePrefetch() {
 
     // Prefetch gastos do mês atual
     const mesAtual = getCurrentMonthKey();
-    prefetch(`gastos-${user.id}-${mesAtual}-0`, async () => {
+    prefetch(`gastos-${user.id}-${mesAtual}`, async () => {
       const [year, month] = mesAtual.split('-').map(Number);
       const lastDay = new Date(year, month, 0);
       const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
@@ -24,8 +24,7 @@ export function usePrefetch() {
         .eq('user_id', user.id)
         .gte('fecha', startDate)
         .lte('fecha', endDate)
-        .order('fecha', { ascending: false })
-        .limit(50);
+        .order('fecha', { ascending: false });
       return data || [];
     });
 

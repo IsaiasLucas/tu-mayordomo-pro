@@ -19,9 +19,8 @@ export default function GastosView({ profile }: GastosViewProps) {
   const [selectedMonth, setSelectedMonth] = useState<string>(
     format(new Date(), "yyyy-MM")
   );
-  const [currentPage, setCurrentPage] = useState(0);
   
-  const { items, loading, hasMore, loadMore } = useGastos(selectedMonth, currentPage);
+  const { items, loading } = useGastos(selectedMonth);
   const phone = profile?.phone_personal || profile?.phone_empresa;
 
   // Calcular totais a partir dos items em cache
@@ -120,10 +119,7 @@ export default function GastosView({ profile }: GastosViewProps) {
           <input
             type="month"
             value={selectedMonth}
-            onChange={(e) => {
-              setSelectedMonth(e.target.value);
-              setCurrentPage(0);
-            }}
+            onChange={(e) => setSelectedMonth(e.target.value)}
             className="px-4 py-2.5 border rounded-lg w-full sm:w-auto text-base sm:text-lg h-12 sm:h-13"
           />
           <Button onClick={handleDownloadPDF} className="w-full sm:w-auto h-12 sm:h-13 text-base sm:text-lg">
@@ -222,27 +218,6 @@ export default function GastosView({ profile }: GastosViewProps) {
               </TableBody>
             </Table>
           </div>
-
-          {/* Botão de carregar mais */}
-          {hasMore && (
-            <div className="flex justify-center mt-4">
-              <Button
-                variant="outline"
-                onClick={() => setCurrentPage(loadMore())}
-                disabled={loading}
-                className="w-full sm:w-auto"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Cargando...
-                  </>
-                ) : (
-                  'Cargar más'
-                )}
-              </Button>
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>

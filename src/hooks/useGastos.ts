@@ -4,16 +4,12 @@ import { useAuth } from "./useAuth";
 import { useSWR } from "./useSWR";
 import { getCurrentMonthKey } from "@/lib/date-config";
 
-export function useGastos(mes?: string, page = 0) {
+export function useGastos(mes?: string) {
   const { user } = useAuth();
   const mesKey = mes || getCurrentMonthKey();
-  const [hasMore, setHasMore] = useState(true);
-  
-  const PAGE_SIZE = 50;
-  const offset = page * PAGE_SIZE;
 
   const { data, error, isValidating, revalidate } = useSWR(
-    user?.id ? `gastos-${user.id}-${mesKey}-${page}` : null,
+    user?.id ? `gastos-${user.id}-${mesKey}` : null,
     async () => {
       if (!user?.id) return [];
 
@@ -25,7 +21,7 @@ export function useGastos(mes?: string, page = 0) {
       const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
       const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
 
-      console.log('Fetching gastos:', { user_id: user.id, startDate, endDate, page, offset });
+      console.log('Fetching gastos:', { user_id: user.id, startDate, endDate });
 
       const { data: fetchData, error: fetchError } = await supabase
         .from('gastos')
@@ -33,8 +29,7 @@ export function useGastos(mes?: string, page = 0) {
         .eq('user_id', user.id)
         .gte('fecha', startDate)
         .lte('fecha', endDate)
-        .order('fecha', { ascending: false })
-        .range(offset, offset + PAGE_SIZE - 1);
+        .order('fecha', { ascending: false });
 
       if (fetchError) {
         console.error('Error fetching gastos:', fetchError);
@@ -42,23 +37,15 @@ export function useGastos(mes?: string, page = 0) {
       }
 
       console.log('Gastos fetched:', fetchData?.length, 'items');
-      setHasMore((fetchData?.length || 0) === PAGE_SIZE);
       return fetchData || [];
     },
     { revalidateOnMount: true }
   );
-
-  const loadMore = useCallback(() => {
-    // Retorna próxima página
-    return page + 1;
-  }, [page]);
 
   return {
     items: data || [],
     loading: isValidating && !data,
     error,
     refetch: revalidate,
-    hasMore,
-    loadMore,
   };
 }
