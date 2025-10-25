@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Eye, EyeOff, Sparkles, TrendingUp, Shield, Zap } from "lucide-react";
 import fintechHero from "@/assets/fintech-hero.png";
 import geminisLogo from "@/assets/geminis-logo.png";
+import apoyadorLogo from "@/assets/apoyador-logo.png";
 import { z } from "zod";
 
 // Security: Input validation schema for authentication
@@ -342,40 +343,42 @@ export default function Auth() {
               </h1>
             </div>
 
-            {/* Tarjeta blanca del formulario */}
-            <div className="bg-white/95 dark:bg-card/95 backdrop-blur-2xl rounded-t-3xl lg:rounded-t-[2rem] shadow-glass border border-white/30 border-b-0 p-6 sm:p-8 lg:p-12 pb-8" style={{ boxShadow: 'var(--shadow-elegant)' }}>
-              <div className="mb-6 sm:mb-8 lg:mb-10">
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  {isSignUp ? "Crear cuenta" : "Bienvenido de vuelta"}
-                </h2>
-                <p className="text-sm sm:text-base lg:text-lg text-muted-foreground font-light">
-                  {isSignUp ? (
-                    <>
-                      Comienza tu viaje{" "}
-                      <button
-                        type="button"
-                        onClick={() => setIsSignUp(false)}
-                        className="text-primary font-bold hover:text-accent transition-colors"
-                      >
-                        Inicia sesión
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      ¿Nuevo?{" "}
-                      <button
-                        type="button"
-                        onClick={() => setIsSignUp(true)}
-                        className="text-primary font-bold hover:text-accent transition-colors"
-                      >
-                        Crea tu cuenta
-                      </button>
-                    </>
-                  )}
-                </p>
-              </div>
+            {/* Contenedor con bordes redondeados */}
+            <div className="space-y-0">
+              {/* Tarjeta blanca del formulario */}
+              <div className="bg-white/95 dark:bg-card/95 backdrop-blur-2xl rounded-3xl lg:rounded-[2rem] shadow-glass border border-white/30 p-6 sm:p-8 lg:p-12 pb-8" style={{ boxShadow: 'var(--shadow-elegant)' }}>
+                <div className="mb-6 sm:mb-8 lg:mb-10">
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    {isSignUp ? "Crear cuenta" : "Bienvenido de vuelta"}
+                  </h2>
+                  <p className="text-sm sm:text-base lg:text-lg text-muted-foreground font-light">
+                    {isSignUp ? (
+                      <>
+                        Comienza tu viaje{" "}
+                        <button
+                          type="button"
+                          onClick={() => setIsSignUp(false)}
+                          className="text-primary font-bold hover:text-accent transition-colors"
+                        >
+                          Inicia sesión
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        ¿Nuevo?{" "}
+                        <button
+                          type="button"
+                          onClick={() => setIsSignUp(true)}
+                          className="text-primary font-bold hover:text-accent transition-colors"
+                        >
+                          Crea tu cuenta
+                        </button>
+                      </>
+                    )}
+                  </p>
+                </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6 lg:space-y-7">
+                <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6 lg:space-y-7">
                 <div className="space-y-2 sm:space-y-3">
                   <Label htmlFor="email" className="text-sm sm:text-base font-bold text-foreground">
                     Correo electrónico
@@ -454,21 +457,46 @@ export default function Auth() {
                 </Button>
               </form>
 
-              <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-border/30">
-                <div className="flex items-center justify-center gap-2">
-                  <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
-                  <p className="text-xs sm:text-sm text-center text-muted-foreground font-medium">
-                    {isSignUp ? (
-                      <>
-                        Al crear cuenta, aceptas nuestros{" "}
-                        <a href="#" className="text-primary hover:text-accent font-bold transition-colors whitespace-nowrap">
-                          términos
-                        </a>
-                      </>
-                    ) : (
-                      "🔒 Protección de nivel bancario"
-                    )}
-                  </p>
+                <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-border/30">
+                  <div className="flex items-center justify-center gap-2">
+                    <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
+                    <p className="text-xs sm:text-sm text-center text-muted-foreground font-medium">
+                      {isSignUp ? (
+                        <>
+                          Al crear cuenta, aceptas nuestros{" "}
+                          <a href="#" className="text-primary hover:text-accent font-bold transition-colors whitespace-nowrap">
+                            términos
+                          </a>
+                        </>
+                      ) : (
+                        "🔒 Protección de nivel bancario"
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sección púrpura de apoyadores */}
+              <div 
+                className="rounded-3xl lg:rounded-[2rem] shadow-glass border border-white/30 py-6 sm:py-8 mt-6"
+                style={{ 
+                  background: 'linear-gradient(180deg, #6C47FF 0%, #8A64FF 100%)',
+                }}
+              >
+                <p className="text-white/90 text-xs sm:text-sm font-semibold text-center mb-4">
+                  Apoyadores
+                </p>
+                
+                {/* Logo del apoyador */}
+                <div className="flex items-center justify-center px-8">
+                  <img 
+                    src={apoyadorLogo} 
+                    alt="Apoyador" 
+                    className="h-16 sm:h-20 w-auto object-contain"
+                    style={{
+                      filter: 'brightness(0) invert(1)',
+                    }}
+                  />
                 </div>
               </div>
             </div>
