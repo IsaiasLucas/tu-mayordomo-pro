@@ -342,7 +342,8 @@ export default function Auth() {
               </h1>
             </div>
 
-            <div className="bg-white/95 dark:bg-card/95 backdrop-blur-2xl rounded-3xl lg:rounded-[2rem] shadow-glass border border-white/30 p-6 sm:p-8 lg:p-12" style={{ boxShadow: 'var(--shadow-elegant)' }}>
+            {/* Tarjeta blanca del formulario */}
+            <div className="bg-white/95 dark:bg-card/95 backdrop-blur-2xl rounded-t-3xl lg:rounded-t-[2rem] shadow-glass border border-white/30 border-b-0 p-6 sm:p-8 lg:p-12 pb-8" style={{ boxShadow: 'var(--shadow-elegant)' }}>
               <div className="mb-6 sm:mb-8 lg:mb-10">
                 <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                   {isSignUp ? "Crear cuenta" : "Bienvenido de vuelta"}
@@ -389,7 +390,6 @@ export default function Auth() {
                     className="h-12 sm:h-14 px-4 sm:px-5 text-sm sm:text-base rounded-xl sm:rounded-2xl bg-secondary/40 border-2 border-input/60 focus:border-primary focus:bg-background/60 backdrop-blur-sm transition-all hover:bg-secondary/60 hover:border-primary/50 font-medium"
                   />
                 </div>
-
 
                 <div className="space-y-2 sm:space-y-3">
                   <Label htmlFor="password" className="text-sm sm:text-base font-bold text-foreground">
@@ -454,7 +454,7 @@ export default function Auth() {
                 </Button>
               </form>
 
-              <div className="mt-6 sm:mt-8 lg:mt-10 pt-5 sm:pt-6 border-t border-border/30 space-y-4">
+              <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-border/30">
                 <div className="flex items-center justify-center gap-2">
                   <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
                   <p className="text-xs sm:text-sm text-center text-muted-foreground font-medium">
@@ -466,20 +466,47 @@ export default function Auth() {
                         </a>
                       </>
                     ) : (
-                      "Protección de nivel bancario"
+                      "🔒 Protección de nivel bancario"
                     )}
                   </p>
                 </div>
-                
-                {/* Apoiadores */}
-                <div className="flex flex-col items-center">
-                  <p className="text-xs text-muted-foreground/80 font-semibold mb-1">Apoyadores</p>
-                  <img 
-                    src={geminisLogo} 
-                    alt="Geminis" 
-                    className="h-28 sm:h-32 w-auto opacity-90 hover:opacity-100 transition-opacity -mt-3"
-                  />
-                </div>
+              </div>
+            </div>
+
+            {/* Sección morada de apoyadores con carrusel */}
+            <div 
+              className="rounded-b-3xl lg:rounded-b-[2rem] shadow-glass border border-white/30 border-t-0 py-6 sm:py-8"
+              style={{ 
+                background: 'linear-gradient(180deg, #6C47FF 0%, #8A64FF 100%)',
+              }}
+            >
+              <p className="text-white/90 text-xs sm:text-sm font-semibold text-center mb-4">
+                Apoyadores
+              </p>
+              
+              {/* Carrusel de logos */}
+              <div className="relative overflow-hidden h-20 sm:h-24 flex items-center justify-center px-8">
+                <style>
+                  {`
+                    @keyframes carousel-slide {
+                      0% { transform: translateX(0); opacity: 1; }
+                      45% { transform: translateX(0); opacity: 1; }
+                      50% { transform: translateX(-120%); opacity: 0; }
+                      55% { transform: translateX(120%); opacity: 0; }
+                      60% { transform: translateX(120%); opacity: 0; }
+                      100% { transform: translateX(0); opacity: 1; }
+                    }
+                  `}
+                </style>
+                <img 
+                  src={geminisLogo} 
+                  alt="Geminis" 
+                  className="h-16 sm:h-20 w-auto"
+                  style={{
+                    animation: 'carousel-slide 8s infinite ease-in-out',
+                    filter: 'brightness(0) invert(1)',
+                  }}
+                />
               </div>
             </div>
           </div>
