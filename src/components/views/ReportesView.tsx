@@ -396,10 +396,10 @@ export default function ReportesView() {
     <main className="px-5 py-6 space-y-7 pb-28 max-w-7xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="space-y-3">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+        <h1 className="text-4xl font-bold text-white drop-shadow-lg">
           Reportes Pro
         </h1>
-        <p className="text-lg text-muted-foreground">
+        <p className="text-lg text-white/90">
           Análisis detallado de tus finanzas y documentos
         </p>
       </div>
