@@ -128,6 +128,35 @@ export default function Auth() {
           return;
         }
 
+        // Detectar si es un signup repetido (usuario ya existe pero no confirmó)
+        const isRepeatedSignup = data.user && (!data.user.identities || data.user.identities.length === 0);
+        
+        if (isRepeatedSignup) {
+          // Usuario ya existe pero no ha confirmado - FORZAR reenvío del email
+          try {
+            await supabase.auth.resend({
+              type: 'signup',
+              email: validEmail,
+              options: { emailRedirectTo: 'https://tumayordomo.app/auth/confirm' }
+            });
+            
+            toast({
+              title: "Correo reenviado",
+              description: "Ya tienes una cuenta. Te reenviamos el correo de verificación. Revisa tu bandeja y spam.",
+            });
+          } catch (resendError) {
+            toast({
+              title: "Error",
+              description: "No pudimos reenviar el correo. Intenta nuevamente.",
+              variant: "destructive",
+            });
+          }
+          
+          setRegisteredEmail(validEmail);
+          setShowEmailConfirmModal(true);
+          return;
+        }
+
         // Si Supabase aceptó el registro: SIEMPRE muestra feedback positivo
         toast({
           title: "¡Correo enviado!",
