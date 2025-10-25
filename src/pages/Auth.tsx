@@ -272,7 +272,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="w-full relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)', background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%)' }}>
+    <div className="w-full relative overflow-y-auto overflow-x-hidden font-['Inter']" style={{ minHeight: '100dvh', background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%)' }}>
       {/* Premium animated mesh background */}
       <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: 'var(--gradient-mesh)' }} />
       
@@ -281,7 +281,7 @@ export default function Auth() {
       <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-accent/25 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '6s', animationDelay: '1s', filter: 'blur(100px)' }} />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-lilac/20 rounded-full blur-3xl pointer-events-none" style={{ filter: 'blur(120px)' }} />
       
-      <div className="flex flex-col lg:flex-row items-center justify-center px-4 py-6 sm:p-6 lg:p-12 relative z-10 gap-6 lg:gap-12" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)' }}>
+      <div className="flex flex-col lg:flex-row items-center justify-center px-4 py-6 sm:p-6 lg:p-12 relative z-10 gap-6 lg:gap-12" style={{ minHeight: '100dvh' }}>
         <div className="w-full max-w-7xl mx-auto grid lg:grid-cols-2 gap-6 lg:gap-16 items-center">
           {/* Left side - Hero & Branding */}
           <div className="hidden lg:flex flex-col space-y-6 lg:space-y-8 text-white">
@@ -480,22 +480,18 @@ export default function Auth() {
               </div>
 
               {/* Sección de apoyadores sin fondo */}
-              <div className="py-1 mt-6">
-                <p className="text-white/90 text-base sm:text-lg font-semibold text-center mb-2">
+              <div className="flex flex-col items-center justify-center mt-6 gap-3">
+                <p className="text-white/90 text-base sm:text-lg font-semibold text-center">
                   Apoyadores
                 </p>
                 
-                {/* Logo del apoyador - 50% maior */}
-                <div className="flex items-center justify-center">
-                  <img 
-                    src={apoyadorLogo} 
-                    alt="Apoyador" 
-                    className="h-36 sm:h-42 w-auto object-contain"
-                    style={{
-                      filter: 'brightness(0) invert(1)',
-                    }}
-                  />
-                </div>
+                {/* Logo GEMINIS - PNG transparente sin padding/margin */}
+                <img 
+                  src={geminisLogo} 
+                  alt="GEMINIS" 
+                  className="h-20 sm:h-24 w-auto object-contain"
+                  style={{ margin: 0, padding: 0 }}
+                />
               </div>
             </div>
           </div>
