@@ -72,6 +72,11 @@ const Navigation = ({ isPro }: NavigationProps) => {
               const isLocked = item.requiresPro && !isPro;
               
               const handleClick = () => {
+                // Cerrar teclado antes de cambiar de vista
+                if (document.activeElement instanceof HTMLElement) {
+                  document.activeElement.blur();
+                }
+                
                 const target = isLocked ? 'planes' : (item.id as ActiveTab);
                 try { console.log('[Nav] setActiveTab', { from: activeTab, to: target, isLocked, isPro }); } catch {}
                 setActiveTab(target);

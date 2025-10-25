@@ -28,6 +28,13 @@ const Index = () => {
     }
   }, [isAuthenticated, authLoading, navigate]);
 
+  // Cerrar teclado al cambiar de pestaña
+  useEffect(() => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  }, [activeTab]);
+
   // Show loading skeleton while auth or profile are loading
   if (authLoading || profileLoading) {
     return (
@@ -46,6 +53,10 @@ const Index = () => {
   }
 
   const handleViewChange = (view: string) => {
+    // Cerrar teclado al cambiar de vista
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     setActiveTab(view as ActiveTab);
   };
 
@@ -59,7 +70,13 @@ const Index = () => {
     <div className="w-full overflow-y-auto overflow-x-hidden" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)', background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%)' }}>
       <Navigation isPro={isPro} />
       
-      <main className="pb-24"  style={{ background: 'transparent' }}>
+      <main className="pb-24" style={{ background: 'transparent' }} onClick={(e) => {
+        // Cerrar teclado al tocar fuera de inputs
+        const target = e.target as HTMLElement;
+        if (!target.closest('input, textarea')) {
+          document.activeElement instanceof HTMLElement && document.activeElement.blur();
+        }
+      }}>
         <ViewTransition isActive={activeTab === 'inicio'}>
           <InicioView 
             profile={profile}

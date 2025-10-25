@@ -58,6 +58,39 @@ body {
 * {
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Solo permitir selección en inputs y textareas */
+input,
+textarea,
+[contenteditable] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Prevenir comportamiento no deseado del teclado */
+input:not(:focus),
+textarea:not(:focus),
+select:not(:focus) {
+  caret-color: transparent;
+}
+
+/* Asegurar que el teclado solo se abre en tap directo */
+input,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Prevenir que divs/botones abran el teclado accidentalmente */
+div:not(input):not(textarea),
+button,
+a {
+  -webkit-user-select: none;
+  user-select: none;
+  outline: none;
 }
 
 /* Performance optimizations */

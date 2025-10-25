@@ -390,6 +390,8 @@ export default function Auth() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="tu@correo.com"
                     required
+                    autoComplete="email"
+                    inputMode="email"
                     className="h-12 sm:h-14 px-4 sm:px-5 text-sm sm:text-base rounded-xl sm:rounded-2xl bg-secondary/40 border-2 border-input/60 focus:border-primary focus:bg-background/60 backdrop-blur-sm transition-all hover:bg-secondary/60 hover:border-primary/50 font-medium"
                   />
                 </div>
@@ -411,6 +413,7 @@ export default function Auth() {
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Mínimo 8 caracteres"
                       required
+                      autoComplete={isSignUp ? "new-password" : "current-password"}
                       className="h-12 sm:h-14 px-4 sm:px-5 pr-12 sm:pr-14 text-sm sm:text-base rounded-xl sm:rounded-2xl bg-secondary/40 border-2 border-input/60 focus:border-primary focus:bg-background/60 backdrop-blur-sm transition-all hover:bg-secondary/60 hover:border-primary/50 font-medium"
                     />
                     <button
