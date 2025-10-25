@@ -7,7 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths, eachDayOfInterval, parseISO } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { es } from "date-fns/locale";
-import { CHILE_TIMEZONE, chileDateOptions, formatDatabaseDate } from "@/lib/date-config";
+import { CHILE_TIMEZONE, formatDatabaseDate } from "@/lib/date-config";
+import dayjs from 'dayjs';
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Download, FileText, Loader2, PieChart, Lock, Calendar, TrendingUp, TrendingDown, Activity, BarChart3, DollarSign, Receipt } from "lucide-react";
@@ -211,7 +212,7 @@ export default function ReportesView() {
     doc.text(`Reporte ${tipo}`, 105, 20, { align: "center" });
     doc.setFontSize(12);
     doc.text(periodo, 105, 30, { align: "center" });
-    const currentDate = new Date().toLocaleString('es-CL', chileDateOptions);
+    const currentDate = dayjs().tz().format('DD/MM/YYYY HH:mm');
     doc.text(`Generado el: ${currentDate}`, 105, 37, { align: "center" });
 
     // Calcular totales

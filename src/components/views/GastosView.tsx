@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useGastos } from "@/hooks/useGastos";
 import { fmtCLP } from "@/lib/api";
-import { chileDateOptions, formatDatabaseDate } from "@/lib/date-config";
+import { formatDatabaseDate } from "@/lib/date-config";
+import dayjs from 'dayjs';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -79,7 +80,7 @@ export default function GastosView({ profile }: GastosViewProps) {
     // Pie de página
     const finalY = (doc as any).lastAutoTable.finalY || 80;
     doc.setFontSize(8);
-    const generatedDate = new Date().toLocaleString('es-CL', chileDateOptions);
+    const generatedDate = dayjs().tz().format('DD/MM/YYYY HH:mm');
     doc.text(
       `Generado automáticamente el ${generatedDate}`,
       20,
