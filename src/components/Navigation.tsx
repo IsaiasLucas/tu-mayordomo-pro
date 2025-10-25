@@ -64,7 +64,7 @@ const Navigation = ({ isPro }: NavigationProps) => {
         className="fixed left-0 right-0 z-[9999] flex justify-center items-center px-4"
         style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}
       >
-      <nav className="bg-gradient-to-r from-primary to-primary-dark backdrop-blur-xl border border-white/20 rounded-[1.5rem] shadow-2xl transition-all duration-300 ease-out pointer-events-auto">
+      <nav className="bg-white rounded-[1.5rem] transition-all duration-200 ease-out pointer-events-auto">
         <div className="flex items-center justify-center gap-1.5 px-4 py-2.5">
             {navigationItems.map(item => {
               const Icon = item.icon;
@@ -90,24 +90,25 @@ const Navigation = ({ isPro }: NavigationProps) => {
                   aria-pressed={isActive}
                   aria-label={item.label}
                   className={cn(
-                    "flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ease-out touch-manipulation relative",
+                    "flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ease-out touch-manipulation relative",
                     "min-w-[69px] px-3.5 py-2.5",
                     isActive 
-                      ? "bg-white/20 rounded-2xl shadow-glow scale-105" 
+                      ? "bg-gradient-to-r from-primary to-primary-dark rounded-2xl scale-105" 
                       : "hover:scale-105 active:scale-95",
                     isLocked && "opacity-60"
                   )}
+                  style={isActive ? { background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%)' } : {}}
                 >
                 <Icon 
                   className={cn(
-                    "w-[22px] h-[22px] transition-all duration-300",
-                    "text-white"
+                    "w-[22px] h-[22px] transition-all duration-200",
+                    isActive ? "text-white" : "text-black"
                   )} 
                 />
                 <span 
                   className={cn(
-                    "text-[11.5px] font-semibold leading-none whitespace-nowrap transition-colors duration-300",
-                    "text-white"
+                    "text-[11.5px] font-semibold leading-none whitespace-nowrap transition-colors duration-200",
+                    isActive ? "text-white" : "text-black"
                   )}
                 >
                   {item.label}
