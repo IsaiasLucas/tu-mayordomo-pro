@@ -102,7 +102,32 @@ export default function ResetPassword() {
         }
       }
 
-      // 3) Revisar si Supabase devolvió un error explícito en la URL
+      // 3) Flujo alternativo con token_hash/token (?type=recovery&token_hash=...)
+      const searchParams = new URLSearchParams(window.location.search);
+      const typeParam = searchParams.get("type") || hashParams.get("type");
+      const tokenHash = searchParams.get("token_hash") || hashParams.get("token_hash");
+      const token = searchParams.get("token") || hashParams.get("token");
+      if (typeParam === "recovery" && (tokenHash || token)) {
+        console.log("✅ Usando verifyOtp para recuperación", { tokenHash: !!tokenHash, token: !!token });
+        try {
+          const authAny: any = supabase.auth as any; // compatibilidad con diferentes variantes
+          if (tokenHash) {
+            const { error } = await authAny.verifyOtp({ type: "recovery", token_hash: tokenHash });
+            if (error) throw error;
+          } else if (token) {
+            const { error } = await authAny.verifyOtp({ type: "recovery", token });
+            if (error) throw error;
+          }
+          console.log("✅ verifyOtp correcto, mostrar formulario");
+          setState("form");
+          return;
+        } catch (err) {
+          console.error("❌ Error en verifyOtp (recovery):", err);
+          // seguir para mostrar mensajes de error si los hay en la URL
+        }
+      }
+
+      // 4) Revisar si Supabase devolvió un error explícito en la URL
       const urlErr = hashParams.get("error_description") || new URLSearchParams(window.location.search).get("error_description");
       if (urlErr) {
         const msg = decodeURIComponent(urlErr);
@@ -112,7 +137,7 @@ export default function ResetPassword() {
         return;
       }
 
-      // 4) Si no hay tokens ni código ni error, mostrar error genérico
+      // 5) Si no hay tokens ni código ni error, mostrar error genérico
       console.error("❌ No se encontraron tokens ni código en la URL");
       setState("error");
       setErrorMessage("El enlace no es válido o expiró. Solicita uno nuevo.");
