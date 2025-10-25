@@ -256,14 +256,14 @@ export default function PlanesView() {
   const currentPlan = profile?.plan || "free";
   const hasActivePlan = currentPlan !== "free";
   const isProPlan = currentPlan === "mensal" || currentPlan === "anual" || currentPlan !== "free" && currentPlan !== "";
-  return <main className="min-h-screen p-4 pb-20 animate-fade-in">
+  return <main className="min-h-screen p-4 pb-20 animate-fade-in bg-background">
       {/* Header */}
       <div className="text-center mb-10 pt-4 animate-fade-in">
-        <div className="inline-flex items-center gap-2 mb-3 bg-white/15 backdrop-blur-md px-4 py-2 rounded-full shadow-sm border border-white/30">
-          <Sparkles className="h-5 w-5 text-yellow-300 animate-pulse" />
-          <span className="text-sm font-semibold text-white">Tu Mayordomo Personal</span>
+        <div className="inline-flex items-center gap-2 mb-3 bg-primary/15 backdrop-blur-md px-4 py-2 rounded-full shadow-sm border border-primary/30">
+          <Sparkles className="h-5 w-5 text-primary animate-pulse" />
+          <span className="text-sm font-semibold text-foreground">Tu Mayordomo Personal</span>
         </div>
-        <h1 className="text-4xl font-bold mb-2 text-white drop-shadow-lg">
+        <h1 className="text-4xl font-bold mb-2 text-foreground">
           Elige tu Plan
         </h1>
         

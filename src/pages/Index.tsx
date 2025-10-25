@@ -38,7 +38,7 @@ const Index = () => {
   // Show loading skeleton while auth or profile are loading
   if (authLoading || profileLoading) {
     return (
-      <div className="w-full" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)', background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%)' }}>
+      <div className="w-full bg-background" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)' }}>
         <div className="px-6 py-6 pb-32 space-y-6">
           <Skeleton className="h-36 w-full rounded-2xl" />
           <Skeleton className="h-28 w-full rounded-2xl" />
@@ -67,10 +67,10 @@ const Index = () => {
 
   // Keep-alive: renderizar todas views, mostrar/esconder via CSS
   return (
-    <div className="w-full overflow-y-auto overflow-x-hidden" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)', background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%)' }}>
+    <div className="w-full overflow-y-auto overflow-x-hidden bg-background" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)' }}>
       <Navigation isPro={isPro} />
       
-      <main className="pb-24" style={{ background: 'transparent' }} onClick={(e) => {
+      <main className="pb-24 bg-background" onClick={(e) => {
         // Cerrar teclado al tocar fuera de inputs
         const target = e.target as HTMLElement;
         if (!target.closest('input, textarea')) {

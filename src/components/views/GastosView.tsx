@@ -112,9 +112,9 @@ export default function GastosView({ profile }: GastosViewProps) {
   }
 
   return (
-    <div className="p-4 sm:p-5 md:p-7 space-y-4 sm:space-y-5 md:space-y-7 pb-24 sm:pb-28">
+    <div className="p-4 sm:p-5 md:p-7 space-y-4 sm:space-y-5 md:space-y-7 pb-24 sm:pb-28 bg-background">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-5">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white drop-shadow-lg">Gastos</h1>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">Gastos</h1>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center w-full sm:w-auto">
           <input
             type="month"

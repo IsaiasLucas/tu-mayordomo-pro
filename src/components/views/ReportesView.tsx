@@ -404,21 +404,21 @@ export default function ReportesView() {
   }
 
   return (
-    <main className="px-5 py-6 space-y-7 pb-28 max-w-7xl mx-auto animate-fade-in">
+    <main className="px-5 py-6 space-y-7 pb-28 max-w-7xl mx-auto animate-fade-in bg-background">
       {/* Header */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+          <h1 className="text-4xl font-bold text-foreground">
             Reportes Pro
           </h1>
           {isRevalidating && (
-            <div className="flex items-center gap-2 text-sm text-white/80">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
               <span className="hidden sm:inline">Actualizando...</span>
             </div>
           )}
         </div>
-        <p className="text-lg text-white/90">
+        <p className="text-lg text-muted-foreground">
           Análisis detallado de tus finanzas y documentos
         </p>
       </div>
