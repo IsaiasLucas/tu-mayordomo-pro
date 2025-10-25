@@ -89,7 +89,7 @@ export default function Auth() {
       const { syncUserProfile } = await import('@/lib/syncUserProfile');
       
       if (isSignUp) {
-        // Flujo de registro
+        // Flujo de registro - SIEMPRE envía correo
         const { data, error } = await supabase.auth.signUp({
           email: validEmail,
           password: validPassword,
@@ -102,19 +102,19 @@ export default function Auth() {
           const msg = (error.message || '').toLowerCase();
           
           // Manejo de errores específicos
-          if (msg.includes('rate limit') || msg.includes('too many')) {
+          if (msg.includes('rate') || msg.includes('too many')) {
             toast({
-              title: "Demasiados intentos",
-              description: "Intenta de nuevo en unos minutos.",
+              title: "Error",
+              description: "Demasiados intentos. Prueba en unos minutos.",
               variant: "destructive",
             });
             return;
           }
           
-          if (msg.includes('email') || msg.includes('already registered')) {
+          if (msg.includes('smtp') || msg.includes('email')) {
             toast({
               title: "Error",
-              description: "No pudimos enviar el correo. Revisa tu dirección o intenta reenviar.",
+              description: "No pudimos enviar el correo. Verifica tu dirección o reintenta.",
               variant: "destructive",
             });
             return;
@@ -128,10 +128,10 @@ export default function Auth() {
           return;
         }
 
-        // Si Supabase aceptó el registro: mostrar feedback
+        // Si Supabase aceptó el registro: SIEMPRE muestra feedback positivo
         toast({
-          title: "¡Cuenta creada!",
-          description: "Te enviamos un correo para verificar tu cuenta.",
+          title: "¡Correo enviado!",
+          description: "Te enviamos un correo para verificar tu cuenta. Revisa tu bandeja y spam.",
         });
         
         // Mostrar modal con opción de reenvío
@@ -202,16 +202,28 @@ export default function Auth() {
         window.location.replace('/inicio');
       }
     } catch (error: any) {
-      // Log detailed error only in development
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Auth error:', error);
-      }
+      const msg = (error?.message || '').toLowerCase();
       
-      toast({
-        title: "Error",
-        description: "Error de autenticación. Por favor intenta nuevamente.",
-        variant: "destructive",
-      });
+      // Manejo específico de errores en catch
+      if (msg.includes('rate') || msg.includes('too many')) {
+        toast({
+          title: "Error",
+          description: "Demasiados intentos. Prueba en unos minutos.",
+          variant: "destructive",
+        });
+      } else if (msg.includes('smtp') || msg.includes('email')) {
+        toast({
+          title: "Error",
+          description: "No pudimos enviar el correo. Verifica tu dirección o reintenta.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "No pudimos crear tu cuenta. Inténtalo de nuevo.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
