@@ -207,7 +207,7 @@ export default function ResetPassword() {
           </div>
         </div>
       </div>
-      <div className="safe-area-fill" style={{ ['--safe-area-bg' as any]: 'hsl(var(--primary-glow))' }} />
+      
     </div>
   );
 }

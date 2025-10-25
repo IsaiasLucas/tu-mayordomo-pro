@@ -582,7 +582,7 @@ export default function Auth() {
           </form>
         </DialogContent>
       </Dialog>
-      <div className="safe-area-fill" style={{ ['--safe-area-bg' as any]: 'hsl(var(--primary-glow))' }} />
+      
     </div>
   );
 }

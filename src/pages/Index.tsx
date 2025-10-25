@@ -114,7 +114,7 @@ const Index = () => {
       />
       
       <InstallPrompt />
-      <div className="safe-area-fill" />
+      
     </div>
   );
 };
