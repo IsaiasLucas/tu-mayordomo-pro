@@ -485,11 +485,11 @@ export default function Auth() {
                   Apoyadores
                 </p>
                 
-                {/* Logo GEMINIS - PNG transparente sin padding/margin */}
+                {/* Logo GEMINIS - PNG transparente sin padding/margin, 24px más arriba */}
                 <img 
                   src={geminisLogo} 
                   alt="GEMINIS" 
-                  className="h-20 sm:h-24 w-auto object-contain"
+                  className="h-20 sm:h-24 w-auto object-contain -mt-6"
                   style={{ margin: 0, padding: 0 }}
                 />
               </div>
