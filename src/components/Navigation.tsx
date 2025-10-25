@@ -34,10 +34,10 @@ const Navigation = ({ isPro }: NavigationProps) => {
     <>
        {/* WhatsApp Floating Button - Only on Inicio */}
        {activeTab === "inicio" && (
-         <div 
+       <div 
            className="fixed z-40 flex justify-end items-center px-4 pointer-events-none"
            style={{ 
-             bottom: 'calc(env(safe-area-inset-bottom) + 6.5rem)',
+             bottom: 'max(7.5rem, calc(7.5rem + env(safe-area-inset-bottom)))',
              right: '1rem'
            }}
          >
@@ -61,10 +61,13 @@ const Navigation = ({ isPro }: NavigationProps) => {
 
       {/* Navigation Bar */}
       <div 
-        className="fixed left-0 right-0 z-[9999] flex justify-center items-center px-4"
-        style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}
+        className="fixed left-0 right-0 z-[9999] flex justify-center items-center px-4 pb-4"
+        style={{ 
+          bottom: '0',
+          paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
+        }}
       >
-      <nav className="bg-white rounded-[1.5rem] transition-all duration-200 ease-out pointer-events-auto">
+      <nav className="bg-white rounded-[1.5rem] transition-all duration-200 ease-out pointer-events-auto shadow-lg">
         <div className="flex items-center justify-center gap-1.5 px-4 py-2.5">
             {navigationItems.map(item => {
               const Icon = item.icon;

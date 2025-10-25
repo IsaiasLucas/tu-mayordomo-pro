@@ -10,7 +10,9 @@
 /* Mobile viewport fix - Full-screen PWA behavior */
 html {
   width: 100%;
-  height: 100dvh;
+  height: 100%;
+  min-height: 100svh;
+  min-height: 100dvh;
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -18,24 +20,29 @@ html {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   -webkit-text-size-adjust: 100%;
-  background: hsl(var(--background));
+  background: #FFFFFF;
 }
 
 body {
   width: 100%;
-  height: 100dvh;
+  height: 100%;
+  min-height: 100svh;
+  min-height: 100dvh;
   margin: 0;
   padding: 0;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
   overflow: hidden;
   position: fixed;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
-  background: hsl(var(--background));
+  background: #FFFFFF;
 }
 
 #root {
   width: 100%;
-  height: 100dvh;
+  height: 100%;
+  min-height: 100svh;
   min-height: 100dvh;
   overflow-y: auto;
   overflow-x: hidden;
@@ -43,7 +50,7 @@ body {
   overscroll-behavior-y: contain;
   padding: 0;
   margin: 0;
-  background: hsl(var(--background));
+  background: #FFFFFF;
 }
 
 /* Prevent pull-to-refresh on mobile */
@@ -261,7 +268,7 @@ All colors MUST be HSL.
 
   body {
     @apply text-foreground antialiased;
-    background: hsl(var(--background));
+    background: #FFFFFF;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1, "ss02" 1;
     text-rendering: optimizeLegibility;
@@ -367,17 +374,23 @@ All colors MUST be HSL.
   /* PWA Specific Styles */
   @media (display-mode: standalone) {
     html, body, #root {
-      height: 100dvh;
+      height: 100%;
+      min-height: 100svh;
       min-height: 100dvh;
+      background: #FFFFFF;
+    }
+    
+    body {
+      /* Safe areas for notch/home indicator */
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
     }
     
     #root {
-      /* Ensure safe areas are respected when installed as PWA - sides only */
-      padding-left: env(safe-area-inset-left);
-      padding-right: env(safe-area-inset-right);
-      /* Content extends behind status bar - NO padding top/bottom to avoid white lines */
-      padding-top: 0;
-      padding-bottom: 0;
+      /* No padding to avoid white lines */
+      padding: 0;
     }
   }
   
