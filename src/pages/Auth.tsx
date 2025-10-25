@@ -483,7 +483,7 @@ export default function Auth() {
 
               {/* Sección de apoyadores sin fondo */}
               <div className="flex flex-col items-center justify-center mt-6 gap-0">
-                <p className="text-white/90 text-base sm:text-lg font-semibold text-center">
+                <p className="text-white/90 text-base sm:text-lg font-semibold text-center mb-[-8px]">
                   Apoyadores
                 </p>
                 
@@ -491,7 +491,7 @@ export default function Auth() {
                 <img 
                   src={geminisLogo} 
                   alt="GEMINIS" 
-                  className="h-[150px] sm:h-[182px] w-auto object-contain -mt-1"
+                  className="h-[150px] sm:h-[182px] w-auto object-contain"
                   style={{ margin: 0, padding: 0 }}
                 />
               </div>
