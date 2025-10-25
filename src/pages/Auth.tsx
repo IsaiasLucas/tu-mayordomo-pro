@@ -56,7 +56,8 @@ export default function Auth() {
   }, [navigate]);
 
   const confirmRedirectUrl = `${window.location.origin}/auth/confirm`;
-  const resetRedirectUrl = `${window.location.origin}/reset-password`;
+  const resetRedirectUrl = `${window.location.origin}/auth/callback`;
+
 
   // Inicializar cooldown desde localStorage (persistente entre recargas)
   useEffect(() => {

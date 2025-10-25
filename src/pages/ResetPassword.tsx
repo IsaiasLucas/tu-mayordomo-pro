@@ -88,7 +88,7 @@ export default function ResetPassword() {
       if (code) {
         console.log("✅ Usando flujo de código");
         try {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          const { error } = await supabase.auth.exchangeCodeForSession(window.location.href);
           if (error) {
             console.error("❌ Error en exchangeCodeForSession:", error);
             throw error;
