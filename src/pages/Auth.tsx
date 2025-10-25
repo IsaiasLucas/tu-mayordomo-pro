@@ -480,19 +480,16 @@ export default function Auth() {
               </div>
 
               {/* Sección de apoyadores sin fondo */}
-              <div className="flex flex-col items-center justify-center mt-6 gap-4">
+              <div className="flex flex-col items-center justify-center mt-6 gap-1">
                 <p className="text-white/90 text-base sm:text-lg font-semibold text-center">
                   Apoyadores
                 </p>
                 
-                {/* Línea separadora negra */}
-                <div className="w-[280px] h-[3px] bg-black/80 rounded-full" />
-                
-                {/* Logo GEMINIS - PNG transparente sin padding/margin, 95% más grande */}
+                {/* Logo GEMINIS - PNG transparente sin padding/margin, 45% más grande */}
                 <img 
                   src={geminisLogo} 
                   alt="GEMINIS" 
-                  className="h-[39px] sm:h-[47px] w-auto object-contain -mt-2"
+                  className="h-[29px] sm:h-[35px] w-auto object-contain"
                   style={{ margin: 0, padding: 0 }}
                 />
               </div>
