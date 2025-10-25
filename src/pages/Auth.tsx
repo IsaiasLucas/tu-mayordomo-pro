@@ -76,7 +76,7 @@ export default function Auth() {
       const { syncUserProfile } = await import('@/lib/syncUserProfile');
       
       if (isSignUp) {
-        const redirectTo = 'https://tumayordomo.app/confirmacion';
+        const redirectTo = 'https://tumayordomo.app/auth/confirm';
         
         const { data, error } = await supabase.auth.signUp({
           email: validEmail,
@@ -88,7 +88,7 @@ export default function Auth() {
 
         // Si el usuario ya existe pero no está confirmado, reenviar email
         if (error?.message?.toLowerCase().includes('already') || error?.code === 'user_already_exists') {
-          const confirmRedirectTo = 'https://tumayordomo.app/confirmacion';
+          const confirmRedirectTo = 'https://tumayordomo.app/auth/confirm';
           try {
             await supabase.auth.resend({
               type: 'signup',
@@ -140,7 +140,7 @@ export default function Auth() {
           
           if (msg.includes('email not confirmed') || code === 'email_not_confirmed') {
             // Email no confirmado - reenviar
-            const confirmRedirectTo = 'https://tumayordomo.app/confirmacion';
+            const confirmRedirectTo = 'https://tumayordomo.app/auth/confirm';
             await supabase.auth.resend({ 
               type: 'signup', 
               email: validEmail, 
@@ -217,7 +217,7 @@ export default function Auth() {
 
   const handleResendEmail = async () => {
     try {
-      const confirmRedirectTo = 'https://tumayordomo.app/confirmacion';
+      const confirmRedirectTo = 'https://tumayordomo.app/auth/confirm';
       await supabase.auth.resend({
         type: 'signup',
         email: registeredEmail,
