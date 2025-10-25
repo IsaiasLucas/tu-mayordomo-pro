@@ -14,30 +14,29 @@ export default function EmailConfirm() {
 
   useEffect(() => {
     const confirmEmail = async () => {
-      // Leer código de la URL
-      const code = new URLSearchParams(window.location.search).get('code');
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
 
-      // Si no hay código, mostrar error
-      if (!code) {
-        setState("error");
-        setErrorMessage("Falta el código de verificación en el enlace.");
+      // Si existe código, intentamos intercambiar por sesión
+      if (code) {
+        try {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) {
+            setState("error");
+            setErrorMessage("El enlace puede haber expirado o ya fue utilizado. Solicita un nuevo correo desde la app.");
+          } else {
+            setState("success");
+          }
+        } catch (error) {
+          setState("error");
+          setErrorMessage("El enlace puede haber expirado o ya fue utilizado. Solicita un nuevo correo desde la app.");
+        }
         return;
       }
 
-      try {
-        // Intercambiar el código por una sesión
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-        if (error) {
-          setState("error");
-          setErrorMessage("El enlace puede haber expirado o ya fue utilizado. Solicita un nuevo correo desde la app.");
-        } else {
-          setState("success");
-        }
-      } catch (error) {
-        setState("error");
-        setErrorMessage("El enlace puede haber expirado o ya fue utilizado. Solicita un nuevo correo desde la app.");
-      }
+      // Sin código: muchos proyectos de Supabase redirigen aquí tras VERIFICAR.
+      // En ese caso no hay sesión pero la verificación ya ocurrió.
+      setState("success");
     };
 
     confirmEmail();
