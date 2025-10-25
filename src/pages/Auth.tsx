@@ -476,14 +476,9 @@ export default function Auth() {
                 </div>
               </div>
 
-              {/* Sección púrpura de apoyadores */}
-              <div 
-                className="rounded-3xl lg:rounded-[2rem] shadow-glass border border-white/30 py-6 sm:py-8 mt-6"
-                style={{ 
-                  background: 'linear-gradient(180deg, #6C47FF 0%, #8A64FF 100%)',
-                }}
-              >
-                <p className="text-white/90 text-xs sm:text-sm font-semibold text-center mb-4">
+              {/* Sección de apoyadores sin fondo */}
+              <div className="py-6 sm:py-8 mt-6">
+                <p className="text-white/90 text-base sm:text-lg font-semibold text-center mb-4">
                   Apoyadores
                 </p>
                 
@@ -492,7 +487,7 @@ export default function Auth() {
                   <img 
                     src={apoyadorLogo} 
                     alt="Apoyador" 
-                    className="h-16 sm:h-20 w-auto object-contain"
+                    className="h-24 sm:h-28 w-auto object-contain"
                     style={{
                       filter: 'brightness(0) invert(1)',
                     }}
