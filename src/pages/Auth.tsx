@@ -34,6 +34,7 @@ export default function Auth() {
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
+  const [resetCooldown, setResetCooldown] = useState(0);
   const [showEmailConfirmModal, setShowEmailConfirmModal] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
   const navigate = useNavigate();
@@ -56,6 +57,13 @@ export default function Auth() {
 
   const confirmRedirectUrl = `${window.location.origin}/auth/confirm`;
   const resetRedirectUrl = `${window.location.origin}/reset-password`;
+
+  // Cooldown para evitar spam del endpoint /recover
+  useEffect(() => {
+    if (resetCooldown <= 0) return;
+    const t = setInterval(() => setResetCooldown((s) => Math.max(0, s - 1)), 1000);
+    return () => clearInterval(t);
+  }, [resetCooldown]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -299,7 +307,17 @@ export default function Auth() {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!resetEmail) {
+
+    if (resetCooldown > 0) {
+      toast({
+        title: "Espera un momento",
+        description: `Vuelve a intentarlo en ${resetCooldown}s para evitar bloqueos por muchos intentos`,
+      });
+      return;
+    }
+
+    const emailToReset = resetEmail.trim().toLowerCase();
+    if (!emailToReset) {
       toast({
         title: "Error",
         description: "Por favor ingresa tu correo electrónico",
@@ -310,7 +328,7 @@ export default function Auth() {
 
     setResetLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      const { error } = await supabase.auth.resetPasswordForEmail(emailToReset, {
         redirectTo: `${resetRedirectUrl}`,
       });
 
@@ -322,12 +340,23 @@ export default function Auth() {
       });
       setShowResetDialog(false);
       setResetEmail("");
+      setResetCooldown(60); // Iniciar cooldown de 60s para evitar rate limit
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Error al enviar el correo de recuperación",
-        variant: "destructive",
-      });
+      const msg = (error?.message || '').toLowerCase();
+      if (msg.includes('rate') || msg.includes('429')) {
+        setResetCooldown(120);
+        toast({
+          title: "Demasiados intentos",
+          description: "Has solicitado demasiados correos en poco tiempo. Inténtalo nuevamente en unos minutos.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message || "Error al enviar el correo de recuperación",
+          variant: "destructive",
+        });
+      }
     } finally {
       setResetLoading(false);
     }
