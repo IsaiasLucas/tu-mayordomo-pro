@@ -101,25 +101,40 @@ export default function Auth() {
         if (error) {
           const msg = (error.message || '').toLowerCase();
           
-          // Manejo de errores específicos
+          // Manejo de errores específicos con reintento de reenvío
           if (msg.includes('rate') || msg.includes('too many')) {
-            toast({
-              title: "Error",
-              description: "Demasiados intentos. Prueba en unos minutos.",
-              variant: "destructive",
-            });
+            try {
+              await supabase.auth.resend({
+                type: 'signup',
+                email: validEmail,
+                options: { emailRedirectTo: 'https://tumayordomo.app/auth/confirm' }
+              });
+              setRegisteredEmail(validEmail);
+              setShowEmailConfirmModal(true);
+              toast({ title: "Demasiados intentos", description: "Reenviamos el correo de verificación. Revisa tu bandeja y spam." });
+            } catch (_) {
+              toast({ title: "Error", description: "Demasiados intentos. Prueba en unos minutos.", variant: "destructive" });
+            }
             return;
           }
           
           if (msg.includes('smtp') || msg.includes('email')) {
-            toast({
-              title: "Error",
-              description: "No pudimos enviar el correo. Verifica tu dirección o reintenta.",
-              variant: "destructive",
-            });
+            try {
+              await supabase.auth.resend({
+                type: 'signup',
+                email: validEmail,
+                options: { emailRedirectTo: 'https://tumayordomo.app/auth/confirm' }
+              });
+              setRegisteredEmail(validEmail);
+              setShowEmailConfirmModal(true);
+              toast({ title: "Correo reenviado", description: "No pudimos enviar el primero. Revisa tu bandeja y spam." });
+            } catch (_) {
+              toast({ title: "Error", description: "No pudimos enviar el correo. Verifica tu dirección o reintenta.", variant: "destructive" });
+            }
             return;
           }
           
+          // Otros errores genéricos
           toast({
             title: "Error",
             description: "No pudimos crear tu cuenta. Inténtalo de nuevo.",
