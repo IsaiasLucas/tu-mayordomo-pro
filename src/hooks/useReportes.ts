@@ -3,15 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useSWR } from "./useSWR";
 
-export function useReportes(page = 0) {
+export function useReportes() {
   const { user } = useAuth();
-  const [hasMore, setHasMore] = useState(true);
-  
-  const PAGE_SIZE = 20;
-  const offset = page * PAGE_SIZE;
 
-  const { data, error, isValidating, revalidate } = useSWR(
-    user?.id ? `reportes-${user.id}-${page}` : null,
+  const { data, error, isValidating, isRevalidating, revalidate } = useSWR(
+    user?.id ? `reportes-${user.id}` : null,
     async () => {
       if (!user?.id) return [];
 
@@ -19,27 +15,20 @@ export function useReportes(page = 0) {
         .from('reportes')
         .select('*')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .range(offset, offset + PAGE_SIZE - 1);
+        .order('created_at', { ascending: false });
 
       if (fetchError) throw fetchError;
 
-      setHasMore((fetchData?.length || 0) === PAGE_SIZE);
       return fetchData || [];
     },
-    { revalidateOnMount: true }
+    { revalidateOnMount: true, revalidateOnFocus: true }
   );
-
-  const loadMore = useCallback(() => {
-    return page + 1;
-  }, [page]);
 
   return {
     items: data || [],
-    loading: isValidating && !data,
+    loading: isValidating && !data, // Só mostra loading se não tem dados
+    isRevalidating, // Novo: indica atualização em background
     error,
     refetch: revalidate,
-    hasMore,
-    loadMore,
   };
 }

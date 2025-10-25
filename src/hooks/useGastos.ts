@@ -8,7 +8,7 @@ export function useGastos(mes?: string) {
   const { user } = useAuth();
   const mesKey = mes || getCurrentMonthKey();
 
-  const { data, error, isValidating, revalidate } = useSWR(
+  const { data, error, isValidating, isRevalidating, revalidate } = useSWR(
     user?.id ? `gastos-${user.id}-${mesKey}` : null,
     async () => {
       if (!user?.id) return [];
@@ -20,8 +20,6 @@ export function useGastos(mes?: string) {
       
       const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
       const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
-
-      console.log('Fetching gastos:', { user_id: user.id, startDate, endDate });
 
       const { data: fetchData, error: fetchError } = await supabase
         .from('gastos')
@@ -36,15 +34,15 @@ export function useGastos(mes?: string) {
         throw fetchError;
       }
 
-      console.log('Gastos fetched:', fetchData?.length, 'items');
       return fetchData || [];
     },
-    { revalidateOnMount: true }
+    { revalidateOnMount: true, revalidateOnFocus: true }
   );
 
   return {
     items: data || [],
-    loading: isValidating && !data,
+    loading: isValidating && !data, // Só mostra loading se não tem dados
+    isRevalidating, // Novo: indica atualização em background
     error,
     refetch: revalidate,
   };

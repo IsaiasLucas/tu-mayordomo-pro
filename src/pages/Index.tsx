@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { usePrefetch } from "@/hooks/usePrefetch";
 import Navigation from "@/components/Navigation";
 import InicioView from "@/components/views/InicioView";
 import GastosView from "@/components/views/GastosView";
@@ -21,9 +20,6 @@ const Index = () => {
   const { activeTab, setActiveTab } = useActiveTab();
   const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
-
-  // Prefetch dados críticos no boot
-  usePrefetch();
 
   // Redirect if not authenticated
   useEffect(() => {

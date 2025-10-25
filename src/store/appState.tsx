@@ -13,17 +13,11 @@ const ActiveTabContext = createContext<ActiveTabContextValue>({
 });
 
 export function ActiveTabProvider({ children }: { children: React.ReactNode }) {
-  const [activeTabState, setActiveTabState] = useState<ActiveTab>(() => {
-    try {
-      const saved = localStorage.getItem('app.activeTab') as ActiveTab | null;
-      if (saved && ['inicio','gastos','reportes','planes','perfil'].includes(saved)) return saved;
-    } catch {}
-    return 'inicio';
-  });
+  // Sempre iniciar em 'inicio' ao abrir a app
+  const [activeTabState, setActiveTabState] = useState<ActiveTab>('inicio');
 
   const setActiveTab = useCallback((tab: ActiveTab) => {
     setActiveTabState(tab);
-    try { localStorage.setItem('app.activeTab', tab); } catch {}
   }, []);
 
   const value = useMemo(() => ({ 

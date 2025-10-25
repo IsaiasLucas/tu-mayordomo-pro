@@ -20,7 +20,7 @@ export default function GastosView({ profile }: GastosViewProps) {
     format(new Date(), "yyyy-MM")
   );
   
-  const { items, loading } = useGastos(selectedMonth);
+  const { items, loading, isRevalidating } = useGastos(selectedMonth);
   const phone = profile?.phone_personal || profile?.phone_empresa;
 
   // Calcular totais a partir dos items em cache
@@ -165,11 +165,16 @@ export default function GastosView({ profile }: GastosViewProps) {
         </Card>
       </div>
 
-      {/* Tabela com skeleton leve durante revalidação */}
+      {/* Tabela com indicador de atualização em background */}
       <Card className="rounded-xl sm:rounded-2xl">
         <CardHeader className="px-5 sm:px-7 flex flex-row items-center justify-between">
           <CardTitle className="text-xl sm:text-2xl">Movimientos del mes</CardTitle>
-          {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+          {isRevalidating && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="hidden sm:inline">Actualizando...</span>
+            </div>
+          )}
         </CardHeader>
         <CardContent className="px-5 sm:px-7">
           <div className="overflow-x-auto -mx-4 sm:mx-0">

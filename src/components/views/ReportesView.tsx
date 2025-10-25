@@ -44,7 +44,7 @@ interface Movimiento {
 }
 
 export default function ReportesView() {
-  const { items, loading } = useReportes();
+  const { items, loading, isRevalidating } = useReportes();
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const [generating, setGenerating] = useState<string | null>(null);
@@ -396,9 +396,17 @@ export default function ReportesView() {
     <main className="px-5 py-6 space-y-7 pb-28 max-w-7xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="space-y-3">
-        <h1 className="text-4xl font-bold text-white drop-shadow-lg">
-          Reportes Pro
-        </h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+            Reportes Pro
+          </h1>
+          {isRevalidating && (
+            <div className="flex items-center gap-2 text-sm text-white/80">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="hidden sm:inline">Actualizando...</span>
+            </div>
+          )}
+        </div>
         <p className="text-lg text-white/90">
           Análisis detallado de tus finanzas y documentos
         </p>

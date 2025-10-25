@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 import { syncUserProfile } from "@/lib/syncUserProfile";
+import { cacheService } from "@/lib/cacheService";
+import { prefetch } from "./useSWR";
+import { getCurrentMonthKey } from "@/lib/date-config";
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -16,11 +19,19 @@ export const useAuth = () => {
       setSession(session);
       setUser(session?.user ?? null);
 
+      // Configurar userId no cache service
+      cacheService.setUserId(session?.user?.id || null);
+
       if (session?.user) {
         // Defer sync and profile fetch to avoid deadlocks
         setTimeout(async () => {
           await performSync();
           await fetchProfile(session.user!.id);
+          
+          // Prefetch dados críticos após SIGNED_IN
+          if (event === 'SIGNED_IN') {
+            performPrefetch(session.user!.id);
+          }
           
           // Redirigir a home si estamos en callback o auth
           if (window.location.pathname === '/auth/callback' || window.location.pathname === '/auth') {
@@ -37,9 +48,15 @@ export const useAuth = () => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      // Configurar userId no cache service
+      cacheService.setUserId(session?.user?.id || null);
+      
       if (session?.user) {
         await performSync();
         await fetchProfile(session.user.id);
+        // Prefetch no boot
+        performPrefetch(session.user.id);
       } else {
         setLoading(false);
       }
@@ -127,7 +144,53 @@ export const useAuth = () => {
     const { clearProfileCache } = await import('@/hooks/useProfile');
     clearProfileCache();
     
+    // Limpar cache persistente
+    await cacheService.clearAll();
+    
     await supabase.auth.signOut();
+  };
+
+  // Função para fazer prefetch dos dados críticos
+  const performPrefetch = async (userId: string) => {
+    const mesAtual = getCurrentMonthKey();
+    
+    // Prefetch gastos do mês atual
+    prefetch(`gastos-${userId}-${mesAtual}`, async () => {
+      const [year, month] = mesAtual.split('-').map(Number);
+      const lastDay = new Date(year, month, 0);
+      const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+      const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
+      
+      const { data } = await supabase
+        .from('gastos')
+        .select('*')
+        .eq('user_id', userId)
+        .gte('fecha', startDate)
+        .lte('fecha', endDate)
+        .order('fecha', { ascending: false });
+      return data || [];
+    });
+    
+    // Prefetch reportes
+    prefetch(`reportes-${userId}`, async () => {
+      const { data } = await supabase
+        .from('reportes')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      return data || [];
+    });
+    
+    // Prefetch profile
+    prefetch(`perfil-${userId}`, async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+      return data;
+    });
   };
 
   return {
