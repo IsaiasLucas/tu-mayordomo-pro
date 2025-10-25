@@ -57,8 +57,21 @@ export default function Auth() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validar que los campos no estén vacíos
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password;
+    
+    if (!trimmedEmail || !trimmedPassword) {
+      toast({
+        title: "Error",
+        description: "Completa tu correo y contraseña.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Security: Validate input before processing
-    const validationResult = authSchema.safeParse({ email, password });
+    const validationResult = authSchema.safeParse({ email: trimmedEmail, password: trimmedPassword });
     if (!validationResult.success) {
       const firstError = validationResult.error.errors[0];
       toast({
@@ -76,59 +89,57 @@ export default function Auth() {
       const { syncUserProfile } = await import('@/lib/syncUserProfile');
       
       if (isSignUp) {
-        const redirectTo = 'https://tumayordomo.app/auth/confirm';
-        
+        // Flujo de registro
         const { data, error } = await supabase.auth.signUp({
           email: validEmail,
           password: validPassword,
           options: {
-            emailRedirectTo: redirectTo
+            emailRedirectTo: 'https://tumayordomo.app/auth/confirm'
           }
         });
 
-        // Si el usuario ya existe pero no está confirmado, reenviar email
-        if (error?.message?.toLowerCase().includes('already') || error?.code === 'user_already_exists') {
-          const confirmRedirectTo = 'https://tumayordomo.app/auth/confirm';
-          try {
-            await supabase.auth.resend({
-              type: 'signup',
-              email: validEmail,
-              options: { emailRedirectTo: confirmRedirectTo }
-            });
-            
-            // Mostrar modal de confirmación
-            setRegisteredEmail(validEmail);
-            setShowEmailConfirmModal(true);
+        if (error) {
+          const msg = (error.message || '').toLowerCase();
+          
+          // Manejo de errores específicos
+          if (msg.includes('rate limit') || msg.includes('too many')) {
             toast({
-              title: "Correo reenviado",
-              description: "Verifica tu bandeja de entrada y spam",
-            });
-          } catch (resendError: any) {
-            toast({
-              title: "Error",
-              description: "No pudimos reenviar el correo. Intenta nuevamente.",
+              title: "Demasiados intentos",
+              description: "Intenta de nuevo en unos minutos.",
               variant: "destructive",
             });
+            return;
           }
+          
+          if (msg.includes('email') || msg.includes('already registered')) {
+            toast({
+              title: "Error",
+              description: "No pudimos enviar el correo. Revisa tu dirección o intenta reenviar.",
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          toast({
+            title: "Error",
+            description: "No pudimos crear tu cuenta. Inténtalo de nuevo.",
+            variant: "destructive",
+          });
           return;
         }
 
-        if (error) {
-          toast({
-            title: "Error",
-            description: "No pudimos enviar el correo de confirmación. Intenta nuevamente.",
-            variant: "destructive",
-          });
-          throw error;
-        }
-
-        // Mostrar modal de confirmación para registro exitoso
+        // Si Supabase aceptó el registro: mostrar feedback
+        toast({
+          title: "¡Cuenta creada!",
+          description: "Te enviamos un correo para verificar tu cuenta.",
+        });
+        
+        // Mostrar modal con opción de reenvío
         setRegisteredEmail(validEmail);
         setShowEmailConfirmModal(true);
         
       } else {
-        // Login flow - SIEMPRE usar auth.users como fuente de verdad
-        const confirmRedirectTo = 'https://tumayordomo.app/confirmacion';
+        // Login flow
         const { data, error } = await supabase.auth.signInWithPassword({
           email: validEmail,
           password: validPassword,
@@ -140,11 +151,10 @@ export default function Auth() {
           
           if (msg.includes('email not confirmed') || code === 'email_not_confirmed') {
             // Email no confirmado - reenviar
-            const confirmRedirectTo = 'https://tumayordomo.app/auth/confirm';
             await supabase.auth.resend({ 
               type: 'signup', 
               email: validEmail, 
-              options: { emailRedirectTo: confirmRedirectTo }
+              options: { emailRedirectTo: 'https://tumayordomo.app/auth/confirm' }
             });
             setRegisteredEmail(validEmail);
             setShowEmailConfirmModal(true);
@@ -153,13 +163,12 @@ export default function Auth() {
               description: `Te enviamos un email a ${validEmail} para activar tu cuenta.`,
             });
           } else if (msg.includes('invalid') || msg.includes('credentials') || code === 'invalid_credentials') {
-            // Credenciales incorrectas - ofrecer reset
+            // Credenciales incorrectas
             toast({
               title: "Credenciales incorrectas",
               description: "Verifica tu correo y contraseña.",
               variant: "destructive",
             });
-            setShowResetDialog(true);
           } else {
             toast({
               title: "Error",
@@ -198,16 +207,9 @@ export default function Auth() {
         console.error('Auth error:', error);
       }
       
-      // Map known errors to safe messages
-      const safeMessage = error.message === 'Invalid login credentials' 
-        ? 'Credenciales incorrectas. Verifica tu email y contraseña.'
-        : error.message === 'Email not confirmed'
-        ? 'Por favor confirma tu email antes de continuar.'
-        : 'Error de autenticación. Por favor intenta nuevamente.';
-      
       toast({
         title: "Error",
-        description: safeMessage,
+        description: "Error de autenticación. Por favor intenta nuevamente.",
         variant: "destructive",
       });
     } finally {
@@ -217,16 +219,15 @@ export default function Auth() {
 
   const handleResendEmail = async () => {
     try {
-      const confirmRedirectTo = 'https://tumayordomo.app/auth/confirm';
       await supabase.auth.resend({
         type: 'signup',
         email: registeredEmail,
-        options: { emailRedirectTo: confirmRedirectTo }
+        options: { emailRedirectTo: 'https://tumayordomo.app/auth/confirm' }
       });
       
       toast({
         title: "Correo reenviado",
-        description: "Revisa tu bandeja de entrada y spam",
+        description: "Hemos reenviado el correo de verificación. Revisa tu bandeja y spam.",
       });
     } catch (error: any) {
       toast({
