@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
+import { usePrefetch } from "@/hooks/usePrefetch";
 import Navigation from "@/components/Navigation";
 import InicioView from "@/components/views/InicioView";
 import GastosView from "@/components/views/GastosView";
@@ -13,20 +14,23 @@ import InstallPrompt from "@/components/InstallPrompt";
 import { ViewTransition } from "@/components/ViewTransition";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActiveTab, ActiveTab } from "@/store/appState";
+
 const Index = () => {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading, isPro, refreshProfile } = useProfile();
   const { activeTab, setActiveTab } = useActiveTab();
   const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
+
+  // Prefetch dados críticos no boot
+  usePrefetch();
+
   // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       navigate("/auth");
     }
   }, [isAuthenticated, authLoading, navigate]);
-
-  // Removed URL sync: single source of truth is global app.activeTab
 
   // Show loading skeleton while auth or profile are loading
   if (authLoading || profileLoading) {
@@ -46,76 +50,43 @@ const Index = () => {
   }
 
   const handleViewChange = (view: string) => {
-    const set = () => setActiveTab(view as ActiveTab);
-    // @ts-ignore - experimental API
-    const startVT = (document as any).startViewTransition;
-    if (typeof startVT === 'function') {
-      startVT(set);
-    } else {
-      set();
-    }
+    setActiveTab(view as ActiveTab);
   };
+
   const handleModalClose = async () => {
     setShowProfileModal(false);
-    // Refresh profile after modal closes
     await refreshProfile();
   };
 
-  const renderCurrentView = () => {
-    switch (activeTab) {
-      case "inicio":
-        return (
-          <ViewTransition viewKey="inicio">
-            <InicioView 
-              profile={profile}
-              onOpenProfileModal={() => setShowProfileModal(true)} 
-              onViewChange={handleViewChange} 
-            />
-          </ViewTransition>
-        );
-      case "gastos":
-        return (
-          <ViewTransition viewKey="gastos">
-            <GastosView profile={profile} />
-          </ViewTransition>
-        );
-      case "reportes":
-        return (
-          <ViewTransition viewKey="reportes">
-            <ReportesView />
-          </ViewTransition>
-        );
-      case "planes":
-        return (
-          <ViewTransition viewKey="planes">
-            <PlanesView />
-          </ViewTransition>
-        );
-      case "perfil":
-        return (
-          <ViewTransition viewKey="perfil">
-            <PerfilView onViewChange={handleViewChange} />
-          </ViewTransition>
-        );
-      default:
-        return (
-          <ViewTransition viewKey="inicio">
-            <InicioView 
-              profile={profile}
-              onOpenProfileModal={() => setShowProfileModal(true)} 
-              onViewChange={handleViewChange} 
-            />
-          </ViewTransition>
-        );
-    }
-  };
-
+  // Keep-alive: renderizar todas views, mostrar/esconder via CSS
   return (
     <div className="w-full bg-background overflow-y-auto overflow-x-hidden" style={{ minHeight: 'calc(var(--vh, 1vh) * 100)' }}>
       <Navigation isPro={isPro} />
       
-      <main key={activeTab} className="pb-24" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
-        {renderCurrentView()}
+      <main className="pb-24" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
+        <ViewTransition isActive={activeTab === 'inicio'}>
+          <InicioView 
+            profile={profile}
+            onOpenProfileModal={() => setShowProfileModal(true)} 
+            onViewChange={handleViewChange} 
+          />
+        </ViewTransition>
+
+        <ViewTransition isActive={activeTab === 'gastos'}>
+          <GastosView profile={profile} />
+        </ViewTransition>
+
+        <ViewTransition isActive={activeTab === 'reportes'}>
+          <ReportesView />
+        </ViewTransition>
+
+        <ViewTransition isActive={activeTab === 'planes'}>
+          <PlanesView />
+        </ViewTransition>
+
+        <ViewTransition isActive={activeTab === 'perfil'}>
+          <PerfilView onViewChange={handleViewChange} />
+        </ViewTransition>
       </main>
 
       <CompleteProfileModal

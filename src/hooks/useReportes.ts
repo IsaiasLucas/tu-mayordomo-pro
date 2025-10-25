@@ -1,64 +1,45 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { useSWR } from "./useSWR";
 
-// Cache simples para reportes
-const reportesCache = new Map<string, { data: any[], timestamp: number }>();
-const CACHE_DURATION = 30000; // 30 segundos
+export function useReportes(page = 0) {
+  const { user } = useAuth();
+  const [hasMore, setHasMore] = useState(true);
+  
+  const PAGE_SIZE = 20;
+  const offset = page * PAGE_SIZE;
 
-export function useReportes() {
-  const { user, profile } = useAuth();
-  const [items, setItems] = useState<any[]>(() => {
-    if (user) {
-      const cached = reportesCache.get(user.id);
-      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-        return cached.data;
-      }
-    }
-    return [];
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<any>(null);
+  const { data, error, isValidating, revalidate } = useSWR(
+    user?.id ? `reportes-${user.id}-${page}` : null,
+    async () => {
+      if (!user?.id) return [];
 
-  const fetchReportes = useCallback(async () => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      
-      // Verificar cache primeiro
-      const cached = reportesCache.get(user.id);
-      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-        setItems(cached.data);
-        setLoading(false);
-        return;
-      }
-
-      const { data, error } = await supabase
+      const { data: fetchData, error: fetchError } = await supabase
         .from('reportes')
         .select('*')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(offset, offset + PAGE_SIZE - 1);
 
-      if (error) throw error;
-      
-      const reportes = data || [];
-      // Salvar no cache
-      reportesCache.set(user.id, { data: reportes, timestamp: Date.now() });
-      setItems(reportes);
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  }, [user, profile]);
+      if (fetchError) throw fetchError;
 
-  useEffect(() => {
-    fetchReportes();
-  }, [fetchReportes]);
+      setHasMore((fetchData?.length || 0) === PAGE_SIZE);
+      return fetchData || [];
+    },
+    { revalidateOnMount: true }
+  );
 
-  return { items, loading, error, refetch: fetchReportes };
+  const loadMore = useCallback(() => {
+    return page + 1;
+  }, [page]);
+
+  return {
+    items: data || [],
+    loading: isValidating && !data,
+    error,
+    refetch: revalidate,
+    hasMore,
+    loadMore,
+  };
 }

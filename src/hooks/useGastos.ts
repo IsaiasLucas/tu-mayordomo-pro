@@ -1,73 +1,51 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { monthRangeUTCFromSantiago } from "@/lib/date-config";
+import { useAuth } from "./useAuth";
+import { useSWR } from "./useSWR";
+import { getCurrentMonthKey } from "@/lib/date-config";
 
-// Cache simples para gastos
-const gastosCache = new Map<string, { data: any[], timestamp: number }>();
-const CACHE_DURATION = 30000; // 30 segundos
+export function useGastos(mes?: string, page = 0) {
+  const { user } = useAuth();
+  const mesKey = mes || getCurrentMonthKey();
+  const [hasMore, setHasMore] = useState(true);
+  
+  const PAGE_SIZE = 50;
+  const offset = page * PAGE_SIZE;
 
-export function useGastos(mes?: string) {
-  const [items, setItems] = useState<any[]>(() => {
-    const d = new Date();
-    const ym = mes || `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    const cached = gastosCache.get(ym);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      return cached.data;
-    }
-    return [];
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<any>(null);
+  const { data, error, isValidating, revalidate } = useSWR(
+    user?.id ? `gastos-${user.id}-${mesKey}-${page}` : null,
+    async () => {
+      if (!user?.id) return [];
 
-  const fetchGastos = useCallback(async () => {
-    try {
-      setLoading(true);
-      
-      // Get authenticated user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      const d = new Date();
-      const ym = mes || `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-      
-      // Verificar cache primeiro
-      const cached = gastosCache.get(ym);
-      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-        setItems(cached.data);
-        setLoading(false);
-        return;
-      }
-      
-      // Buscar gastos del mes específico SIEMPRE por user_id
-      const { data, error: fetchError } = await supabase
+      const ym = mesKey.substring(0, 7);
+      const { data: fetchData, error: fetchError } = await supabase
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
         .gte('fecha', ym + '-01')
         .lte('fecha', ym + '-31')
-        .order('fecha', { ascending: false });
+        .order('fecha', { ascending: false })
+        .range(offset, offset + PAGE_SIZE - 1);
 
       if (fetchError) throw fetchError;
-      
-      const gastos = data || [];
-      
-      // Salvar no cache
-      gastosCache.set(ym, { data: gastos, timestamp: Date.now() });
-      setItems(gastos);
-    } catch (err) {
-      console.error('Error fetching gastos:', err);
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  }, [mes]);
 
-  useEffect(() => {
-    fetchGastos();
-  }, [fetchGastos]);
+      setHasMore((fetchData?.length || 0) === PAGE_SIZE);
+      return fetchData || [];
+    },
+    { revalidateOnMount: true }
+  );
 
-  return { items, loading, error, refetch: fetchGastos };
+  const loadMore = useCallback(() => {
+    // Retorna próxima página
+    return page + 1;
+  }, [page]);
+
+  return {
+    items: data || [],
+    loading: isValidating && !data,
+    error,
+    refetch: revalidate,
+    hasMore,
+    loadMore,
+  };
 }

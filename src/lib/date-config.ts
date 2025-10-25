@@ -1,10 +1,18 @@
-// Configuración de fecha y hora para Chile/Santiago
+// Configuração de fecha y hora para Chile/Santiago
 import { es } from 'date-fns/locale';
 import { parseISO, isValid } from 'date-fns';
 import { formatInTimeZone, fromZonedTime, toZonedTime } from 'date-fns-tz';
 
 // Timezone para Chile/Santiago
 export const CHILE_TIMEZONE = 'America/Santiago';
+
+// Helper para obter chave do mês atual
+export function getCurrentMonthKey(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+}
 
 // Locale en español chileno
 export const chileLocale = es;

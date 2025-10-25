@@ -2,18 +2,16 @@ import { ReactNode } from "react";
 
 interface ViewTransitionProps {
   children: ReactNode;
-  viewKey: string;
+  isActive: boolean;
 }
 
-export function ViewTransition({ children, viewKey }: ViewTransitionProps) {
+export function ViewTransition({ children, isActive }: ViewTransitionProps) {
   return (
     <div 
-      key={viewKey} 
-      className="animate-fade-in-fast will-change-transform"
+      className="transition-opacity duration-200"
       style={{ 
-        animationFillMode: 'both',
-        backfaceVisibility: 'hidden',
-        transform: 'translateZ(0)'
+        display: isActive ? 'block' : 'none',
+        opacity: isActive ? 1 : 0,
       }}
     >
       {children}
