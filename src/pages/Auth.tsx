@@ -76,7 +76,7 @@ export default function Auth() {
       const { syncUserProfile } = await import('@/lib/syncUserProfile');
       
       if (isSignUp) {
-        const redirectTo = 'https://tumayordomo.app/auth/callback';
+        const redirectTo = 'https://tumayordomo.app/auth/confirm';
         
         const { data, error } = await supabase.auth.signUp({
           email: validEmail,
@@ -88,11 +88,12 @@ export default function Auth() {
 
         // Si el usuario ya existe pero no está confirmado, reenviar email
         if (error?.message?.toLowerCase().includes('already') || error?.code === 'user_already_exists') {
+          const confirmRedirectTo = 'https://tumayordomo.app/auth/confirm';
           try {
             await supabase.auth.resend({
               type: 'signup',
               email: validEmail,
-              options: { emailRedirectTo: redirectTo }
+              options: { emailRedirectTo: confirmRedirectTo }
             });
             
             // Mostrar modal de confirmación
@@ -127,7 +128,7 @@ export default function Auth() {
         
       } else {
         // Login flow - SIEMPRE usar auth.users como fuente de verdad
-        const redirectTo = 'https://tumayordomo.app/auth/callback';
+        const confirmRedirectTo = 'https://tumayordomo.app/auth/confirm';
         const { data, error } = await supabase.auth.signInWithPassword({
           email: validEmail,
           password: validPassword,
@@ -139,10 +140,11 @@ export default function Auth() {
           
           if (msg.includes('email not confirmed') || code === 'email_not_confirmed') {
             // Email no confirmado - reenviar
+            const confirmRedirectTo = 'https://tumayordomo.app/auth/confirm';
             await supabase.auth.resend({ 
               type: 'signup', 
               email: validEmail, 
-              options: { emailRedirectTo: redirectTo }
+              options: { emailRedirectTo: confirmRedirectTo }
             });
             setRegisteredEmail(validEmail);
             setShowEmailConfirmModal(true);
@@ -215,11 +217,11 @@ export default function Auth() {
 
   const handleResendEmail = async () => {
     try {
-      const redirectTo = 'https://tumayordomo.app/auth/callback';
+      const confirmRedirectTo = 'https://tumayordomo.app/auth/confirm';
       await supabase.auth.resend({
         type: 'signup',
         email: registeredEmail,
-        options: { emailRedirectTo: redirectTo }
+        options: { emailRedirectTo: confirmRedirectTo }
       });
       
       toast({

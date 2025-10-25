@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
+import EmailConfirm from "./pages/EmailConfirm";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "./components/ui/toaster";
@@ -19,6 +20,7 @@ function App() {
           <Route path="/perfil" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/auth/confirm" element={<EmailConfirm />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
