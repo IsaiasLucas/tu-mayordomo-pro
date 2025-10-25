@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Eye, EyeOff, Sparkles, TrendingUp, Shield, Zap } from "lucide-react";
+import { Eye, EyeOff, Sparkles, TrendingUp, Shield, Zap, Mail } from "lucide-react";
 import fintechHero from "@/assets/fintech-hero.png";
 import geminisLogo from "@/assets/geminis-logo.png";
 import apoyadorLogo from "@/assets/apoyador-logo.png";
@@ -140,7 +140,7 @@ export default function Auth() {
           
           if (msg.includes('email not confirmed') || code === 'email_not_confirmed') {
             // Email no confirmado - reenviar
-            const confirmRedirectTo = 'https://tumayordomo.app/verified';
+            const confirmRedirectTo = `${window.location.origin}/verified`;
             await supabase.auth.resend({ 
               type: 'signup', 
               email: validEmail, 
@@ -170,7 +170,7 @@ export default function Auth() {
           return;
         }
 
-        // Login exitoso - sincronizar profiles/usuarios por user_id
+        // Login exitoso - verificar que el email está confirmado
         const user = data.user;
         if (!user) {
           toast({
@@ -178,6 +178,14 @@ export default function Auth() {
             description: "No se pudo obtener los datos del usuario.",
             variant: "destructive",
           });
+          return;
+        }
+
+        // Verificar si el email está confirmado
+        if (!user.email_confirmed_at) {
+          setRegisteredEmail(email);
+          setShowEmailConfirmModal(true);
+          await supabase.auth.signOut(); // Cerrar sesión de usuario no confirmado
           return;
         }
 
@@ -217,7 +225,7 @@ export default function Auth() {
 
   const handleResendEmail = async () => {
     try {
-      const confirmRedirectTo = 'https://tumayordomo.app/verified';
+      const confirmRedirectTo = `${window.location.origin}/verified`;
       await supabase.auth.resend({
         type: 'signup',
         email: registeredEmail,
@@ -225,9 +233,11 @@ export default function Auth() {
       });
       
       toast({
-        title: "Correo reenviado",
+        title: "✅ Correo reenviado",
         description: "Revisa tu bandeja de entrada y spam",
       });
+      
+      setShowEmailConfirmModal(false);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -511,29 +521,34 @@ export default function Auth() {
       <Dialog open={showEmailConfirmModal} onOpenChange={setShowEmailConfirmModal}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Confirma tu correo</DialogTitle>
-            <DialogDescription className="text-base pt-2 space-y-2">
-              <p>Te enviamos un correo de verificación. Revisa tu bandeja y haz clic en el enlace para confirmar tu cuenta.</p>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+              <Mail className="w-6 h-6 text-primary" />
+              Verifica tu correo
+            </DialogTitle>
+            <DialogDescription className="text-base pt-3 space-y-3">
+              <p className="text-foreground/80">
+                Tu correo aún no ha sido confirmado. Revisa tu bandeja de entrada (o spam) y haz clic en el enlace de verificación.
+              </p>
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-3 pt-4">
             <Button
+              onClick={handleResendEmail}
+              className="w-full h-12 font-semibold"
+            >
+              Reenviar correo de verificación
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => {
                 setShowEmailConfirmModal(false);
                 setEmail("");
                 setPassword("");
               }}
-              className="w-full"
+              className="w-full h-12"
             >
               Entendido
             </Button>
-            <button
-              type="button"
-              onClick={handleResendEmail}
-              className="text-sm font-semibold text-primary hover:text-accent transition-colors underline"
-            >
-              Reenviar correo
-            </button>
           </div>
         </DialogContent>
       </Dialog>
