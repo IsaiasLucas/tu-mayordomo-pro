@@ -5,6 +5,7 @@ import AuthCallback from "./pages/AuthCallback";
 import EmailConfirm from "./pages/EmailConfirm";
 import EmailConfirmation from "./pages/EmailConfirmation";
 import ResetPassword from "./pages/ResetPassword";
+import EmailChange from "./pages/EmailChange";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "./components/ui/toaster";
 import { ActiveTabProvider } from "./store/appState";
@@ -24,6 +25,7 @@ function App() {
           <Route path="/auth/confirm" element={<EmailConfirm />} />
           <Route path="/confirmacion" element={<EmailConfirmation />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/email-change" element={<EmailChange />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />

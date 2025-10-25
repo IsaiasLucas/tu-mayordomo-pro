@@ -51,6 +51,7 @@ import {
   Plus,
   MessageCircle
 } from "lucide-react";
+import { z } from "zod";
 
 interface PerfilViewProps {
   onViewChange?: (view: string) => void;
@@ -69,6 +70,8 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showCancelPlanDialog, setShowCancelPlanDialog] = useState(false);
   const [newPassword, setNewPassword] = useState("");
+  const [editEmail, setEditEmail] = useState<string>("");
+  const [changingEmail, setChangingEmail] = useState(false);
   const [loading, setLoading] = useState(false);
   const [cancellingPlan, setCancellingPlan] = useState(false);
   const [editName, setEditName] = useState("");
@@ -315,6 +318,7 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
   const handleEditProfile = () => {
     setEditName(userProfile.name);
     setAvatarUrl(profile?.avatar_url || null);
+    setEditEmail(userProfile.email);
     setShowEditDialog(true);
   };
 
@@ -1111,16 +1115,47 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
               </p>
             </div>
 
-            {/* Email (disabled) */}
+            {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-base font-semibold">Email</Label>
               <Input
                 id="email"
-                value={userProfile.email}
-                disabled
-                className="rounded-xl h-12 text-base bg-gray-100 cursor-not-allowed"
+                value={editEmail}
+                onChange={(e) => setEditEmail(e.target.value)}
+                className="rounded-xl h-12 text-base"
                 autoFocus={false}
+                placeholder="novoemail@exemplo.com"
               />
+              <p className="text-xs text-muted-foreground">
+                Para alterar o e-mail, informe o novo endereço e clique em "Enviar confirmação". Você receberá um link para confirmar a troca.
+              </p>
+              <Button
+                type="button"
+                onClick={async () => {
+                  const emailSchema = z.string().trim().toLowerCase().email("Email inválido").max(255);
+                  const parsed = emailSchema.safeParse(editEmail);
+                  if (!parsed.success) {
+                    toast({ title: "Email inválido", description: parsed.error.errors[0].message, variant: "destructive" });
+                    return;
+                  }
+                  setChangingEmail(true);
+                  try {
+                    const redirect = `${window.location.origin}/email-change`;
+                    const authAny: any = supabase.auth as any;
+                    const { error } = await authAny.updateUser({ email: parsed.data, options: { emailRedirectTo: redirect } });
+                    if (error) throw error;
+                    toast({ title: "Confirmação enviada", description: `Enviamos um link para ${parsed.data}. Confirme para concluir a troca.` });
+                  } catch (e: any) {
+                    toast({ title: "Erro ao solicitar troca", description: e?.message || "Tente novamente.", variant: "destructive" });
+                  } finally {
+                    setChangingEmail(false);
+                  }
+                }}
+                disabled={changingEmail}
+                className="rounded-xl h-10"
+              >
+                {changingEmail ? "Enviando..." : "Enviar confirmação"}
+              </Button>
             </div>
           </div>
 
