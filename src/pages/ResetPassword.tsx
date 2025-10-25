@@ -22,6 +22,10 @@ export default function ResetPassword() {
 
   useEffect(() => {
     const verifyResetLink = async () => {
+      console.log("🔍 ResetPassword - Verificando URL completa:", window.location.href);
+      console.log("🔍 Hash:", window.location.hash);
+      console.log("🔍 Search:", window.location.search);
+      
       // 1) Intentar flujo estándar de Supabase (hash con tokens y type=recovery)
       const hash = window.location.hash?.replace(/^#/, "") || "";
       const hashParams = new URLSearchParams(hash);
@@ -29,32 +33,50 @@ export default function ResetPassword() {
       const accessToken = hashParams.get("access_token");
       const refreshToken = hashParams.get("refresh_token");
 
+      console.log("🔍 Hash type:", type);
+      console.log("🔍 Hash accessToken:", accessToken ? "presente" : "ausente");
+      console.log("🔍 Hash refreshToken:", refreshToken ? "presente" : "ausente");
+
       if (type === "recovery" && accessToken && refreshToken) {
+        console.log("✅ Usando flujo de hash con tokens");
         try {
           const { error } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken,
           });
-          if (error) throw error;
+          if (error) {
+            console.error("❌ Error en setSession:", error);
+            throw error;
+          }
 
+          console.log("✅ Sesión establecida correctamente");
           // Limpiar el hash de la URL
           window.history.replaceState(null, "", window.location.pathname + window.location.search);
           setState("form");
           return;
-        } catch (_) {
+        } catch (err) {
+          console.error("❌ Error en flujo de hash:", err);
           // Si falla, caer al flujo por código
         }
       }
 
       // 2) Flujo alternativo por código (?code=...)
       const code = new URLSearchParams(window.location.search).get("code");
+      console.log("🔍 Query code:", code ? "presente" : "ausente");
+      
       if (code) {
+        console.log("✅ Usando flujo de código");
         try {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
-          if (error) throw error;
+          if (error) {
+            console.error("❌ Error en exchangeCodeForSession:", error);
+            throw error;
+          }
+          console.log("✅ Código intercambiado correctamente");
           setState("form");
           return;
-        } catch (_) {
+        } catch (err) {
+          console.error("❌ Error en flujo de código:", err);
           setState("error");
           setErrorMessage("El enlace no es válido o expiró. Solicita uno nuevo.");
           return;
@@ -62,6 +84,7 @@ export default function ResetPassword() {
       }
 
       // 3) Si no hay tokens ni código, mostrar error
+      console.error("❌ No se encontraron tokens ni código en la URL");
       setState("error");
       setErrorMessage("El enlace no es válido o expiró. Solicita uno nuevo.");
     };
