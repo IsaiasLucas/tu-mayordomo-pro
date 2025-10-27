@@ -73,7 +73,6 @@ export default function ReportesView() {
       const { data: gastos, error } = await (supabase as any)
         .from('gastos')
         .select('*')
-        .eq('user_id', user.id)
         .gte('fecha', format(startDate, 'yyyy-MM-dd'))
         .lte('fecha', format(endDate, 'yyyy-MM-dd'))
         .order('fecha', { ascending: false });
