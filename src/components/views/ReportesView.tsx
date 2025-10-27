@@ -56,7 +56,6 @@ export default function ReportesView() {
   const [customStartDate, setCustomStartDate] = useState<Date>();
   const [customEndDate, setCustomEndDate] = useState<Date>();
   const [selectedPeriod, setSelectedPeriod] = useState<"week" | "month" | "lastMonth" | "custom">("month");
-  const [recentMovimientos, setRecentMovimientos] = useState<Movimiento[]>([]);
   
   // Verificar plano do cache imediatamente
   const isPro = profile?.plan === "pro" || profile?.plan === "mensal" || profile?.plan === "anual";
@@ -196,7 +195,6 @@ export default function ReportesView() {
       setTotalIngresos(ingresos);
       setTotalEgresos(egresos);
       setTotalMovimientos(movimientos.length);
-      setRecentMovimientos(movimientos.slice(0, 10));
     };
 
     loadPeriodData();
@@ -841,53 +839,60 @@ export default function ReportesView() {
         </CardContent>
       </Card>
 
-      {/* Movimientos recientes */}
-      {recentMovimientos.length > 0 && (
-        <Card className="shadow-card border-0">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <FileText className="h-5 w-5 text-primary" />
-              Movimientos del Periodo
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+      {/* Reportes Solicitados */}
+      <Card className="shadow-card border-0">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <FileText className="h-5 w-5 text-primary" />
+            Reportes Solicitados
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {items.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <FileText className="h-12 w-12 mx-auto mb-3 opacity-30" />
+              <p>No hay reportes generados aún</p>
+              <p className="text-sm mt-2">Genera tu primer reporte usando los botones de arriba</p>
+            </div>
+          ) : (
             <div className="space-y-3">
-              {recentMovimientos.map((mov, index) => (
+              {items.map((reporte) => (
                 <div
-                  key={index}
+                  key={reporte.id}
                   className="flex items-center justify-between p-4 rounded-xl border bg-card hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className={cn(
-                        "text-xs px-2 py-1 rounded font-medium",
-                        (mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita")
-                          ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-                          : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
-                      )}>
-                        {formatDatabaseDate(mov.fecha, "dd/MM HH:mm")}
-                       </span>
-                      {mov.categoria && (
-                        <span className="text-xs text-muted-foreground">• {mov.categoria}</span>
-                      )}
+                      <span className="text-xs px-2 py-1 rounded font-medium bg-primary/10 text-primary">
+                        {reporte.tipo.charAt(0).toUpperCase() + reporte.tipo.slice(1)}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {formatDatabaseDate(reporte.created_at, "dd/MM/yyyy HH:mm")}
+                      </span>
                     </div>
-                    <p className="font-medium truncate">{mov.descripcion}</p>
+                    <p className="font-medium">{reporte.periodo}</p>
+                    {reporte.data && (reporte.data as any).movimientos_count && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {(reporte.data as any).movimientos_count} movimientos
+                      </p>
+                    )}
                   </div>
-                  <span className={cn(
-                    "font-bold text-lg ml-3 flex-shrink-0",
-                    (mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita")
-                      ? "text-green-600 dark:text-green-400"
-                      : "text-red-600 dark:text-red-400"
-                  )}>
-                    {(mov.tipo.toLowerCase() === "ingreso" || mov.tipo.toLowerCase() === "receita") ? "+" : "-"}
-                    {fmtCLP(Math.abs(Number(mov.monto)))}
-                  </span>
+                  {reporte.pdf_url && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="ml-3 flex-shrink-0"
+                      onClick={() => window.open(reporte.pdf_url!, '_blank')}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
+        </CardContent>
+      </Card>
         </TabsContent>
 
         {/* Tab de Facturas y Boletas */}
