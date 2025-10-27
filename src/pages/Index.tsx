@@ -28,19 +28,6 @@ const Index = () => {
     }
   }, [isAuthenticated, authLoading, navigate]);
 
-  // Check if user is returning from Stripe checkout and refresh profile
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('checkout') === 'success') {
-      // User returned from successful checkout, refresh profile
-      setTimeout(() => {
-        refreshProfile();
-      }, 1500); // Wait a bit for Stripe webhook to update database
-      // Clean up URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, [refreshProfile]);
-
   // Cerrar teclado al cambiar de pestaña
   useEffect(() => {
     if (document.activeElement instanceof HTMLElement) {
