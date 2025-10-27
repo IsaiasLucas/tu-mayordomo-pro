@@ -156,6 +156,8 @@ export default function PlanesView() {
       }
       if (data.subscribed) {
         console.log("Subscription active:", data.plan);
+        // Force profile refresh to update UI
+        window.location.reload();
       }
     } catch (error) {
       console.error("Error checking subscription:", error);
