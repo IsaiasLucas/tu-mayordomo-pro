@@ -93,6 +93,7 @@ export type Database = {
           fecha_documento: string
           id: string
           monto: number | null
+          telefono: string | null
           tipo: string
           updated_at: string
           user_id: string
@@ -107,6 +108,7 @@ export type Database = {
           fecha_documento: string
           id?: string
           monto?: number | null
+          telefono?: string | null
           tipo: string
           updated_at?: string
           user_id: string
@@ -121,6 +123,7 @@ export type Database = {
           fecha_documento?: string
           id?: string
           monto?: number | null
+          telefono?: string | null
           tipo?: string
           updated_at?: string
           user_id?: string
