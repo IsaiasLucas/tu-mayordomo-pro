@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useSWR } from "./useSWR";
@@ -24,10 +24,36 @@ export function useReportes() {
     { revalidateOnMount: true, revalidateOnFocus: true }
   );
 
+  // Set up realtime subscription
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channel = supabase
+      .channel('reportes-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'reportes',
+          filter: `user_id=eq.${user.id}`
+        },
+        () => {
+          console.log('Reportes atualizado em tempo real');
+          revalidate();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, revalidate]);
+
   return {
     items: data || [],
-    loading: isValidating && !data, // Só mostra loading se não tem dados
-    isRevalidating, // Novo: indica atualização em background
+    loading: isValidating && !data,
+    isRevalidating,
     error,
     refetch: revalidate,
   };
