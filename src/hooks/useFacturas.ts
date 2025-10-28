@@ -61,6 +61,54 @@ export function useFacturas(accountId?: string) {
 
   useEffect(() => {
     fetchFacturas();
+
+    // Set up real-time subscription for new facturas
+    const setupRealtimeSubscription = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const channel = supabase
+        .channel('facturas-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'facturas_boletas',
+            filter: `user_id=eq.${user.id}`
+          },
+          (payload) => {
+            console.log('Nova factura adicionada:', payload);
+            fetchFacturas();
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'facturas_boletas',
+            filter: `user_id=eq.${user.id}`
+          },
+          (payload) => {
+            console.log('Factura deletada:', payload);
+            fetchFacturas();
+          }
+        )
+        .subscribe();
+
+      return channel;
+    };
+
+    const channelPromise = setupRealtimeSubscription();
+
+    return () => {
+      channelPromise.then(channel => {
+        if (channel) {
+          supabase.removeChannel(channel);
+        }
+      });
+    };
   }, [accountId]);
 
   const uploadFactura = async (
