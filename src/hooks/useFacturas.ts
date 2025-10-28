@@ -45,7 +45,29 @@ export function useFacturas(accountId?: string) {
       const { data, error } = await query;
 
       if (error) throw error;
-      setFacturas((data || []) as Factura[]);
+
+      // Ensure URL works even if bucket is private by generating a fresh signed URL
+      const processed = await Promise.all((data || []).map(async (rec: any) => {
+        try {
+          const url: string = rec.archivo_url || '';
+          if (!url) return rec;
+          // Try to extract the storage path after the bucket name
+          const m = url.match(/storage\/v1\/object\/(?:public|sign)\/facturas-boletas\/([^?]+)/);
+          const path = m ? decodeURIComponent(m[1]) : null;
+          if (!path) return rec;
+          const { data: signed } = await supabase.storage
+            .from('facturas-boletas')
+            .createSignedUrl(path, 60 * 60 * 24 * 7); // 7 days
+          if (signed?.signedUrl) {
+            return { ...rec, archivo_url: signed.signedUrl };
+          }
+          return rec;
+        } catch (_) {
+          return rec;
+        }
+      }));
+
+      setFacturas(processed as Factura[]);
     } catch (error: any) {
       console.error('Error fetching facturas:', error);
       toast({
@@ -83,10 +105,17 @@ export function useFacturas(accountId?: string) {
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
+      // Create a fresh signed URL (bucket is private)
+      const { data: signedData } = await supabase.storage
+        .from('facturas-boletas')
+        .createSignedUrl(fileName, 60 * 60 * 24 * 7); // 7 days
+
+      // Fallback to public URL (in case bucket becomes public later)
       const { data: { publicUrl } } = supabase.storage
         .from('facturas-boletas')
         .getPublicUrl(fileName);
+
+      const urlToSave = signedData?.signedUrl || publicUrl;
 
       // Insert record in database
       const { error: insertError } = await supabase
@@ -95,7 +124,7 @@ export function useFacturas(accountId?: string) {
           user_id: user.id,
           account_id: accountId || null,
           tipo,
-          archivo_url: publicUrl,
+          archivo_url: urlToSave,
           archivo_nombre: file.name,
           archivo_tamanio: file.size,
           fecha_documento: fechaDocumento.toISOString().split('T')[0],
@@ -124,9 +153,9 @@ export function useFacturas(accountId?: string) {
 
   const deleteFactura = async (id: string, archivoUrl: string) => {
     try {
-      // Extract file path from URL
-      const urlParts = archivoUrl.split('/');
-      const filePath = urlParts.slice(-2).join('/');
+      // Extract file path from URL (supports public and signed URLs)
+      const match = archivoUrl.match(/storage\/v1\/object\/(?:public|sign)\/facturas-boletas\/([^?]+)/);
+      const filePath = match ? decodeURIComponent(match[1]) : archivoUrl.split('/').slice(-2).join('/');
 
       // Delete file from storage
       const { error: storageError } = await supabase.storage
