@@ -36,6 +36,15 @@ export function useFacturas(accountId?: string) {
         setLoading(true);
       }
 
+      // Fetch phone once to enrich records
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('phone_personal, phone_empresa')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      const telefono = (profile as any)?.phone_personal || (profile as any)?.phone_empresa || null;
+
+      // 1) Fetch DB records
       let query = supabase
         .from('facturas_boletas')
         .select('*')
@@ -46,11 +55,51 @@ export function useFacturas(accountId?: string) {
         query = query.eq('account_id', accountId);
       }
 
-      const { data, error } = await query;
-
+      const { data: dbData, error } = await query;
       if (error) throw error;
+      const dbItems = ((dbData || []) as Factura[]).map((f) => ({ ...f, telefono: ((f as any).telefono ?? telefono) ?? undefined }));
 
-      setFacturas((data || []) as Factura[]);
+      // 2) Fetch Storage files for this user (prefix user.id)
+      const { data: files, error: listError } = await supabase.storage
+        .from('facturas-boletas')
+        .list(user.id, { limit: 200, offset: 0, sortBy: { column: 'updated_at', order: 'desc' } });
+
+      if (listError) {
+        console.warn('Storage list warning:', listError.message);
+      }
+
+      const storageItems: Factura[] = (files || []).map((file: any) => {
+        const path = `${user.id}/${file.name}`;
+        const { data: pub } = supabase.storage.from('facturas-boletas').getPublicUrl(path);
+        const updated = file.updated_at || new Date().toISOString();
+        return {
+          id: `storage-${file.name}`,
+          user_id: user.id,
+          account_id: accountId || null,
+          tipo: 'boleta',
+          archivo_url: pub.publicUrl,
+          archivo_nombre: file.name,
+          archivo_tamanio: file.metadata?.size ?? null,
+          fecha_documento: (updated as string).split('T')[0],
+          monto: null,
+          descripcion: null,
+          telefono: telefono || undefined,
+          created_at: updated,
+          updated_at: updated,
+        } as Factura;
+      });
+
+      // 3) Merge by archivo_url (prefer DB item when present)
+      const byUrl = new Map<string, Factura>();
+      [...storageItems, ...dbItems].forEach((item) => {
+        if (!byUrl.has(item.archivo_url) || (item.id && !String(item.id).startsWith('storage-'))) {
+          byUrl.set(item.archivo_url, item);
+        }
+      });
+
+      const merged = Array.from(byUrl.values()).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      setFacturas(merged);
     } catch (error: any) {
       console.error('Error fetching facturas:', error);
       toast({
@@ -81,8 +130,7 @@ export function useFacturas(accountId?: string) {
             table: 'facturas_boletas',
             filter: `user_id=eq.${user.id}`
           },
-          (payload) => {
-            console.log('Nova factura adicionada:', payload);
+          () => {
             fetchFacturas();
           }
         )
@@ -94,9 +142,39 @@ export function useFacturas(accountId?: string) {
             table: 'facturas_boletas',
             filter: `user_id=eq.${user.id}`
           },
-          (payload) => {
-            console.log('Factura deletada:', payload);
+          () => {
             fetchFacturas();
+          }
+        )
+        // Listen to storage object changes (new files uploaded)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'storage',
+            table: 'objects',
+            filter: `bucket_id=eq.facturas-boletas`
+          },
+          (payload: any) => {
+            const name = payload?.new?.name as string | undefined;
+            if (name && name.startsWith(`${user.id}/`)) {
+              fetchFacturas();
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'DELETE',
+            schema: 'storage',
+            table: 'objects',
+            filter: `bucket_id=eq.facturas-boletas`
+          },
+          (payload: any) => {
+            const name = payload?.old?.name as string | undefined;
+            if (name && name.startsWith(`${user.id}/`)) {
+              fetchFacturas();
+            }
           }
         )
         .subscribe();
