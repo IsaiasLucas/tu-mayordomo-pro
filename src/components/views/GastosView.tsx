@@ -183,6 +183,7 @@ export default function GastosView({ profile }: GastosViewProps) {
                 <TableRow>
                   <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Fecha</TableHead>
                   <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5">Descripción</TableHead>
+                  <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Categoría</TableHead>
                   <TableHead className="text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Tipo</TableHead>
                   <TableHead className="text-right text-sm sm:text-base md:text-lg py-4 sm:py-5 whitespace-nowrap">Monto</TableHead>
                 </TableRow>
@@ -190,7 +191,7 @@ export default function GastosView({ profile }: GastosViewProps) {
               <TableBody>
                 {items.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                       {loading ? 'Cargando...' : 'Sin movimientos en este mes.'}
                     </TableCell>
                   </TableRow>
@@ -201,6 +202,9 @@ export default function GastosView({ profile }: GastosViewProps) {
                         {formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm")}
                       </TableCell>
                       <TableCell className="py-4 sm:py-5 text-sm sm:text-base md:text-lg">{mov.descripcion}</TableCell>
+                      <TableCell className="py-4 sm:py-5 text-sm sm:text-base md:text-lg">
+                        {mov.categoria || '-'}
+                      </TableCell>
                       <TableCell className="py-4 sm:py-5">
                         <Badge
                           variant={

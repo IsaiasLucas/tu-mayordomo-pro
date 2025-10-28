@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useSWR } from "./useSWR";
@@ -27,7 +27,7 @@ export function useGastos(mes?: string) {
         .eq('user_id', user.id)
         .gte('fecha', startDate)
         .lte('fecha', endDate)
-        .order('fecha', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (fetchError) {
         console.error('Error fetching gastos:', fetchError);
@@ -39,10 +39,36 @@ export function useGastos(mes?: string) {
     { revalidateOnMount: true, revalidateOnFocus: true }
   );
 
+  // Set up realtime subscription
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channel = supabase
+      .channel('gastos-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'gastos',
+          filter: `user_id=eq.${user.id}`
+        },
+        () => {
+          console.log('Gastos atualizado em tempo real');
+          revalidate();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, revalidate]);
+
   return {
     items: data || [],
-    loading: isValidating && !data, // Só mostra loading se não tem dados
-    isRevalidating, // Novo: indica atualização em background
+    loading: isValidating && !data,
+    isRevalidating,
     error,
     refetch: revalidate,
   };

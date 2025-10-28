@@ -357,6 +357,11 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
                       ) : (
                         <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 flex-shrink-0" />
                       )}
+                      {mov.categoria && (
+                        <span className="text-xs sm:text-sm text-muted-foreground bg-muted px-2 py-1 rounded">
+                          {mov.categoria}
+                        </span>
+                      )}
                     </div>
                     <p className="text-base sm:text-lg font-medium truncate leading-tight">
                       {mov.descripcion}
