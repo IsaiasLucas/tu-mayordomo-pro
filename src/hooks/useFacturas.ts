@@ -13,6 +13,7 @@ export interface Factura {
   fecha_documento: string;
   monto: number | null;
   descripcion: string | null;
+  telefono?: string;
   created_at: string;
   updated_at: string;
 }
@@ -39,7 +40,7 @@ export function useFacturas(accountId?: string) {
         .from('facturas_boletas')
         .select('*')
         .eq('user_id', user.id)
-        .order('fecha_documento', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (accountId) {
         query = query.eq('account_id', accountId);

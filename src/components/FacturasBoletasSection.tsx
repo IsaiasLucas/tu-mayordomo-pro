@@ -327,6 +327,12 @@ export default function FacturasBoletasSection() {
                     </div>
                   )}
                   
+                  {factura.telefono && (
+                    <div className="text-xs text-muted-foreground">
+                      📱 {factura.telefono}
+                    </div>
+                  )}
+                  
                   {factura.descripcion && (
                     <p className="text-xs text-muted-foreground line-clamp-2">
                       {factura.descripcion}
