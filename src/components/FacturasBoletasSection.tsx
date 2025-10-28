@@ -38,7 +38,7 @@ import {
 
 export default function FacturasBoletasSection() {
   const { facturas, loading, deleteFactura } = useFacturas();
-  const [filterPeriod, setFilterPeriod] = useState<'week' | 'month' | 'custom'>('month');
+  const [filterPeriod, setFilterPeriod] = useState<'all' | 'week' | 'month' | 'custom'>('all');
   const [customStartDate, setCustomStartDate] = useState<Date>();
   const [customEndDate, setCustomEndDate] = useState<Date>();
   const [generatingPDF, setGeneratingPDF] = useState(false);
@@ -175,7 +175,14 @@ export default function FacturasBoletasSection() {
               <span className="text-sm font-semibold">Filtrar por período:</span>
             </div>
             
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-4 gap-2">
+              <Button
+                variant={filterPeriod === 'all' ? 'default' : 'outline'}
+                onClick={() => setFilterPeriod('all')}
+                className="h-10"
+              >
+                Todos
+              </Button>
               <Button
                 variant={filterPeriod === 'week' ? 'default' : 'outline'}
                 onClick={() => setFilterPeriod('week')}
