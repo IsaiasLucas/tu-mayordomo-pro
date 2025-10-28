@@ -121,26 +121,40 @@ export default function FacturasBoletasSection() {
 
   const handleDownloadFile = async (url: string, nombre: string) => {
     try {
+      // Extrair o nome correto do arquivo da URL se necessário
+      let fileName = nombre;
+      if (!fileName || fileName === 'undefined') {
+        const urlParts = url.split('/');
+        fileName = decodeURIComponent(urlParts[urlParts.length - 1].split('?')[0]);
+      }
+      
       const response = await fetch(url);
+      if (!response.ok) throw new Error('Falha ao baixar arquivo');
+      
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = downloadUrl;
-      link.download = nombre;
+      link.download = fileName;
+      link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(downloadUrl);
+      
+      // Aguardar um pouco antes de limpar
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(downloadUrl);
+      }, 100);
       
       toast({
-        title: "Descarga iniciada",
-        description: "El archivo se está descargando",
+        title: "Download iniciado",
+        description: "O arquivo está sendo baixado",
       });
     } catch (error) {
       console.error('Error downloading file:', error);
       toast({
-        title: "Error",
-        description: "No se pudo descargar el archivo",
+        title: "Erro",
+        description: "Não foi possível baixar o arquivo",
         variant: "destructive",
       });
     }
