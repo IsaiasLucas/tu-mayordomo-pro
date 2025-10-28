@@ -69,9 +69,10 @@ export default function ReportesView() {
       const startISO = fromZonedTime(`${format(startDate, 'yyyy-MM-dd')}T00:00:00`, CHILE_TIMEZONE).toISOString();
       const endISO = fromZonedTime(`${format(endDate, 'yyyy-MM-dd')}T23:59:59`, CHILE_TIMEZONE).toISOString();
       
-      const { data: gastos, error } = await (supabase as any)
+      const { data: gastos, error } = await supabase
         .from('gastos')
         .select('*')
+        .eq('user_id', user.id)
         .gte('fecha', format(startDate, 'yyyy-MM-dd'))
         .lte('fecha', format(endDate, 'yyyy-MM-dd'))
         .order('fecha', { ascending: false });

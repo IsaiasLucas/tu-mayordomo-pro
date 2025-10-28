@@ -35,25 +35,20 @@ interface Movimiento {
 }
 
 const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewProps) => {
-  const { items: gastos } = useGastos();
+  const { items: gastosDoMes, loading: loadingGastos, isRevalidating } = useGastos();
   const [perfilLoaded, setPerfilLoaded] = useState(false);
   const [perfil, setPerfil] = useState<any>(null);
   const [phone, setPhone] = useState<string | null>(null);
-  const [movimientos, setMovimientos] = useState<Movimiento[]>(() => {
-    const cached = localStorage.getItem('tm_movimientos_cache');
-    return cached ? JSON.parse(cached) : [];
-  });
-  const [allMovimientos, setAllMovimientos] = useState<Movimiento[]>(() => {
-    const cached = localStorage.getItem('tm_all_movimientos_cache');
-    return cached ? JSON.parse(cached) : [];
-  });
-  const [loadingMovimientos, setLoadingMovimientos] = useState(false);
   const [showBalance, setShowBalance] = useState(() => {
     const saved = localStorage.getItem("tm_show_balance");
     return saved === null ? true : saved === "true";
   });
   const [selectedMovimiento, setSelectedMovimiento] = useState<any>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+
+  // Usar direto os dados do hook - mais eficiente
+  const allMovimientos = gastosDoMes;
+  const movimientos = gastosDoMes.slice(0, 5); // Últimos 5 movimentos
 
   // Check and show profile popup once on mount if incomplete
   useEffect(() => {
@@ -144,7 +139,7 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
           return;
         }
 
-        // Check telefono, nombre, tipo_cuenta from usuarios table
+        // Check telefono, nome from usuarios table
         const { data: usuario } = await supabase
           .from('usuarios')
           .select('telefono, nombre, tipo_cuenta')
@@ -153,87 +148,11 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
 
         setPerfil(usuario || null);
         setPerfilLoaded(true);
-
-        // Use user_id as cache key instead of phone
-        const currentUserId = user.id;
-        const cachedUserId = localStorage.getItem("tm_user_id");
         
-        // Clear cache if user changed (different user logged in)
-        if (cachedUserId && cachedUserId !== currentUserId) {
-          localStorage.removeItem('tm_movimientos_cache');
-          localStorage.removeItem('tm_all_movimientos_cache');
-          localStorage.removeItem('tm_phone');
-          localStorage.removeItem('tm_nombre');
-          setMovimientos([]);
-          setAllMovimientos([]);
-        }
-        
-        // Store current user_id
-        localStorage.setItem("tm_user_id", currentUserId);
-        
-        // Store phone if available (for display purposes only, not for queries)
+        // Store phone if available
         if (usuario?.telefono && usuario.telefono.trim() !== '') {
           setPhone(usuario.telefono);
-          localStorage.setItem("tm_phone", usuario.telefono);
         }
-        
-        // Initial load - now based on user_id, not phone
-        fetchMovimientos();
-        fetchAllMovimientos();
-        
-        // Setup Realtime subscriptions for recent and all movements
-        const recentChannel = supabase
-          .channel('inicio-gastos-recent')
-          .on(
-            'postgres_changes',
-            {
-              event: '*',
-              schema: 'public',
-              table: 'gastos'
-            },
-            async (payload) => {
-              const { data: { user } } = await supabase.auth.getUser();
-              if (!user) return;
-              
-              if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
-                fetchMovimientosUpdate();
-              }
-            }
-          )
-          .subscribe();
-
-          const allChannel = supabase
-            .channel('inicio-gastos-all')
-            .on(
-              'postgres_changes',
-              {
-                event: '*',
-                schema: 'public',
-                table: 'gastos'
-              },
-              async (payload) => {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) return;
-                
-                // Refetch if change is for current user
-                if ((payload.new as any)?.user_id === user.id || (payload.old as any)?.user_id === user.id) {
-                  fetchAllMovimientosUpdate();
-                }
-              }
-            )
-            .subscribe();
-          
-          // Silent polling every 5 seconds
-          const pollingInterval = setInterval(() => {
-            fetchMovimientosUpdate();
-            fetchAllMovimientosUpdate();
-          }, 5000);
-          
-          return () => {
-            supabase.removeChannel(recentChannel);
-            supabase.removeChannel(allChannel);
-            clearInterval(pollingInterval);
-          };
       } catch (error) {
         console.error('Error checking usuario data:', error);
         setPerfilLoaded(true);
@@ -261,122 +180,9 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
     };
   }, []);
 
-  const fetchMovimientos = async () => {
-    setLoadingMovimientos(true);
-    try {
-      // Get authenticated user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: gastos, error } = await supabase
-        .from('gastos')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      if (error) throw error;
-
-      const newMovimientos = gastos || [];
-      localStorage.setItem('tm_movimientos_cache', JSON.stringify(newMovimientos));
-      setMovimientos(newMovimientos);
-    } catch (error) {
-      console.error("Error al cargar movimientos:", error);
-    } finally {
-      setLoadingMovimientos(false);
-    }
+  const formatMovimientoDate = (mov: any) => {
+    return formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm");
   };
-
-  const fetchMovimientosUpdate = async () => {
-    try {
-      // Get authenticated user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: gastos, error } = await supabase
-        .from('gastos')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      if (error) throw error;
-
-      const newMovimientos = gastos || [];
-      const currentCache = localStorage.getItem('tm_movimientos_cache');
-      const newCache = JSON.stringify(newMovimientos);
-      if (currentCache !== newCache) {
-        localStorage.setItem('tm_movimientos_cache', newCache);
-        setMovimientos(newMovimientos);
-      }
-    } catch (error) {
-      console.error("Error al actualizar movimientos:", error);
-    }
-  };
-
-  const fetchAllMovimientos = async () => {
-    try {
-      // Get authenticated user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const now = getCurrentDateInSantiago();
-      const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-      const { startISO, endISO } = monthRangeUTCFromSantiago(mes);
-      
-      const { data: gastos, error } = await supabase
-        .from('gastos')
-        .select('*')
-        .eq('user_id', user.id)
-        .gte('fecha', mes + '-01')
-        .lte('fecha', mes + '-31')
-        .order('fecha', { ascending: false });
-
-      if (error) throw error;
-
-      const items = gastos || [];
-      localStorage.setItem('tm_all_movimientos_cache', JSON.stringify(items));
-      setAllMovimientos(items);
-    } catch (error) {
-      console.error("Error al cargar todos los movimientos:", error);
-    }
-  };
-
-  const fetchAllMovimientosUpdate = async () => {
-    try {
-      // Get authenticated user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const now = getCurrentDateInSantiago();
-      const mes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-      const { startISO, endISO } = monthRangeUTCFromSantiago(mes);
-      
-      const { data: gastos, error } = await supabase
-        .from('gastos')
-        .select('*')
-        .eq('user_id', user.id)
-        .gte('fecha', mes + '-01')
-        .lte('fecha', mes + '-31')
-        .order('fecha', { ascending: false });
-
-      if (error) throw error;
-
-      const items = gastos || [];
-      const currentCache = localStorage.getItem('tm_all_movimientos_cache');
-      const newCache = JSON.stringify(items);
-      if (currentCache !== newCache) {
-        localStorage.setItem('tm_all_movimientos_cache', newCache);
-        setAllMovimientos(items);
-      }
-    } catch (error) {
-      console.error("Error al actualizar todos los movimientos:", error);
-    }
-  };
-
-const formatMovimientoDate = (mov: any) => {
-  return formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm");
-};
 
   // Show WhatsApp card only if profile loaded and phone is NULL or empty (profiles or usuarios)
   const effectivePhone = profile?.phone_personal || profile?.phone_empresa || perfil?.telefono;
@@ -510,7 +316,7 @@ const formatMovimientoDate = (mov: any) => {
                 </Button>
               </AlertDescription>
             </Alert>
-          ) : loadingMovimientos ? (
+          ) : loadingGastos ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="flex items-center justify-between p-4 sm:p-5 rounded-lg sm:rounded-xl border">

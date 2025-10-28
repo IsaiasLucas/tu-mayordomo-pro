@@ -24,6 +24,7 @@ export function useGastos(mes?: string) {
       const { data: fetchData, error: fetchError } = await supabase
         .from('gastos')
         .select('*')
+        .eq('user_id', user.id)
         .gte('fecha', startDate)
         .lte('fecha', endDate)
         .order('fecha', { ascending: false });
