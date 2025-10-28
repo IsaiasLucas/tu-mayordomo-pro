@@ -288,17 +288,28 @@ export default function FacturasBoletasSection() {
           {filteredFacturas.map((factura) => (
             <Card key={factura.id} className="shadow-card border-0 hover:shadow-card-hover transition-all duration-200">
               <CardContent className="p-4">
-                {factura.archivo_url.match(/\.(jpg|jpeg|png|webp)$/i) ? (
+                {factura.archivo_url && factura.archivo_url.match(/\.(jpg|jpeg|png|webp)$/i) ? (
                   <div className="relative aspect-video rounded-xl overflow-hidden mb-3 bg-muted">
                     <img 
                       src={factura.archivo_url} 
                       alt={factura.archivo_nombre}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        const parent = e.currentTarget.parentElement;
+                        if (parent) {
+                          parent.innerHTML = '<div class="w-full h-full flex flex-col items-center justify-center text-muted-foreground"><p class="text-sm">Sem imagem disponível 📄</p></div>';
+                        }
+                      }}
                     />
                   </div>
-                ) : (
+                ) : factura.archivo_url ? (
                   <div className="aspect-video rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-3">
                     <FileText className="h-16 w-16 text-primary" />
+                  </div>
+                ) : (
+                  <div className="aspect-video rounded-xl bg-muted flex flex-col items-center justify-center mb-3">
+                    <p className="text-sm text-muted-foreground">Sem imagem disponível 📄</p>
                   </div>
                 )}
                 
@@ -371,13 +382,19 @@ export default function FacturasBoletasSection() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="p-4">
-            {viewingFactura?.url.match(/\.(jpg|jpeg|png|webp)$/i) ? (
+            {viewingFactura?.url && viewingFactura.url.match(/\.(jpg|jpeg|png|webp)$/i) ? (
               <img 
                 src={viewingFactura.url} 
                 alt={viewingFactura.nombre}
                 className="w-full h-auto max-h-[70vh] object-contain rounded-lg"
+                onError={(e) => {
+                  const parent = e.currentTarget.parentElement;
+                  if (parent) {
+                    parent.innerHTML = '<div class="flex flex-col items-center justify-center p-12 bg-muted rounded-lg"><p class="text-lg text-muted-foreground">Sem imagem disponível 📄</p></div>';
+                  }
+                }}
               />
-            ) : (
+            ) : viewingFactura?.url ? (
               <div className="flex flex-col items-center justify-center p-12 bg-muted rounded-lg">
                 <FileText className="h-24 w-24 text-muted-foreground mb-4" />
                 <p className="text-lg font-medium mb-2">{viewingFactura?.nombre}</p>
@@ -388,6 +405,10 @@ export default function FacturasBoletasSection() {
                   <Download className="h-4 w-4 mr-2" />
                   Abrir archivo
                 </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center p-12 bg-muted rounded-lg">
+                <p className="text-lg text-muted-foreground">Sem imagem disponível 📄</p>
               </div>
             )}
           </div>
