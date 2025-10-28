@@ -42,46 +42,6 @@ export const useProfile = () => {
     if (!cachedProfile) {
       loadProfile();
     }
-
-    // Set up real-time subscription for profile changes
-    const setupRealtimeSubscription = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const channel = supabase
-        .channel('profile-changes')
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'profiles',
-            filter: `user_id=eq.${user.id}`
-          },
-          async (payload) => {
-            console.log('Profile updated in real-time:', payload);
-            // Refresh profile data
-            profilePromise = fetchProfile();
-            const data = await profilePromise;
-            cachedProfile = data;
-            setProfile(data);
-            profilePromise = null;
-          }
-        )
-        .subscribe();
-
-      return channel;
-    };
-
-    const channelPromise = setupRealtimeSubscription();
-
-    return () => {
-      channelPromise.then(channel => {
-        if (channel) {
-          supabase.removeChannel(channel);
-        }
-      });
-    };
   }, []);
 
   const fetchProfile = async (): Promise<ProfileData | null> => {

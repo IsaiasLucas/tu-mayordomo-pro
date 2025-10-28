@@ -90,10 +90,14 @@ export const useAuth = () => {
       } else {
         setProfile(data);
         
-        // Check subscription status only - removed sync from sheets
-        setTimeout(() => {
-          checkSubscriptionStatus();
-        }, 0);
+        // Check subscription status apenas uma vez por sessão
+        const sessionCheck = sessionStorage.getItem('subscription_checked');
+        if (!sessionCheck) {
+          setTimeout(() => {
+            checkSubscriptionStatus();
+            sessionStorage.setItem('subscription_checked', 'true');
+          }, 1000); // Delay de 1 segundo para não bloquear o carregamento inicial
+        }
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -104,6 +108,13 @@ export const useAuth = () => {
 
   const checkSubscriptionStatus = async () => {
     try {
+      // Verificar se já checou recentemente (cache de 5 minutos)
+      const lastCheck = localStorage.getItem('last_subscription_check');
+      const now = Date.now();
+      if (lastCheck && now - parseInt(lastCheck) < 5 * 60 * 1000) {
+        return; // Já checou há menos de 5 minutos
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
@@ -112,6 +123,8 @@ export const useAuth = () => {
           Authorization: `Bearer ${session.access_token}`,
         },
       });
+      
+      localStorage.setItem('last_subscription_check', now.toString());
       
       // Refresh profile after check
       if (session.user) {
@@ -137,8 +150,10 @@ export const useAuth = () => {
     localStorage.removeItem('tm_movimientos_cache');
     localStorage.removeItem('tm_all_movimientos_cache');
     localStorage.removeItem('tm_show_balance');
-    localStorage.removeItem('telefono'); // Remove old phone storage
+    localStorage.removeItem('telefono');
+    localStorage.removeItem('last_subscription_check');
     sessionStorage.removeItem('profilePopupShown');
+    sessionStorage.removeItem('subscription_checked');
     
     // Clear profile cache
     const { clearProfileCache } = await import('@/hooks/useProfile');
