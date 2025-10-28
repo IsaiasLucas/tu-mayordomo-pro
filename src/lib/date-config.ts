@@ -6,9 +6,9 @@ import { formatInTimeZone, fromZonedTime, toZonedTime } from 'date-fns-tz';
 // Timezone para Chile/Santiago
 export const CHILE_TIMEZONE = 'America/Santiago';
 
-// Helper para obter chave do mês atual
+// Helper para obter chave do mês atual em Santiago
 export function getCurrentMonthKey(): string {
-  const now = new Date();
+  const now = getCurrentDateInSantiago();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   return `${year}-${month}`;
@@ -118,4 +118,16 @@ export function monthRangeUTCFromSantiago(ym: string) {
   const endISO = fromZonedTime(`${ym}-${String(lastDay).padStart(2, '0')}T23:59:59`, CHILE_TIMEZONE).toISOString();
 
   return { startISO, endISO };
+}
+
+// Helper para verificar se um movimento é ingreso
+export function isIngreso(tipo: string): boolean {
+  const tipoLower = tipo?.toLowerCase() || '';
+  return tipoLower === 'ingreso' || tipoLower === 'receita';
+}
+
+// Helper para verificar se um movimento é egreso
+export function isEgreso(tipo: string): boolean {
+  const tipoLower = tipo?.toLowerCase() || '';
+  return tipoLower === 'egreso' || tipoLower === 'gasto' || tipoLower === 'despesa';
 }

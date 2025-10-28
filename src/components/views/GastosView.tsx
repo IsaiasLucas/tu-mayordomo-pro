@@ -25,11 +25,11 @@ export default function GastosView({ profile }: GastosViewProps) {
 
   // Calcular totais a partir dos items em cache
   const totalIngresos = items
-    .filter((m: any) => m.tipo?.toLowerCase() === "ingreso")
+    .filter((m: any) => m.tipo?.toLowerCase() === "ingreso" || m.tipo?.toLowerCase() === "receita")
     .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
         
   const totalGastos = items
-    .filter((m: any) => m.tipo?.toLowerCase() === "egreso" || m.tipo?.toLowerCase() === "gasto")
+    .filter((m: any) => m.tipo?.toLowerCase() === "egreso" || m.tipo?.toLowerCase() === "gasto" || m.tipo?.toLowerCase() === "despesa")
     .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
 
   const saldo = totalIngresos - totalGastos;
