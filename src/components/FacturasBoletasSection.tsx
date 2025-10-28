@@ -291,7 +291,8 @@ export default function FacturasBoletasSection() {
                     <img 
                       src={factura.archivo_url} 
                       alt={factura.archivo_nombre}
-                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-opacity duration-300"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                         const parent = e.currentTarget.parentElement;
@@ -380,6 +381,7 @@ export default function FacturasBoletasSection() {
               <img 
                 src={viewingFactura.url} 
                 alt={viewingFactura.nombre}
+                loading="eager"
                 className="w-full h-auto max-h-[70vh] object-contain rounded-lg"
                 onError={(e) => {
                   const parent = e.currentTarget.parentElement;

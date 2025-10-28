@@ -23,13 +23,16 @@ export function useFacturas(accountId?: string) {
 
   const fetchFacturas = async () => {
     try {
-      setLoading(true);
-      
       // Get authenticated user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         setLoading(false);
         return;
+      }
+
+      // Only show loading on initial fetch
+      if (facturas.length === 0) {
+        setLoading(true);
       }
 
       let query = supabase
