@@ -119,32 +119,16 @@ export default function FacturasBoletasSection() {
     }
   };
 
-  const handleDownloadFile = async (url: string, nombre: string) => {
+  const handleDownloadFile = (url: string, nombre: string) => {
     try {
-      // Extrair o nome correto do arquivo da URL se necessário
-      let fileName = nombre;
-      if (!fileName || fileName === 'undefined') {
-        const urlParts = url.split('/');
-        fileName = decodeURIComponent(urlParts[urlParts.length - 1].split('?')[0]);
-      }
-      
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Falha ao baixar arquivo');
-      
-      const blob = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = fileName;
+      link.href = url;
+      link.download = nombre;
+      link.target = '_blank';
       link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
-      
-      // Aguardar um pouco antes de limpar
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(downloadUrl);
-      }, 100);
+      document.body.removeChild(link);
       
       toast({
         title: "Download iniciado",
