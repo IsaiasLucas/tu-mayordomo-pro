@@ -125,19 +125,7 @@ export function useFacturas(accountId?: string) {
         .on(
           'postgres_changes',
           {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'facturas_boletas',
-            filter: `user_id=eq.${user.id}`
-          },
-          () => {
-            fetchFacturas();
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: 'DELETE',
+            event: '*',
             schema: 'public',
             table: 'facturas_boletas',
             filter: `user_id=eq.${user.id}`

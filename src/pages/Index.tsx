@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
+import { usePreloadAllData } from "@/hooks/usePreloadView";
 import Navigation from "@/components/Navigation";
 import InicioView from "@/components/views/InicioView";
 import GastosView from "@/components/views/GastosView";
@@ -15,11 +16,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useActiveTab, ActiveTab } from "@/store/appState";
 
 const Index = () => {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading, isPro, refreshProfile } = useProfile();
   const { activeTab, setActiveTab } = useActiveTab();
   const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
+  
+  // Preload all data in background for seamless tab switching
+  usePreloadAllData(user?.id);
 
   // Redirect if not authenticated
   useEffect(() => {
