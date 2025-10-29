@@ -29,7 +29,17 @@ export const usePreloadAllData = (userId: string | undefined) => {
     const preloadAllData = async () => {
       const mesKey = getCurrentMonthKey();
       
-      // Prefetch gastos
+      // Prefetch all gastos for the user (global cache for all views)
+      prefetch(`gastos-all-${userId}`, async () => {
+        const { data } = await supabase
+          .from('gastos')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+        return data || [];
+      });
+      
+      // Prefetch gastos (current month) for faster first paint when filtering by month
       prefetch(`gastos-${userId}-${mesKey}`, async () => {
         const [year, month] = mesKey.split('-').map(Number);
         const startDate = `${year}-${String(month).padStart(2, '0')}-01`;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useReportes } from "@/hooks/useReportes";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -148,58 +148,82 @@ export default function ReportesView() {
     return timeline;
   };
 
+  const loadPeriodData = useCallback(async () => {
+    if (!isPro) return;
+    if (!user?.id) return;
+    
+    const now = new Date();
+    let startDate: Date;
+    let endDate: Date;
+
+    if (selectedPeriod === "week") {
+      startDate = startOfWeek(now, { weekStartsOn: 1 });
+      endDate = endOfWeek(now, { weekStartsOn: 1 });
+    } else if (selectedPeriod === "month") {
+      startDate = startOfMonth(now);
+      endDate = endOfMonth(now);
+    } else if (selectedPeriod === "lastMonth") {
+      startDate = startOfMonth(subMonths(now, 1));
+      endDate = endOfMonth(subMonths(now, 1));
+    } else if (selectedPeriod === "custom" && customStartDate && customEndDate) {
+      startDate = customStartDate;
+      endDate = customEndDate;
+    } else {
+      return;
+    }
+
+    console.log('Loading data for period:', selectedPeriod, 'from', format(startDate, 'yyyy-MM-dd'), 'to', format(endDate, 'yyyy-MM-dd'));
+    const movimientos = await fetchMovimientos(startDate, endDate);
+    console.log('Movimientos loaded:', movimientos.length);
+    
+    const data = processChartData(movimientos);
+    setChartData(data);
+
+    const timeline = processTimelineData(movimientos, startDate, endDate);
+    setTimelineData(timeline);
+
+    const ingresos = movimientos
+      .filter(m => m.tipo.toLowerCase() === "ingreso" || m.tipo.toLowerCase() === "receita")
+      .reduce((sum, m) => sum + Number(m.monto || 0), 0);
+    
+    const egresos = movimientos
+      .filter(m => m.tipo.toLowerCase() === "egreso" || m.tipo.toLowerCase() === "despesa" || m.tipo.toLowerCase() === "gasto")
+      .reduce((sum, m) => sum + Number(m.monto || 0), 0);
+
+    console.log('Totals calculated - Ingresos:', ingresos, 'Egresos:', egresos);
+    
+    setTotalIngresos(ingresos);
+    setTotalEgresos(egresos);
+    setTotalMovimientos(movimientos.length);
+  }, [isPro, user?.id, selectedPeriod, customStartDate, customEndDate]);
+
   useEffect(() => {
-    const loadPeriodData = async () => {
-      if (!isPro) return;
-      if (!user?.id) return;
-      
-      const now = new Date();
-      let startDate: Date;
-      let endDate: Date;
-
-      if (selectedPeriod === "week") {
-        startDate = startOfWeek(now, { weekStartsOn: 1 });
-        endDate = endOfWeek(now, { weekStartsOn: 1 });
-      } else if (selectedPeriod === "month") {
-        startDate = startOfMonth(now);
-        endDate = endOfMonth(now);
-      } else if (selectedPeriod === "lastMonth") {
-        startDate = startOfMonth(subMonths(now, 1));
-        endDate = endOfMonth(subMonths(now, 1));
-      } else if (selectedPeriod === "custom" && customStartDate && customEndDate) {
-        startDate = customStartDate;
-        endDate = customEndDate;
-      } else {
-        return;
-      }
-      
-      console.log('Loading data for period:', selectedPeriod, 'from', format(startDate, 'yyyy-MM-dd'), 'to', format(endDate, 'yyyy-MM-dd'));
-      const movimientos = await fetchMovimientos(startDate, endDate);
-      console.log('Movimientos loaded:', movimientos.length);
-      
-      const data = processChartData(movimientos);
-      setChartData(data);
-
-      const timeline = processTimelineData(movimientos, startDate, endDate);
-      setTimelineData(timeline);
-
-      const ingresos = movimientos
-        .filter(m => m.tipo.toLowerCase() === "ingreso" || m.tipo.toLowerCase() === "receita")
-        .reduce((sum, m) => sum + Number(m.monto || 0), 0);
-      
-      const egresos = movimientos
-        .filter(m => m.tipo.toLowerCase() === "egreso" || m.tipo.toLowerCase() === "despesa" || m.tipo.toLowerCase() === "gasto")
-        .reduce((sum, m) => sum + Number(m.monto || 0), 0);
-
-      console.log('Totals calculated - Ingresos:', ingresos, 'Egresos:', egresos);
-      
-      setTotalIngresos(ingresos);
-      setTotalEgresos(egresos);
-      setTotalMovimientos(movimientos.length);
-    };
-
     loadPeriodData();
-  }, [isPro, user, selectedPeriod, customStartDate, customEndDate]);
+  }, [loadPeriodData]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channel = supabase
+      .channel(`reportes-gastos-realtime-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'gastos',
+          filter: `user_id=eq.${user.id}`
+        },
+        () => {
+          loadPeriodData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, loadPeriodData]);
 
   const generatePDF = (movimientos: Movimiento[], tipo: string, periodo: string) => {
     const doc = new jsPDF();

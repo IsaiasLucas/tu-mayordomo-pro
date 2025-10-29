@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useSWR } from "./useSWR";
@@ -8,25 +8,15 @@ export function useGastos(mes?: string) {
   const { user } = useAuth();
   const mesKey = mes || getCurrentMonthKey();
 
-  const { data, error, isValidating, isRevalidating, revalidate } = useSWR(
-    user?.id ? `gastos-${user.id}-${mesKey}` : null,
+  const { data, error, isValidating, isRevalidating, revalidate, mutate } = useSWR(
+    user?.id ? `gastos-all-${user.id}` : null,
     async () => {
       if (!user?.id) return [];
-
-      // Calcular primeiro e último dia do mês corretamente
-      const [year, month] = mesKey.split('-').map(Number);
-      const firstDay = new Date(year, month - 1, 1);
-      const lastDay = new Date(year, month, 0);
-      
-      const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
-      const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
 
       const { data: fetchData, error: fetchError } = await supabase
         .from('gastos')
         .select('*')
         .eq('user_id', user.id)
-        .gte('fecha', startDate)
-        .lte('fecha', endDate)
         .order('created_at', { ascending: false });
 
       if (fetchError) {
@@ -39,23 +29,37 @@ export function useGastos(mes?: string) {
     { revalidateOnMount: true, revalidateOnFocus: true, revalidateInterval: 15000 }
   );
 
+  // Keep a ref with the latest data to avoid stale closures inside realtime handler
+  const dataRef = useRef<any[]>([]);
+  useEffect(() => {
+    dataRef.current = Array.isArray(data) ? (data as any[]) : [];
+  }, [data]);
+
   // Set up realtime subscription
   useEffect(() => {
     if (!user?.id) return;
 
     const channel = supabase
-      .channel('gastos-realtime')
+      .channel(`gastos-realtime-${user.id}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'gastos'
+          table: 'gastos',
+          filter: `user_id=eq.${user.id}`
         },
         (payload: any) => {
-          const affectedUser = payload?.new?.user_id ?? payload?.old?.user_id;
-          if (affectedUser === user.id) {
-            revalidate();
+          const current = Array.isArray(data) ? (data as any[]) : [];
+          if (payload.eventType === 'INSERT' && payload.new) {
+            const updated = [payload.new, ...current.filter((r: any) => r.id !== payload.new.id)];
+            mutate(updated);
+          } else if (payload.eventType === 'UPDATE' && payload.new) {
+            const updated = current.map((r: any) => r.id === payload.new.id ? payload.new : r);
+            mutate(updated);
+          } else if (payload.eventType === 'DELETE' && payload.old) {
+            const updated = current.filter((r: any) => r.id !== payload.old.id);
+            mutate(updated);
           }
         }
       )
@@ -66,8 +70,13 @@ export function useGastos(mes?: string) {
     };
   }, [user?.id, revalidate]);
 
+  const allItems = Array.isArray(data) ? (data as any[]) : [];
+  const itemsForView = mesKey
+    ? allItems.filter((m: any) => String(m.fecha ?? '').slice(0, 7) === mesKey)
+    : allItems;
+
   return {
-    items: data || [],
+    items: itemsForView,
     loading: isValidating && !data,
     isRevalidating,
     error,
