@@ -5,6 +5,7 @@ interface SWROptions {
   revalidateOnMount?: boolean;
   dedupingInterval?: number;
   revalidateOnFocus?: boolean;
+  revalidateInterval?: number; // polling silencioso em ms
 }
 
 interface SWRState<T> {
@@ -29,7 +30,8 @@ export function useSWR<T>(
   const {
     revalidateOnMount = false,
     dedupingInterval = 2000,
-    revalidateOnFocus = true
+    revalidateOnFocus = true,
+    revalidateInterval
   } = options;
 
   const [state, setState] = useState<SWRState<T>>({
@@ -212,6 +214,17 @@ export function useSWR<T>(
       document.removeEventListener('visibilitychange', handleFocus);
     };
   }, [key, revalidateOnFocus, fetchData]);
+
+  // Revalidar em intervalo silencioso (polling)
+  useEffect(() => {
+    if (!key || !revalidateInterval) return;
+    const id = setInterval(() => {
+      if (hasLoadedFromCacheRef.current) {
+        fetchData(true); // background
+      }
+    }, revalidateInterval);
+    return () => clearInterval(id);
+  }, [key, revalidateInterval, fetchData]);
 
   return {
     ...state,

@@ -35,7 +35,7 @@ interface Movimiento {
 }
 
 const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewProps) => {
-  const { items: gastosDoMes, loading: loadingGastos, isRevalidating } = useGastos();
+  const { items: gastosDoMes, loading: loadingGastos } = useGastos();
   const [perfilLoaded, setPerfilLoaded] = useState(false);
   const [perfil, setPerfil] = useState<any>(null);
   const [phone, setPhone] = useState<string | null>(null);

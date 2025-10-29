@@ -167,14 +167,8 @@ export default function GastosView({ profile }: GastosViewProps) {
 
       {/* Tabela com indicador de atualização em background */}
       <Card className="rounded-xl sm:rounded-2xl">
-        <CardHeader className="px-5 sm:px-7 flex flex-row items-center justify-between">
+          <CardHeader className="px-5 sm:px-7 flex flex-row items-center justify-between">
           <CardTitle className="text-xl sm:text-2xl">Movimientos del mes</CardTitle>
-          {isRevalidating && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="hidden sm:inline">Actualizando...</span>
-            </div>
-          )}
         </CardHeader>
         <CardContent className="px-5 sm:px-7">
           <div className="overflow-x-auto -mx-4 sm:mx-0">

@@ -409,12 +409,6 @@ export default function ReportesView() {
           <h1 className="text-4xl font-bold text-foreground">
             Reportes Pro
           </h1>
-          {isRevalidating && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="hidden sm:inline">Actualizando...</span>
-            </div>
-          )}
         </div>
         <p className="text-lg text-muted-foreground">
           Análisis detallado de tus finanzas y documentos

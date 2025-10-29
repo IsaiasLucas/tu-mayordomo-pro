@@ -36,7 +36,7 @@ export function useGastos(mes?: string) {
 
       return fetchData || [];
     },
-    { revalidateOnMount: true, revalidateOnFocus: true }
+    { revalidateOnMount: true, revalidateOnFocus: true, revalidateInterval: 15000 }
   );
 
   // Set up realtime subscription
@@ -50,12 +50,13 @@ export function useGastos(mes?: string) {
         {
           event: '*',
           schema: 'public',
-          table: 'gastos',
-          filter: `user_id=eq.${user.id}`
+          table: 'gastos'
         },
-        () => {
-          console.log('Gastos atualizado em tempo real');
-          revalidate();
+        (payload: any) => {
+          const affectedUser = payload?.new?.user_id ?? payload?.old?.user_id;
+          if (affectedUser === user.id) {
+            revalidate();
+          }
         }
       )
       .subscribe();

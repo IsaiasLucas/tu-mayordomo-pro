@@ -193,6 +193,14 @@ export function useFacturas(accountId?: string) {
     };
   }, [accountId]);
 
+  // Polling silencioso a cada 15s
+  useEffect(() => {
+    const id = setInterval(() => {
+      fetchFacturas();
+    }, 15000);
+    return () => clearInterval(id);
+  }, [accountId]);
+
   const uploadFactura = async (
     file: File,
     tipo: 'factura' | 'boleta' | 'transferencia',
