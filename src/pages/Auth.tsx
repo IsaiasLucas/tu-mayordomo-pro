@@ -610,7 +610,7 @@ export default function Auth() {
                 <img 
                   src={geminisLogo} 
                   alt="GEMINIS" 
-                  className="h-[38px] sm:h-[46px] w-auto object-contain mt-2"
+                  className="h-[32px] sm:h-[40px] w-auto object-contain mt-5"
                   style={{ margin: 0, padding: 0 }}
                 />
               </div>
