@@ -57,6 +57,9 @@ export default function PlanesView() {
       text: "Análisis de gastos",
       included: true
     }, {
+      text: "3 metas de ahorro",
+      included: true
+    }, {
       text: "Mensajes ilimitados",
       included: false
     }, {
@@ -66,7 +69,7 @@ export default function PlanesView() {
   }, {
     id: "mensal",
     name: "Pro Mensual",
-    description: "Uso sin límites",
+    description: "Mismo valor para uso personal o empresarial",
     price: 3000,
     period: "mes",
     priceId: "price_1SAb6WCGNOUldBA37lsDjBgB",
@@ -83,6 +86,9 @@ export default function PlanesView() {
       text: "Análisis avanzado",
       included: true
     }, {
+      text: "Metas de ahorro ilimitadas",
+      included: true
+    }, {
       text: "Exportar datos",
       included: true
     }, {
@@ -92,7 +98,7 @@ export default function PlanesView() {
   }, {
     id: "anual",
     name: "Pro Anual",
-    description: "Ahorra $11.000",
+    description: "Ahorra $11.000 • Mismo valor para uso personal o empresarial",
     price: 25000,
     period: "año",
     priceId: "price_1SBRZJCGNOUldBA3dPc3DIqU",
@@ -103,6 +109,9 @@ export default function PlanesView() {
       included: true
     }, {
       text: "~$2.083/mes (30% off)",
+      included: true
+    }, {
+      text: "Metas de ahorro ilimitadas",
       included: true
     }, {
       text: "Backup automático",
