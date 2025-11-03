@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { useGastos } from "@/hooks/useGastos";
+import { usePresupuesto } from "@/hooks/usePresupuesto";
 import { fmtCLP } from "@/lib/api";
 import { chileDateOptions, formatDatabaseDate } from "@/lib/date-config";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, AlertCircle, Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import { Download, AlertCircle, Loader2, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -19,6 +24,8 @@ export default function GastosView({ profile }: GastosViewProps) {
   const [selectedMonth, setSelectedMonth] = useState<string>(
     format(new Date(), "yyyy-MM")
   );
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [montoInput, setMontoInput] = useState("");
   
   const { items, loading, isRevalidating } = useGastos(selectedMonth);
   const phone = profile?.phone_personal || profile?.phone_empresa;
@@ -33,6 +40,18 @@ export default function GastosView({ profile }: GastosViewProps) {
     .reduce((sum: number, m: any) => sum + Number(m.monto || 0), 0);
 
   const saldo = totalIngresos - totalGastos;
+
+  const { presupuesto, loading: loadingPresupuesto, porcentajeGastado, diasRestantes, savePresupuesto } = usePresupuesto(selectedMonth, totalGastos);
+
+  const handleSavePresupuesto = async () => {
+    const monto = parseFloat(montoInput);
+    if (isNaN(monto) || monto <= 0) {
+      return;
+    }
+    await savePresupuesto(monto);
+    setDialogOpen(false);
+    setMontoInput("");
+  };
 
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
@@ -128,6 +147,115 @@ export default function GastosView({ profile }: GastosViewProps) {
           </Button>
         </div>
       </div>
+
+      {/* Módulo de Presupuesto Mensual */}
+      {!loadingPresupuesto && (
+        <Card className="rounded-xl sm:rounded-2xl border-2 border-primary/20">
+          <CardContent className="p-5 sm:p-7">
+            {!presupuesto ? (
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogTrigger asChild>
+                  <button className="w-full text-left hover:bg-accent/50 p-4 rounded-lg transition-colors">
+                    <p className="text-base sm:text-lg text-muted-foreground">
+                      💰 Aún no tienes un presupuesto mensual. <span className="text-primary font-medium">Toca aquí para agregar uno.</span>
+                    </p>
+                  </button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Configurar Presupuesto Mensual</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="monto">Monto total del presupuesto del mes</Label>
+                      <Input
+                        id="monto"
+                        type="number"
+                        placeholder="Ej: 500000"
+                        value={montoInput}
+                        onChange={(e) => setMontoInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleSavePresupuesto();
+                          }
+                        }}
+                      />
+                    </div>
+                    <Button onClick={handleSavePresupuesto} className="w-full">
+                      Guardar
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">💰 Presupuesto mensual</p>
+                    <p className="text-2xl sm:text-3xl font-bold">{fmtCLP(Number(presupuesto.monto_total))}</p>
+                  </div>
+                  <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">Editar</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Editar Presupuesto Mensual</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="monto">Monto total del presupuesto del mes</Label>
+                          <Input
+                            id="monto"
+                            type="number"
+                            placeholder="Ej: 500000"
+                            value={montoInput}
+                            onChange={(e) => setMontoInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleSavePresupuesto();
+                              }
+                            }}
+                          />
+                        </div>
+                        <Button onClick={handleSavePresupuesto} className="w-full">
+                          Guardar
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">📊 Gastado</span>
+                    <span className={`font-medium ${porcentajeGastado > 100 ? 'text-red-600' : 'text-foreground'}`}>
+                      {fmtCLP(totalGastos)} ({porcentajeGastado.toFixed(1)}%)
+                    </span>
+                  </div>
+                  <Progress 
+                    value={Math.min(porcentajeGastado, 100)} 
+                    className={porcentajeGastado > 100 ? 'bg-red-100 [&>div]:bg-red-600' : ''}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Calendar className="w-4 h-4" />
+                  <span>📅 Restan {diasRestantes} días del mes</span>
+                </div>
+
+                {porcentajeGastado > 100 && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                    <p className="text-sm text-red-600 font-medium">
+                      ⚠️ Has superado tu presupuesto mensual ({fmtCLP(totalGastos)} / {fmtCLP(Number(presupuesto.monto_total))}).
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Cards de totales - sempre mostrar do cache */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">

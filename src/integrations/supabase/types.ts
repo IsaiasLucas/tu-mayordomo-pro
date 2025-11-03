@@ -204,6 +204,39 @@ export type Database = {
           },
         ]
       }
+      presupuestos: {
+        Row: {
+          anio: number
+          created_at: string
+          fecha_creacion: string
+          id: string
+          mes: number
+          monto_total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          anio: number
+          created_at?: string
+          fecha_creacion?: string
+          id?: string
+          mes: number
+          monto_total: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          anio?: number
+          created_at?: string
+          fecha_creacion?: string
+          id?: string
+          mes?: number
+          monto_total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
