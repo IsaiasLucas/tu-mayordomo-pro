@@ -87,7 +87,7 @@ export function useMetas() {
       });
 
       if (error) throw error;
-      toast.success("Meta creada correctamente");
+      toast.success("✅ Meta creada correctamente");
     } catch (error) {
       console.error("Error creating meta:", error);
       toast.error("Error al crear la meta");
@@ -133,7 +133,7 @@ export function useMetas() {
       const { error } = await supabase.from("metas").delete().eq("id", metaId);
 
       if (error) throw error;
-      toast.success("Meta eliminada correctamente");
+      toast.success("✅ Meta eliminada correctamente");
     } catch (error) {
       console.error("Error deleting meta:", error);
       toast.error("Error al eliminar la meta");

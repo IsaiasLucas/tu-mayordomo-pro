@@ -144,7 +144,7 @@ export default function AhorroView({ profile }: AhorroViewProps) {
       </div>
 
       {metas.length === 0 ? (
-        <Card className="rounded-xl sm:rounded-2xl">
+        <Card className="rounded-xl sm:rounded-2xl animate-fade-in">
           <CardContent className="p-12 text-center">
             <Target className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
             <p className="text-lg text-muted-foreground">
@@ -164,7 +164,7 @@ export default function AhorroView({ profile }: AhorroViewProps) {
             return (
               <Card
                 key={meta.id}
-                className={`rounded-xl sm:rounded-2xl ${
+                className={`rounded-xl sm:rounded-2xl animate-fade-in ${
                   completada ? "border-2 border-green-500" : ""
                 }`}
               >
