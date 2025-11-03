@@ -50,7 +50,7 @@ export function useGastos(mes?: string) {
           filter: `user_id=eq.${user.id}`
         },
         (payload: any) => {
-          const current = Array.isArray(data) ? (data as any[]) : [];
+          const current = dataRef.current;
           if (payload.eventType === 'INSERT' && payload.new) {
             const updated = [payload.new, ...current.filter((r: any) => r.id !== payload.new.id)];
             mutate(updated);
@@ -68,7 +68,7 @@ export function useGastos(mes?: string) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.id, revalidate]);
+  }, [user?.id, mutate]);
 
   const allItems = Array.isArray(data) ? (data as any[]) : [];
   const itemsForView = mesKey

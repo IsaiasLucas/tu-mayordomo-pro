@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { toast } from "sonner";
@@ -9,6 +9,12 @@ export function usePresupuesto(mes: string, totalGastos: number) {
   const [loading, setLoading] = useState(true);
 
   const [year, month] = mes.split("-").map(Number);
+
+  // Keep a ref with the latest presupuesto to avoid stale closures
+  const presupuestoRef = useRef<any>(null);
+  useEffect(() => {
+    presupuestoRef.current = presupuesto;
+  }, [presupuesto]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -33,29 +39,70 @@ export function usePresupuesto(mes: string, totalGastos: number) {
     };
 
     fetchPresupuesto();
-  }, [user?.id, month, year]);
+
+    // Set up realtime subscription for presupuestos
+    const channel = supabase
+      .channel(`presupuesto-realtime-${user.id}-${mes}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'presupuestos',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload: any) => {
+          // Only update if it's for the current month/year
+          if (payload.eventType === 'INSERT' && payload.new) {
+            if (payload.new.mes === month && payload.new.anio === year) {
+              setPresupuesto(payload.new);
+            }
+          } else if (payload.eventType === 'UPDATE' && payload.new) {
+            if (payload.new.mes === month && payload.new.anio === year) {
+              setPresupuesto(payload.new);
+            }
+          } else if (payload.eventType === 'DELETE' && payload.old) {
+            if (payload.old.mes === month && payload.old.anio === year) {
+              setPresupuesto(null);
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, month, year, mes]);
 
   const savePresupuesto = async (montoTotal: number) => {
     if (!user?.id) return;
 
     try {
-      if (presupuesto) {
+      if (presupuestoRef.current) {
+        // Optimistic update
+        setPresupuesto({ ...presupuestoRef.current, monto_total: montoTotal });
+
         const { error } = await supabase
           .from("presupuestos")
           .update({ monto_total: montoTotal })
-          .eq("id", presupuesto.id);
+          .eq("id", presupuestoRef.current.id);
 
         if (error) throw error;
-        setPresupuesto({ ...presupuesto, monto_total: montoTotal });
       } else {
+        const newPresupuesto = {
+          user_id: user.id,
+          monto_total: montoTotal,
+          mes: month,
+          anio: year,
+        };
+
+        // Optimistic update
+        setPresupuesto({ ...newPresupuesto, id: 'temp' });
+
         const { data, error } = await supabase
           .from("presupuestos")
-          .insert({
-            user_id: user.id,
-            monto_total: montoTotal,
-            mes: month,
-            anio: year,
-          })
+          .insert(newPresupuesto)
           .select()
           .single();
 
@@ -63,10 +110,12 @@ export function usePresupuesto(mes: string, totalGastos: number) {
         setPresupuesto(data);
       }
 
-      toast.success("Presupuesto guardado correctamente");
+      toast.success("✅ Presupuesto guardado correctamente");
     } catch (error) {
       console.error("Error saving presupuesto:", error);
       toast.error("Error al guardar el presupuesto");
+      // Revert optimistic update on error
+      setPresupuesto(presupuestoRef.current);
     }
   };
 

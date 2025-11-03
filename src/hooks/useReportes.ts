@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useSWR } from "./useSWR";
@@ -6,7 +6,7 @@ import { useSWR } from "./useSWR";
 export function useReportes() {
   const { user } = useAuth();
 
-  const { data, error, isValidating, isRevalidating, revalidate } = useSWR(
+  const { data, error, isValidating, isRevalidating, revalidate, mutate } = useSWR(
     user?.id ? `reportes-${user.id}` : null,
     async () => {
       if (!user?.id) return [];
@@ -24,23 +24,37 @@ export function useReportes() {
     { revalidateOnMount: true, revalidateOnFocus: true, revalidateInterval: 15000 }
   );
 
+  // Keep a ref with the latest data to avoid stale closures inside realtime handler
+  const dataRef = useRef<any[]>([]);
+  useEffect(() => {
+    dataRef.current = Array.isArray(data) ? (data as any[]) : [];
+  }, [data]);
+
   // Set up realtime subscription
   useEffect(() => {
     if (!user?.id) return;
 
     const channel = supabase
-      .channel('reportes-realtime')
+      .channel(`reportes-realtime-${user.id}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'reportes'
+          table: 'reportes',
+          filter: `user_id=eq.${user.id}`
         },
         (payload: any) => {
-          const affectedUser = payload?.new?.user_id ?? payload?.old?.user_id;
-          if (affectedUser === user.id) {
-            revalidate();
+          const current = dataRef.current;
+          if (payload.eventType === 'INSERT' && payload.new) {
+            const updated = [payload.new, ...current.filter((r: any) => r.id !== payload.new.id)];
+            mutate(updated);
+          } else if (payload.eventType === 'UPDATE' && payload.new) {
+            const updated = current.map((r: any) => r.id === payload.new.id ? payload.new : r);
+            mutate(updated);
+          } else if (payload.eventType === 'DELETE' && payload.old) {
+            const updated = current.filter((r: any) => r.id !== payload.old.id);
+            mutate(updated);
           }
         }
       )
@@ -49,7 +63,7 @@ export function useReportes() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.id, revalidate]);
+  }, [user?.id, mutate]);
 
   return {
     items: data || [],

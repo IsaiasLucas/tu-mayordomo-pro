@@ -259,34 +259,34 @@ export default function GastosView({ profile }: GastosViewProps) {
 
       {/* Cards de totales - sempre mostrar do cache */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
-        <Card className="rounded-xl sm:rounded-2xl">
+        <Card className="rounded-xl sm:rounded-2xl transition-all duration-300">
           <CardHeader className="pb-3 px-5 sm:px-7 pt-5 sm:pt-7">
             <CardTitle className="text-sm sm:text-base font-medium text-muted-foreground">Ingresos</CardTitle>
           </CardHeader>
           <CardContent className="px-5 sm:px-7 pb-5 sm:pb-7">
-            <div className="text-2xl sm:text-3xl font-bold text-green-600">
+            <div className="text-2xl sm:text-3xl font-bold text-green-600 transition-all duration-300">
               {fmtCLP(totalIngresos)}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl sm:rounded-2xl">
+        <Card className="rounded-xl sm:rounded-2xl transition-all duration-300">
           <CardHeader className="pb-3 px-5 sm:px-7 pt-5 sm:pt-7">
             <CardTitle className="text-sm sm:text-base font-medium text-muted-foreground">Gastos</CardTitle>
           </CardHeader>
           <CardContent className="px-5 sm:px-7 pb-5 sm:pb-7">
-            <div className="text-2xl sm:text-3xl font-bold text-red-600">
+            <div className="text-2xl sm:text-3xl font-bold text-red-600 transition-all duration-300">
               {fmtCLP(totalGastos)}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl sm:rounded-2xl">
+        <Card className="rounded-xl sm:rounded-2xl transition-all duration-300">
           <CardHeader className="pb-3 px-5 sm:px-7 pt-5 sm:pt-7">
             <CardTitle className="text-sm sm:text-base font-medium text-muted-foreground">Saldo</CardTitle>
           </CardHeader>
           <CardContent className="px-5 sm:px-7 pb-5 sm:pb-7">
-            <div className={`text-2xl sm:text-3xl font-bold ${saldo >= 0 ? 'text-primary' : 'text-red-600'}`}>
+            <div className={`text-2xl sm:text-3xl font-bold transition-all duration-300 ${saldo >= 0 ? 'text-primary' : 'text-red-600'}`}>
               {fmtCLP(saldo)}
             </div>
           </CardContent>
@@ -317,9 +317,9 @@ export default function GastosView({ profile }: GastosViewProps) {
                       {loading ? 'Cargando...' : 'Sin movimientos en este mes.'}
                     </TableCell>
                   </TableRow>
-                ) : (
+                 ) : (
                   items.map((mov: any) => (
-                    <TableRow key={mov.id}>
+                    <TableRow key={mov.id} className="animate-fade-in">
                       <TableCell className="py-4 sm:py-5 whitespace-nowrap text-sm sm:text-base md:text-lg">
                         {formatDatabaseDate(mov.created_at || mov.fecha, "dd/MM HH:mm")}
                       </TableCell>

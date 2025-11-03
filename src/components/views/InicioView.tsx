@@ -232,9 +232,9 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
   return (
     <main className="px-6 py-6 pb-32 space-y-6 animate-fade-in">
       {/* Saldo do Mês */}
-      <div className="bg-gradient-to-br from-primary to-primary-glow text-primary-foreground rounded-2xl p-7 shadow-card">
+      <div className="bg-gradient-to-br from-primary to-primary-glow text-primary-foreground rounded-2xl p-7 shadow-card transition-all duration-300">
         <p className="text-base opacity-75 mb-2">Saldo del Mes</p>
-        <p className="text-4xl font-bold truncate">
+        <p className="text-4xl font-bold truncate transition-all duration-300">
           {showBalance ? fmtCLP(saldoMes||0) : "••••••"}
         </p>
       </div>
@@ -281,16 +281,16 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
 
 
       <div className="grid grid-cols-2 gap-4 sm:gap-5">
-        <Card className="shadow-card rounded-xl sm:rounded-2xl border-0">
+        <Card className="shadow-card rounded-xl sm:rounded-2xl border-0 transition-all duration-300">
           <CardContent className="p-6 sm:p-7">
             <p className="text-base sm:text-lg text-muted-foreground mb-2.5 sm:mb-3">Ingresos</p>
-            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-green-600 truncate">{fmtCLP(ingresos)}</p>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-green-600 truncate transition-all duration-300">{fmtCLP(ingresos)}</p>
           </CardContent>
         </Card>
-        <Card className="shadow-card rounded-xl sm:rounded-2xl border-0">
+        <Card className="shadow-card rounded-xl sm:rounded-2xl border-0 transition-all duration-300">
           <CardContent className="p-6 sm:p-7">
             <p className="text-base sm:text-lg text-muted-foreground mb-2.5 sm:mb-3">Gastos</p>
-            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-red-600 truncate">{fmtCLP(egresos)}</p>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-red-600 truncate transition-all duration-300">{fmtCLP(egresos)}</p>
           </CardContent>
         </Card>
       </div>
@@ -341,7 +341,7 @@ const InicioView = ({ profile, onOpenProfileModal, onViewChange }: InicioViewPro
                     setSelectedMovimiento(mov);
                     setShowDetailsModal(true);
                   }}
-                  className="flex items-center justify-between p-4 sm:p-5 rounded-lg sm:rounded-xl border bg-card hover:bg-accent/50 active:bg-accent/70 transition-colors gap-3 sm:gap-4 cursor-pointer touch-manipulation"
+                  className="flex items-center justify-between p-4 sm:p-5 rounded-lg sm:rounded-xl border bg-card hover:bg-accent/50 active:bg-accent/70 transition-colors gap-3 sm:gap-4 cursor-pointer touch-manipulation animate-fade-in"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 sm:gap-2.5 mb-1.5 sm:mb-2 flex-wrap">
