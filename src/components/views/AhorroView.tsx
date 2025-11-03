@@ -238,7 +238,7 @@ export default function AhorroView({ profile, onViewChange }: AhorroViewProps) {
             return (
               <Card
                 key={meta.id}
-                className={`rounded-xl sm:rounded-2xl animate-fade-in ${
+                className={`rounded-xl sm:rounded-2xl transition-all duration-300 animate-fade-in ${
                   completada ? "border-2 border-green-500" : ""
                 }`}
               >

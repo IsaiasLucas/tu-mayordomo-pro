@@ -90,19 +90,44 @@ export function useMetas() {
 
     try {
       console.log('[Metas] Creating meta:', nombre_meta);
-      const { error } = await supabase.from("metas").insert({
+      
+      // Optimistic update - add immediately with temporary ID
+      const tempId = `temp-${Date.now()}`;
+      const optimisticMeta = {
+        id: tempId,
+        user_id: user.id,
+        nombre_meta,
+        monto_objetivo,
+        monto_actual: 0,
+        fecha_limite: fecha_limite || null,
+        estado: "activo",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        fecha_creacion: new Date().toISOString(),
+      };
+      
+      const optimisticUpdate = [optimisticMeta, ...metas];
+      mutate(optimisticUpdate);
+
+      const { data, error } = await supabase.from("metas").insert({
         user_id: user.id,
         nombre_meta,
         monto_objetivo,
         fecha_limite: fecha_limite || null,
-      });
+      }).select().single();
 
       if (error) throw error;
+      
+      // Replace temp meta with real one
+      mutate([data, ...metas.filter(m => m.id !== tempId)]);
+      
       toast.success("✅ Meta creada correctamente");
       return { success: true };
     } catch (error) {
       console.error("Error creating meta:", error);
       toast.error("Error al crear la meta");
+      // Revert optimistic update on error
+      mutate(metas);
       return { success: false };
     }
   };
