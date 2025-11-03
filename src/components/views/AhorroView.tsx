@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMetas } from "@/hooks/useMetas";
 import { fmtCLP } from "@/lib/api";
+import { formatChileanNumber, parseChileanNumber } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -29,7 +30,7 @@ export default function AhorroView({ profile }: AhorroViewProps) {
   const [montoAgregar, setMontoAgregar] = useState("");
 
   const handleCreateMeta = async () => {
-    const monto = parseFloat(montoObjetivo);
+    const monto = parseChileanNumber(montoObjetivo);
     if (!nombreMeta.trim() || isNaN(monto) || monto <= 0) {
       return;
     }
@@ -42,7 +43,7 @@ export default function AhorroView({ profile }: AhorroViewProps) {
   };
 
   const handleAgregarAhorro = async () => {
-    const monto = parseFloat(montoAgregar);
+    const monto = parseChileanNumber(montoAgregar);
     if (isNaN(monto) || monto <= 0) {
       return;
     }
@@ -115,10 +116,14 @@ export default function AhorroView({ profile }: AhorroViewProps) {
                 <Label htmlFor="monto">Monto objetivo</Label>
                 <Input
                   id="monto"
-                  type="number"
-                  placeholder="Ej: 1000000"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="Ej: 1.000.000"
                   value={montoObjetivo}
-                  onChange={(e) => setMontoObjetivo(e.target.value)}
+                  onChange={(e) => {
+                    const formatted = formatChileanNumber(e.target.value);
+                    setMontoObjetivo(formatted);
+                  }}
                 />
               </div>
               <div className="space-y-2">
@@ -240,15 +245,19 @@ export default function AhorroView({ profile }: AhorroViewProps) {
                         <DialogHeader>
                           <DialogTitle>Agregar ahorro a "{meta.nombre_meta}"</DialogTitle>
                         </DialogHeader>
-                        <div className="space-y-4 py-4">
+                          <div className="space-y-4 py-4">
                           <div className="space-y-2">
                             <Label htmlFor="monto-agregar">¿Cuánto deseas agregar a esta meta?</Label>
                             <Input
                               id="monto-agregar"
-                              type="number"
-                              placeholder="Ej: 50000"
+                              type="text"
+                              inputMode="numeric"
+                              placeholder="Ej: 50.000"
                               value={montoAgregar}
-                              onChange={(e) => setMontoAgregar(e.target.value)}
+                              onChange={(e) => {
+                                const formatted = formatChileanNumber(e.target.value);
+                                setMontoAgregar(formatted);
+                              }}
                               onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                   handleAgregarAhorro();
