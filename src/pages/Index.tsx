@@ -101,7 +101,7 @@ const Index = () => {
         </ViewTransition>
 
         <ViewTransition isActive={activeTab === 'ahorro'}>
-          <AhorroView profile={profile} />
+          <AhorroView profile={profile} onViewChange={handleViewChange} />
         </ViewTransition>
 
         <ViewTransition isActive={activeTab === 'reportes'}>

@@ -5,23 +5,27 @@ import { formatChileanNumber, parseChileanNumber } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { AlertCircle, Plus, Target, Trash2 } from "lucide-react";
+import { AlertCircle, Plus, Target, Trash2, Crown } from "lucide-react";
 import { format } from "date-fns";
 
 interface AhorroViewProps {
   profile: any;
+  onViewChange?: (view: string) => void;
 }
 
-export default function AhorroView({ profile }: AhorroViewProps) {
+export default function AhorroView({ profile, onViewChange }: AhorroViewProps) {
   const { metas, loading, createMeta, agregarAhorro, deleteMeta } = useMetas();
   const phone = profile?.phone_personal || profile?.phone_empresa;
+  const isPro = profile?.plan && profile.plan !== "free";
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [selectedMetaId, setSelectedMetaId] = useState<string>("");
+  const [showLimitAlert, setShowLimitAlert] = useState(false);
 
   const [nombreMeta, setNombreMeta] = useState("");
   const [montoObjetivo, setMontoObjetivo] = useState("");
@@ -29,17 +33,31 @@ export default function AhorroView({ profile }: AhorroViewProps) {
 
   const [montoAgregar, setMontoAgregar] = useState("");
 
+  // Límite de 3 metas para usuarios Free
+  const FREE_LIMIT = 3;
+  const activeMetas = metas.filter((m) => m.estado !== "completado");
+  const canCreateMore = isPro || activeMetas.length < FREE_LIMIT;
+
   const handleCreateMeta = async () => {
     const monto = parseChileanNumber(montoObjetivo);
     if (!nombreMeta.trim() || isNaN(monto) || monto <= 0) {
       return;
     }
 
-    await createMeta(nombreMeta, monto, fechaLimite || undefined);
-    setDialogOpen(false);
-    setNombreMeta("");
-    setMontoObjetivo("");
-    setFechaLimite("");
+    // Verificar límite para usuarios Free
+    if (!canCreateMore) {
+      setShowLimitAlert(true);
+      setDialogOpen(false);
+      return;
+    }
+
+    const result = await createMeta(nombreMeta, monto, fechaLimite || undefined);
+    if (result.success) {
+      setDialogOpen(false);
+      setNombreMeta("");
+      setMontoObjetivo("");
+      setFechaLimite("");
+    }
   };
 
   const handleAgregarAhorro = async () => {
@@ -142,6 +160,62 @@ export default function AhorroView({ profile }: AhorroViewProps) {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Alert de límite alcanzado para usuarios Free */}
+      {showLimitAlert && (
+        <Alert className="border-2 border-primary bg-primary/5 animate-fade-in">
+          <Crown className="h-5 w-5 text-primary" />
+          <AlertDescription className="ml-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex-1">
+              <p className="font-semibold text-base mb-1">
+                Límite alcanzado: actualiza a Pro para crear metas ilimitadas 🎯
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Has alcanzado el límite de {FREE_LIMIT} metas activas en el plan gratuito.
+              </p>
+            </div>
+            {onViewChange && (
+              <Button
+                onClick={() => {
+                  setShowLimitAlert(false);
+                  onViewChange("planes");
+                }}
+                className="w-full sm:w-auto"
+              >
+                <Crown className="w-4 h-4 mr-2" />
+                Ver Planes
+              </Button>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Indicador de metas disponibles para usuarios Free */}
+      {!isPro && (
+        <Card className="rounded-xl sm:rounded-2xl border-primary/30 bg-primary/5 animate-fade-in">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Target className="w-5 h-5 text-primary" />
+                <p className="text-sm font-medium">
+                  Metas activas: {activeMetas.length} / {FREE_LIMIT}
+                </p>
+              </div>
+              {activeMetas.length >= FREE_LIMIT && onViewChange && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onViewChange("planes")}
+                  className="text-xs"
+                >
+                  <Crown className="w-3 h-3 mr-1" />
+                  Actualizar
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {metas.length === 0 ? (
         <Card className="rounded-xl sm:rounded-2xl animate-fade-in">

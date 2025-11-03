@@ -85,8 +85,8 @@ export function useMetas() {
     nombre_meta: string,
     monto_objetivo: number,
     fecha_limite?: string
-  ) => {
-    if (!user?.id) return;
+  ): Promise<{ success: boolean; limitReached?: boolean }> => {
+    if (!user?.id) return { success: false };
 
     try {
       console.log('[Metas] Creating meta:', nombre_meta);
@@ -99,9 +99,11 @@ export function useMetas() {
 
       if (error) throw error;
       toast.success("✅ Meta creada correctamente");
+      return { success: true };
     } catch (error) {
       console.error("Error creating meta:", error);
       toast.error("Error al crear la meta");
+      return { success: false };
     }
   };
 
