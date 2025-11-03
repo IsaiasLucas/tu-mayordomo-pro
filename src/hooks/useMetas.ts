@@ -38,6 +38,8 @@ export function useMetas() {
   useEffect(() => {
     if (!user?.id) return;
 
+    console.log('[Metas Realtime] Setting up subscription for user:', user.id);
+
     const channel = supabase
       .channel(`metas-realtime-${user.id}`)
       .on(
@@ -49,22 +51,30 @@ export function useMetas() {
           filter: `user_id=eq.${user.id}`,
         },
         (payload: any) => {
+          console.log('[Metas Realtime] Received event:', payload.eventType, payload);
           const current = dataRef.current;
+          
           if (payload.eventType === "INSERT" && payload.new) {
+            console.log('[Metas Realtime] Adding new meta:', payload.new.id);
             const updated = [payload.new, ...current.filter((r: any) => r.id !== payload.new.id)];
             mutate(updated);
           } else if (payload.eventType === "UPDATE" && payload.new) {
+            console.log('[Metas Realtime] Updating meta:', payload.new.id);
             const updated = current.map((r: any) => (r.id === payload.new.id ? payload.new : r));
             mutate(updated);
           } else if (payload.eventType === "DELETE" && payload.old) {
+            console.log('[Metas Realtime] Removing meta:', payload.old.id);
             const updated = current.filter((r: any) => r.id !== payload.old.id);
             mutate(updated);
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('[Metas Realtime] Subscription status:', status);
+      });
 
     return () => {
+      console.log('[Metas Realtime] Cleaning up subscription');
       supabase.removeChannel(channel);
     };
   }, [user?.id, mutate]);
@@ -79,6 +89,7 @@ export function useMetas() {
     if (!user?.id) return;
 
     try {
+      console.log('[Metas] Creating meta:', nombre_meta);
       const { error } = await supabase.from("metas").insert({
         user_id: user.id,
         nombre_meta,
@@ -105,6 +116,17 @@ export function useMetas() {
       const porcentaje = (nuevoMonto / Number(meta.monto_objetivo)) * 100;
       const nuevoEstado = porcentaje >= 100 ? "completado" : "activo";
 
+      console.log('[Metas] Adding ahorro to meta:', metaId, monto);
+
+      // Optimistic update
+      const optimisticMeta = {
+        ...meta,
+        monto_actual: nuevoMonto,
+        estado: nuevoEstado,
+      };
+      const optimisticUpdate = metas.map((m) => m.id === metaId ? optimisticMeta : m);
+      mutate(optimisticUpdate);
+
       const { error } = await supabase
         .from("metas")
         .update({
@@ -118,11 +140,13 @@ export function useMetas() {
       if (nuevoEstado === "completado") {
         toast.success(`🎉 ¡Felicidades! Has completado tu meta "${meta.nombre_meta}".`);
       } else {
-        toast.success("Ahorro agregado correctamente");
+        toast.success("✅ Ahorro agregado correctamente");
       }
     } catch (error) {
       console.error("Error adding ahorro:", error);
       toast.error("Error al agregar ahorro");
+      // Revert optimistic update on error
+      mutate(metas);
     }
   };
 
@@ -130,6 +154,12 @@ export function useMetas() {
     if (!user?.id) return;
 
     try {
+      console.log('[Metas] Deleting meta:', metaId);
+      
+      // Optimistic update - remove immediately
+      const optimisticUpdate = metas.filter((m) => m.id !== metaId);
+      mutate(optimisticUpdate);
+
       const { error } = await supabase.from("metas").delete().eq("id", metaId);
 
       if (error) throw error;
@@ -137,6 +167,8 @@ export function useMetas() {
     } catch (error) {
       console.error("Error deleting meta:", error);
       toast.error("Error al eliminar la meta");
+      // Revert optimistic update on error
+      mutate(metas);
     }
   };
 
