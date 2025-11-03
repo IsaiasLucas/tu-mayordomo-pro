@@ -1,4 +1,4 @@
-import { Home, Receipt, BarChart3, Crown, User } from "lucide-react";
+import { Home, Receipt, Target, BarChart3, Crown, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useActiveTab, ActiveTab } from "@/store/appState";
 
@@ -16,6 +16,10 @@ const Navigation = ({ isPro }: NavigationProps) => {
     id: "gastos",
     label: "Gastos",
     icon: Receipt
+  }, {
+    id: "ahorro",
+    label: "Ahorro",
+    icon: Target
   }, {
     id: "reportes",
     label: "Reportes",
@@ -94,7 +98,7 @@ const Navigation = ({ isPro }: NavigationProps) => {
                   aria-label={item.label}
                   className={cn(
                     "flex flex-col items-center justify-center gap-1.5 transition-all duration-200 ease-out touch-manipulation relative",
-                    "min-w-[69px] px-3.5 py-2.5",
+                    "min-w-[58px] px-2.5 py-2.5",
                     isActive 
                       ? "bg-gradient-to-r from-primary to-primary-dark rounded-2xl scale-105" 
                       : "hover:scale-105 active:scale-95",

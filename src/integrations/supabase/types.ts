@@ -204,6 +204,45 @@ export type Database = {
           },
         ]
       }
+      metas: {
+        Row: {
+          created_at: string
+          estado: string
+          fecha_creacion: string
+          fecha_limite: string | null
+          id: string
+          monto_actual: number
+          monto_objetivo: number
+          nombre_meta: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          estado?: string
+          fecha_creacion?: string
+          fecha_limite?: string | null
+          id?: string
+          monto_actual?: number
+          monto_objetivo: number
+          nombre_meta: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          estado?: string
+          fecha_creacion?: string
+          fecha_limite?: string | null
+          id?: string
+          monto_actual?: number
+          monto_objetivo?: number
+          nombre_meta?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       presupuestos: {
         Row: {
           anio: number

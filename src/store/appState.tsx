@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useMemo, useState, useCallback } from "react";
 
-export type ActiveTab = 'inicio' | 'gastos' | 'reportes' | 'planes' | 'perfil';
+export type ActiveTab = 'inicio' | 'gastos' | 'ahorro' | 'reportes' | 'planes' | 'perfil';
 
 interface ActiveTabContextValue {
   activeTab: ActiveTab;

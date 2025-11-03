@@ -6,6 +6,7 @@ import { usePreloadAllData } from "@/hooks/usePreloadView";
 import Navigation from "@/components/Navigation";
 import InicioView from "@/components/views/InicioView";
 import GastosView from "@/components/views/GastosView";
+import AhorroView from "@/components/views/AhorroView";
 import ReportesView from "@/components/views/ReportesView";
 import PlanesView from "@/components/views/PlanesView";
 import PerfilView from "@/components/views/PerfilView";
@@ -97,6 +98,10 @@ const Index = () => {
 
         <ViewTransition isActive={activeTab === 'gastos'}>
           <GastosView profile={profile} />
+        </ViewTransition>
+
+        <ViewTransition isActive={activeTab === 'ahorro'}>
+          <AhorroView profile={profile} />
         </ViewTransition>
 
         <ViewTransition isActive={activeTab === 'reportes'}>

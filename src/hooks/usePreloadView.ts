@@ -67,6 +67,17 @@ export const usePreloadAllData = (userId: string | undefined) => {
 
         return data || [];
       });
+
+      // Prefetch metas
+      prefetch(`metas-${userId}`, async () => {
+        const { data } = await supabase
+          .from('metas')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+
+        return data || [];
+      });
     };
 
     // Initial prefetch after a short delay
