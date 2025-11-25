@@ -256,7 +256,7 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
           </div>
 
           <div className="space-y-1.5 sm:space-y-2">
-            <Label htmlFor="currency" className="text-sm sm:text-base">Moeda *</Label>
+            <Label htmlFor="currency" className="text-sm sm:text-base">Moneda *</Label>
             <Select value={currency} onValueChange={(value) => setCurrency(value as CurrencyCode)}>
               <SelectTrigger id="currency" className="h-11 sm:h-12 text-base">
                 <SelectValue />
