@@ -13,6 +13,7 @@ export interface Country {
   currency: string;
   locale: string;
   phone: PhoneFormat;
+  flag: string; // Unicode flag emoji
 }
 
 // Phone format configurations for each country
@@ -274,26 +275,26 @@ const PHONE_FORMATS: Record<string, PhoneFormat> = {
 };
 
 export const COUNTRIES: Country[] = [
-  { code: 'AR', name: 'Argentina', currency: 'ARS', locale: 'es-AR', phone: PHONE_FORMATS.AR },
-  { code: 'BO', name: 'Bolivia', currency: 'BOB', locale: 'es-BO', phone: PHONE_FORMATS.BO },
-  { code: 'CL', name: 'Chile', currency: 'CLP', locale: 'es-CL', phone: PHONE_FORMATS.CL },
-  { code: 'CO', name: 'Colombia', currency: 'COP', locale: 'es-CO', phone: PHONE_FORMATS.CO },
-  { code: 'CR', name: 'Costa Rica', currency: 'CRC', locale: 'es-CR', phone: PHONE_FORMATS.CR },
-  { code: 'CU', name: 'Cuba', currency: 'CUP', locale: 'es-CU', phone: PHONE_FORMATS.CU },
-  { code: 'EC', name: 'Ecuador', currency: 'USD', locale: 'es-EC', phone: PHONE_FORMATS.EC },
-  { code: 'SV', name: 'El Salvador', currency: 'USD', locale: 'es-SV', phone: PHONE_FORMATS.SV },
-  { code: 'ES', name: 'España', currency: 'EUR', locale: 'es-ES', phone: PHONE_FORMATS.ES },
-  { code: 'GT', name: 'Guatemala', currency: 'GTQ', locale: 'es-GT', phone: PHONE_FORMATS.GT },
-  { code: 'HN', name: 'Honduras', currency: 'HNL', locale: 'es-HN', phone: PHONE_FORMATS.HN },
-  { code: 'MX', name: 'México', currency: 'MXN', locale: 'es-MX', phone: PHONE_FORMATS.MX },
-  { code: 'NI', name: 'Nicaragua', currency: 'NIO', locale: 'es-NI', phone: PHONE_FORMATS.NI },
-  { code: 'PA', name: 'Panamá', currency: 'USD', locale: 'es-PA', phone: PHONE_FORMATS.PA },
-  { code: 'PY', name: 'Paraguay', currency: 'PYG', locale: 'es-PY', phone: PHONE_FORMATS.PY },
-  { code: 'PE', name: 'Perú', currency: 'PEN', locale: 'es-PE', phone: PHONE_FORMATS.PE },
-  { code: 'DO', name: 'República Dominicana', currency: 'DOP', locale: 'es-DO', phone: PHONE_FORMATS.DO },
-  { code: 'UY', name: 'Uruguay', currency: 'UYU', locale: 'es-UY', phone: PHONE_FORMATS.UY },
-  { code: 'VE', name: 'Venezuela', currency: 'VES', locale: 'es-VE', phone: PHONE_FORMATS.VE },
-  { code: 'US', name: 'Estados Unidos', currency: 'USD', locale: 'en-US', phone: PHONE_FORMATS.US },
+  { code: 'AR', name: 'Argentina', currency: 'ARS', locale: 'es-AR', phone: PHONE_FORMATS.AR, flag: '🇦🇷' },
+  { code: 'BO', name: 'Bolivia', currency: 'BOB', locale: 'es-BO', phone: PHONE_FORMATS.BO, flag: '🇧🇴' },
+  { code: 'CL', name: 'Chile', currency: 'CLP', locale: 'es-CL', phone: PHONE_FORMATS.CL, flag: '🇨🇱' },
+  { code: 'CO', name: 'Colombia', currency: 'COP', locale: 'es-CO', phone: PHONE_FORMATS.CO, flag: '🇨🇴' },
+  { code: 'CR', name: 'Costa Rica', currency: 'CRC', locale: 'es-CR', phone: PHONE_FORMATS.CR, flag: '🇨🇷' },
+  { code: 'CU', name: 'Cuba', currency: 'CUP', locale: 'es-CU', phone: PHONE_FORMATS.CU, flag: '🇨🇺' },
+  { code: 'EC', name: 'Ecuador', currency: 'USD', locale: 'es-EC', phone: PHONE_FORMATS.EC, flag: '🇪🇨' },
+  { code: 'SV', name: 'El Salvador', currency: 'USD', locale: 'es-SV', phone: PHONE_FORMATS.SV, flag: '🇸🇻' },
+  { code: 'ES', name: 'España', currency: 'EUR', locale: 'es-ES', phone: PHONE_FORMATS.ES, flag: '🇪🇸' },
+  { code: 'GT', name: 'Guatemala', currency: 'GTQ', locale: 'es-GT', phone: PHONE_FORMATS.GT, flag: '🇬🇹' },
+  { code: 'HN', name: 'Honduras', currency: 'HNL', locale: 'es-HN', phone: PHONE_FORMATS.HN, flag: '🇭🇳' },
+  { code: 'MX', name: 'México', currency: 'MXN', locale: 'es-MX', phone: PHONE_FORMATS.MX, flag: '🇲🇽' },
+  { code: 'NI', name: 'Nicaragua', currency: 'NIO', locale: 'es-NI', phone: PHONE_FORMATS.NI, flag: '🇳🇮' },
+  { code: 'PA', name: 'Panamá', currency: 'USD', locale: 'es-PA', phone: PHONE_FORMATS.PA, flag: '🇵🇦' },
+  { code: 'PY', name: 'Paraguay', currency: 'PYG', locale: 'es-PY', phone: PHONE_FORMATS.PY, flag: '🇵🇾' },
+  { code: 'PE', name: 'Perú', currency: 'PEN', locale: 'es-PE', phone: PHONE_FORMATS.PE, flag: '🇵🇪' },
+  { code: 'DO', name: 'República Dominicana', currency: 'DOP', locale: 'es-DO', phone: PHONE_FORMATS.DO, flag: '🇩🇴' },
+  { code: 'UY', name: 'Uruguay', currency: 'UYU', locale: 'es-UY', phone: PHONE_FORMATS.UY, flag: '🇺🇾' },
+  { code: 'VE', name: 'Venezuela', currency: 'VES', locale: 'es-VE', phone: PHONE_FORMATS.VE, flag: '🇻🇪' },
+  { code: 'US', name: 'Estados Unidos', currency: 'USD', locale: 'en-US', phone: PHONE_FORMATS.US, flag: '🇺🇸' },
 ];
 
 export const CURRENCIES = {

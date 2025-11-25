@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { COUNTRIES, CURRENCIES, type CurrencyCode, formatPhoneNumber, validatePhoneNumber, getPhoneFormat } from "@/lib/countries";
 import { detectUserCountry } from "@/lib/countryDetection";
+import { CountrySelector } from "@/components/CountrySelector";
 
 interface CompleteProfileModalProps {
   open: boolean;
@@ -230,10 +231,10 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
 
           <div className="space-y-1.5 sm:space-y-2">
             <Label htmlFor="country" className="text-sm sm:text-base">
-              País * {detectingCountry && <span className="text-xs text-muted-foreground ml-2">🌍 Detectando...</span>}
+              País *
             </Label>
-            <Select 
-              value={country} 
+            <CountrySelector
+              value={country}
               onValueChange={(value) => {
                 setCountry(value);
                 const selectedCountry = COUNTRIES.find(c => c.code === value);
@@ -244,19 +245,9 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
                 setWhatsapp("");
                 setPhoneValid(null);
               }}
-              disabled={loading || detectingCountry}
-            >
-              <SelectTrigger id="country" className="h-11 sm:h-12 text-base">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {COUNTRIES.map((c) => (
-                  <SelectItem key={c.code} value={c.code}>
-                    {c.name} ({c.currency})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              disabled={loading}
+              detectingCountry={detectingCountry}
+            />
             {!detectingCountry && (
               <p className="text-xs text-muted-foreground">
                 ✓ País detectado automaticamente. Puedes cambiarlo si es necesario.
