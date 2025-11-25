@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Shield, MessageCircle, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { COUNTRIES, CURRENCIES, type CurrencyCode, formatPhoneNumber, validatePhoneNumber, getPhoneFormat } from "@/lib/countries";
+import { detectUserCountry } from "@/lib/countryDetection";
 
 interface CompleteProfileModalProps {
   open: boolean;
@@ -22,6 +23,32 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
   const [currency, setCurrency] = useState<CurrencyCode>("CLP");
   const [loading, setLoading] = useState(false);
   const [phoneValid, setPhoneValid] = useState<boolean | null>(null);
+  const [detectingCountry, setDetectingCountry] = useState(true);
+
+  // Auto-detect country when modal opens
+  useEffect(() => {
+    if (open) {
+      const autoDetectCountry = async () => {
+        setDetectingCountry(true);
+        try {
+          const detectedCountry = await detectUserCountry();
+          setCountry(detectedCountry);
+          
+          // Update currency based on detected country
+          const selectedCountry = COUNTRIES.find(c => c.code === detectedCountry);
+          if (selectedCountry) {
+            setCurrency(selectedCountry.currency as CurrencyCode);
+          }
+        } catch (error) {
+          console.error('[CompleteProfileModal] Error detecting country:', error);
+        } finally {
+          setDetectingCountry(false);
+        }
+      };
+
+      autoDetectCountry();
+    }
+  }, [open]);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -202,17 +229,23 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
           </div>
 
           <div className="space-y-1.5 sm:space-y-2">
-            <Label htmlFor="country" className="text-sm sm:text-base">País *</Label>
-            <Select value={country} onValueChange={(value) => {
-              setCountry(value);
-              const selectedCountry = COUNTRIES.find(c => c.code === value);
-              if (selectedCountry) {
-                setCurrency(selectedCountry.currency as CurrencyCode);
-              }
-              // Reset phone when country changes
-              setWhatsapp("");
-              setPhoneValid(null);
-            }}>
+            <Label htmlFor="country" className="text-sm sm:text-base">
+              País * {detectingCountry && <span className="text-xs text-muted-foreground ml-2">🌍 Detectando...</span>}
+            </Label>
+            <Select 
+              value={country} 
+              onValueChange={(value) => {
+                setCountry(value);
+                const selectedCountry = COUNTRIES.find(c => c.code === value);
+                if (selectedCountry) {
+                  setCurrency(selectedCountry.currency as CurrencyCode);
+                }
+                // Reset phone when country changes
+                setWhatsapp("");
+                setPhoneValid(null);
+              }}
+              disabled={loading || detectingCountry}
+            >
               <SelectTrigger id="country" className="h-11 sm:h-12 text-base">
                 <SelectValue />
               </SelectTrigger>
@@ -224,6 +257,11 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
                 ))}
               </SelectContent>
             </Select>
+            {!detectingCountry && (
+              <p className="text-xs text-muted-foreground">
+                ✓ País detectado automaticamente. Puedes cambiarlo si es necesario.
+              </p>
+            )}
           </div>
 
           <div className="space-y-1.5 sm:space-y-2">
