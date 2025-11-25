@@ -279,7 +279,9 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          country: string | null
           created_at: string
+          currency: string | null
           display_name: string | null
           email: string
           entidad: string
@@ -302,7 +304,9 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          country?: string | null
           created_at?: string
+          currency?: string | null
           display_name?: string | null
           email: string
           entidad?: string
@@ -325,7 +329,9 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          country?: string | null
           created_at?: string
+          currency?: string | null
           display_name?: string | null
           email?: string
           entidad?: string
@@ -422,7 +428,9 @@ export type Database = {
       }
       usuarios: {
         Row: {
+          country: string | null
           created_at: string | null
+          currency: string | null
           id: string
           nombre: string | null
           plan: string | null
@@ -437,7 +445,9 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          country?: string | null
           created_at?: string | null
+          currency?: string | null
           id?: string
           nombre?: string | null
           plan?: string | null
@@ -452,7 +462,9 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          country?: string | null
           created_at?: string | null
+          currency?: string | null
           id?: string
           nombre?: string | null
           plan?: string | null

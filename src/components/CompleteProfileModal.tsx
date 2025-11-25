@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Shield, MessageCircle, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { COUNTRIES, CURRENCIES, type CurrencyCode } from "@/lib/countries";
 
 interface CompleteProfileModalProps {
   open: boolean;
@@ -16,6 +18,8 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
   const [nombre, setNombre] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [tipo, setTipo] = useState("");
+  const [country, setCountry] = useState("CL");
+  const [currency, setCurrency] = useState<CurrencyCode>("CLP");
   const [loading, setLoading] = useState(false);
   const [phoneValid, setPhoneValid] = useState<boolean | null>(null);
 
@@ -92,7 +96,9 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
             telefono: phoneDigits,
             nombre: nombre,
             tipo_cuenta: tipo.toLowerCase(),
-            profile_complete: true
+            profile_complete: true,
+            country,
+            currency
           })
           .eq('user_id', user.id),
         
@@ -104,7 +110,9 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
             phone_empresa: tipo === "Empresa" ? whatsapp : null,
             entidad: tipo.toLowerCase(),
             whatsapp_configured: true,
-            profile_complete: true
+            profile_complete: true,
+            country,
+            currency
           })
           .eq('user_id', user.id)
       ]);
@@ -204,6 +212,44 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
               <MessageCircle className="w-3 h-3 flex-shrink-0" />
               Introduce tu número chileno (debe comenzar con 9)
             </p>
+          </div>
+
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="country" className="text-sm sm:text-base">País *</Label>
+            <Select value={country} onValueChange={(value) => {
+              setCountry(value);
+              const selectedCountry = COUNTRIES.find(c => c.code === value);
+              if (selectedCountry) {
+                setCurrency(selectedCountry.currency as CurrencyCode);
+              }
+            }}>
+              <SelectTrigger id="country" className="h-11 sm:h-12 text-base">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {COUNTRIES.map((c) => (
+                  <SelectItem key={c.code} value={c.code}>
+                    {c.name} ({c.currency})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="currency" className="text-sm sm:text-base">Moeda *</Label>
+            <Select value={currency} onValueChange={(value) => setCurrency(value as CurrencyCode)}>
+              <SelectTrigger id="currency" className="h-11 sm:h-12 text-base">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(CURRENCIES).map(([code, info]) => (
+                  <SelectItem key={code} value={code}>
+                    {info.name} ({info.symbol})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2 sm:space-y-3">
