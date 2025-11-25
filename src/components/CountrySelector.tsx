@@ -74,7 +74,7 @@ export function CountrySelector({
         <Command className="touch-auto pointer-events-auto rounded-lg">
           <CommandInput 
             placeholder="Buscar país..." 
-            className="h-12 text-base sticky top-0 bg-background z-10 border-b"
+            className="hidden sm:flex h-12 text-base sticky top-0 bg-background z-10 border-b"
             autoFocus={false}
           />
           <CommandList 
