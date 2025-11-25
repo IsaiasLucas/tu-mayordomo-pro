@@ -7,7 +7,7 @@ import { toast } from "@/hooks/use-toast";
 import { Shield, MessageCircle, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { COUNTRIES, CURRENCIES, type CurrencyCode } from "@/lib/countries";
+import { COUNTRIES, CURRENCIES, type CurrencyCode, formatPhoneNumber, validatePhoneNumber, getPhoneFormat } from "@/lib/countries";
 
 interface CompleteProfileModalProps {
   open: boolean;
@@ -23,31 +23,17 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
   const [loading, setLoading] = useState(false);
   const [phoneValid, setPhoneValid] = useState<boolean | null>(null);
 
-  const formatPhone = (value: string) => {
-    // Remove all non-digits
-    const digits = value.replace(/\D/g, "");
-    
-    // Remove leading 56 if present
-    let phone = digits;
-    if (phone.startsWith("56")) {
-      phone = phone.substring(2);
-    }
-    
-    // Format as +56 9 1234 5678
-    if (phone.length <= 1) return phone;
-    if (phone.length <= 5) return `+56 ${phone}`;
-    return `+56 ${phone.substring(0, 1)} ${phone.substring(1, 5)} ${phone.substring(5, 9)}`;
-  };
-
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatPhone(e.target.value);
+    const value = e.target.value;
+    const formatted = formatPhoneNumber(value, country);
     setWhatsapp(formatted);
     
-    // Validate phone number (Chilean format: 9 digits)
-    const digits = formatted.replace(/\D/g, "");
-    const isValid = digits.length === 11 && digits.startsWith("56") && digits[2] === "9";
+    // Validate phone number for selected country
+    const isValid = validatePhoneNumber(formatted, country);
     setPhoneValid(formatted.length > 0 ? isValid : null);
   };
+
+  const currentPhoneFormat = getPhoneFormat(country);
 
   const handleSave = async () => {
     // Validación
@@ -61,9 +47,10 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
     }
 
     if (!whatsapp.trim() || phoneValid !== true) {
+      const countryName = COUNTRIES.find(c => c.code === country)?.name || country;
       toast({
         title: "Error",
-        description: "Debes ingresar un número de WhatsApp válido chileno",
+        description: `Debes ingresar un número de WhatsApp válido de ${countryName}`,
         variant: "destructive",
       });
       return;
@@ -188,11 +175,11 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
               <Input
                 id="whatsapp"
                 type="tel"
-                placeholder="+56 9 1234 5678"
+                placeholder={currentPhoneFormat?.placeholder || "+56 9 1234 5678"}
                 value={whatsapp}
                 onChange={handlePhoneChange}
                 disabled={loading}
-                maxLength={17}
+                maxLength={25}
                 className={`h-11 sm:h-12 pr-10 sm:pr-12 text-base ${
                   phoneValid === true 
                     ? "border-green-500 focus-visible:ring-green-500" 
@@ -210,7 +197,7 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
             </div>
             <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
               <MessageCircle className="w-3 h-3 flex-shrink-0" />
-              Introduce tu número chileno (debe comenzar con 9)
+              {currentPhoneFormat?.mask || "Introduce tu número de WhatsApp"}
             </p>
           </div>
 
@@ -222,6 +209,9 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
               if (selectedCountry) {
                 setCurrency(selectedCountry.currency as CurrencyCode);
               }
+              // Reset phone when country changes
+              setWhatsapp("");
+              setPhoneValid(null);
             }}>
               <SelectTrigger id="country" className="h-11 sm:h-12 text-base">
                 <SelectValue />
