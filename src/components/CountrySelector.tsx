@@ -70,13 +70,13 @@ export function CountrySelector({
         align="start"
         sideOffset={5}
       >
-        <Command className="touch-auto">
+        <Command className="touch-auto pointer-events-auto">
           <CommandInput 
             placeholder="Buscar país..." 
             className="h-11 sticky top-0 bg-background z-10"
           />
           <CommandList 
-            className="max-h-[300px] overflow-y-auto overscroll-contain touch-pan-y"
+            className="max-h-[300px] overflow-y-auto overscroll-contain touch-pan-y pointer-events-auto"
             style={{ WebkitOverflowScrolling: 'touch' }}
           >
             <CommandEmpty>
