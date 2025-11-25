@@ -65,20 +65,27 @@ export function CountrySelector({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full sm:w-[400px] p-0 z-50" align="start">
-        <Command>
+      <PopoverContent 
+        className="w-full sm:w-[400px] p-0 z-50 pointer-events-auto" 
+        align="start"
+        sideOffset={5}
+      >
+        <Command className="touch-auto">
           <CommandInput 
             placeholder="Buscar país..." 
-            className="h-11"
+            className="h-11 sticky top-0 bg-background z-10"
           />
-          <CommandList className="max-h-[300px]">
+          <CommandList 
+            className="max-h-[300px] overflow-y-auto overscroll-contain touch-pan-y"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
             <CommandEmpty>
               <div className="flex flex-col items-center justify-center py-6 text-center">
                 <Search className="h-8 w-8 text-muted-foreground mb-2" />
                 <p className="text-sm text-muted-foreground">No se encontraron países</p>
               </div>
             </CommandEmpty>
-            <CommandGroup heading="Países disponibles">
+            <CommandGroup heading="Países disponibles" className="p-2">
               {COUNTRIES.map((country) => (
                 <CommandItem
                   key={country.code}
@@ -87,18 +94,18 @@ export function CountrySelector({
                     onValueChange(country.code);
                     setOpen(false);
                   }}
-                  className="cursor-pointer"
+                  className="cursor-pointer touch-manipulation py-3 px-3"
                 >
-                  <span className="text-2xl mr-3">{country.flag}</span>
-                  <div className="flex flex-col flex-1">
-                    <span className="font-medium">{country.name}</span>
-                    <span className="text-xs text-muted-foreground">
+                  <span className="text-2xl mr-3 flex-shrink-0">{country.flag}</span>
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <span className="font-medium text-sm sm:text-base">{country.name}</span>
+                    <span className="text-xs text-muted-foreground truncate">
                       {country.currency} • {country.phone.placeholder}
                     </span>
                   </div>
                   <Check
                     className={cn(
-                      "ml-auto h-4 w-4",
+                      "ml-auto h-4 w-4 flex-shrink-0",
                       value === country.code ? "opacity-100" : "opacity-0"
                     )}
                   />
