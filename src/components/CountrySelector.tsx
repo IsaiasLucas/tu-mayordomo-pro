@@ -75,6 +75,7 @@ export function CountrySelector({
           <CommandInput 
             placeholder="Buscar país..." 
             className="h-12 text-base sticky top-0 bg-background z-10 border-b"
+            autoFocus={false}
           />
           <CommandList 
             className="max-h-[min(400px,60vh)] overflow-y-auto overscroll-contain touch-pan-y pointer-events-auto scroll-smooth"
