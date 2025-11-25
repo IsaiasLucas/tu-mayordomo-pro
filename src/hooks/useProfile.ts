@@ -11,6 +11,8 @@ interface ProfileData {
   display_name: string | null;
   entidad: string;
   usuario_profile_complete: boolean;
+  country: string;
+  currency: string;
 }
 
 let cachedProfile: ProfileData | null = null;
@@ -53,12 +55,12 @@ export const useProfile = () => {
       const [profileResult, usuarioResult] = await Promise.all([
         supabase
           .from('profiles')
-          .select('user_id, plan, profile_complete, phone_personal, phone_empresa, display_name, entidad')
+          .select('user_id, plan, profile_complete, phone_personal, phone_empresa, display_name, entidad, country, currency')
           .eq('user_id', user.id)
           .maybeSingle(),
         supabase
           .from('usuarios')
-          .select('telefono, profile_complete')
+          .select('telefono, profile_complete, country, currency')
           .eq('user_id', user.id)
           .maybeSingle()
       ]);
@@ -80,7 +82,9 @@ export const useProfile = () => {
         phone_empresa: profileData?.phone_empresa || null,
         display_name: profileData?.display_name || null,
         entidad: profileData?.entidad || 'personal',
-        usuario_profile_complete: usuarioData?.profile_complete || false
+        usuario_profile_complete: usuarioData?.profile_complete || false,
+        country: profileData?.country || usuarioData?.country || 'CL',
+        currency: profileData?.currency || usuarioData?.currency || 'CLP',
       };
     } catch (error) {
       console.error('Error in fetchProfile:', error);
