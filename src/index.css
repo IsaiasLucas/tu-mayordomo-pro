@@ -20,7 +20,6 @@ html {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   -webkit-text-size-adjust: 100%;
-  background: #9d6dd3;
 }
 
 body {
@@ -34,7 +33,6 @@ body {
   position: fixed;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
-  background: #9d6dd3;
 }
 
 #root {
@@ -48,7 +46,6 @@ body {
   overscroll-behavior-y: contain;
   padding: 0;
   margin: 0;
-  background: #9d6dd3;
 }
 
 /* Prevent pull-to-refresh on mobile */
