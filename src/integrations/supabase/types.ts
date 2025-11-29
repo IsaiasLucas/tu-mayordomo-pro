@@ -393,39 +393,6 @@ export type Database = {
         }
         Relationships: []
       }
-      student_verifications: {
-        Row: {
-          admin_notes: string | null
-          created_at: string | null
-          id: string
-          status: string | null
-          updated_at: string | null
-          user_id: string
-          verification_data: Json | null
-          verification_type: string
-        }
-        Insert: {
-          admin_notes?: string | null
-          created_at?: string | null
-          id?: string
-          status?: string | null
-          updated_at?: string | null
-          user_id: string
-          verification_data?: Json | null
-          verification_type: string
-        }
-        Update: {
-          admin_notes?: string | null
-          created_at?: string | null
-          id?: string
-          status?: string | null
-          updated_at?: string | null
-          user_id?: string
-          verification_data?: Json | null
-          verification_type?: string
-        }
-        Relationships: []
-      }
       usuarios: {
         Row: {
           country: string | null
