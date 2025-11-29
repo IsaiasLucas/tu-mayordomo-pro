@@ -164,24 +164,26 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleCancel()}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
-        <DialogHeader>
-          <div className="flex items-center gap-2 sm:gap-3 mb-2">
-            <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg flex-shrink-0">
-              <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-hidden flex flex-col p-0" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+        <div className="p-4 sm:p-6 border-b">
+          <DialogHeader>
+            <div className="flex items-center gap-2 sm:gap-3 mb-2">
+              <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg flex-shrink-0">
+                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+              </div>
+              <div className="min-w-0">
+                <DialogTitle className="text-lg sm:text-xl leading-tight">
+                  Completa tu Perfil
+                </DialogTitle>
+                <DialogDescription className="text-xs sm:text-sm text-muted-foreground mt-1 leading-tight">
+                  Configura tu cuenta para comenzar a gestionar tus gastos
+                </DialogDescription>
+              </div>
             </div>
-            <div className="min-w-0">
-              <DialogTitle className="text-lg sm:text-xl leading-tight">
-                Completa tu Perfil
-              </DialogTitle>
-              <DialogDescription className="text-xs sm:text-sm text-muted-foreground mt-1 leading-tight">
-                Configura tu cuenta para comenzar a gestionar tus gastos
-              </DialogDescription>
-            </div>
-          </div>
-        </DialogHeader>
+          </DialogHeader>
+        </div>
 
-        <div className="space-y-3 sm:space-y-4 py-3 sm:py-4">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 sm:space-y-4">
           <div className="space-y-1.5 sm:space-y-2">
             <Label htmlFor="nombre" className="text-sm sm:text-base">Nombre *</Label>
             <Input
@@ -327,11 +329,11 @@ export default function CompleteProfileModal({ open, onClose }: CompleteProfileM
           </div>
         </div>
 
-        <div className="flex gap-2 sm:gap-3 justify-end pt-2">
+        <div className="p-4 sm:p-6 border-t bg-background sticky bottom-0">
           <Button
             onClick={handleSave}
             disabled={loading || phoneValid !== true || !nombre.trim() || !tipo}
-            className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold touch-manipulation"
+            className="w-full h-12 sm:h-14 text-base sm:text-lg font-semibold touch-manipulation shadow-lg"
           >
             {loading ? "Guardando..." : "Completar Perfil"}
           </Button>
