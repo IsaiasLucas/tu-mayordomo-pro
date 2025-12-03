@@ -66,7 +66,7 @@ export function CountrySelector({
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-[calc(100vw-2rem)] sm:w-[400px] p-0 z-50 pointer-events-auto" 
+        className="w-[calc(100vw-2rem)] sm:w-[400px] p-0 z-[10002] pointer-events-auto" 
         align="start"
         sideOffset={8}
         alignOffset={-8}
