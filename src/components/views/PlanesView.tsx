@@ -41,7 +41,7 @@ export default function PlanesView() {
   const plans: Plan[] = [{
     id: "free",
     name: "Gratuito",
-    description: "Pa' empezar",
+    description: "Para empezar",
     price: 0,
     period: "siempre",
     priceId: "",
@@ -70,7 +70,7 @@ export default function PlanesView() {
     id: "mensal",
     name: "Pro Mensual",
     description: "Mismo valor para uso personal o empresarial",
-    price: 3000,
+    price: 3,
     period: "mes",
     priceId: "price_1SAb6WCGNOUldBA37lsDjBgB",
     iconName: "zap",
@@ -98,8 +98,8 @@ export default function PlanesView() {
   }, {
     id: "anual",
     name: "Pro Anual",
-    description: "Ahorra $11.000 • Mismo valor para uso personal o empresarial",
-    price: 25000,
+    description: "Ahorra $11 • Mismo valor para uso personal o empresarial",
+    price: 25,
     period: "año",
     priceId: "price_1SBRZJCGNOUldBA3dPc3DIqU",
     iconName: "sparkles",
@@ -108,7 +108,7 @@ export default function PlanesView() {
       text: "Todo del Pro Mensual",
       included: true
     }, {
-      text: "~$2.083/mes (30% off)",
+      text: "~$2/mes (30% off)",
       included: true
     }, {
       text: "Metas de ahorro ilimitadas",
