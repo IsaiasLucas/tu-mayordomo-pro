@@ -624,9 +624,11 @@ export default function Auth() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Confirma tu correo</DialogTitle>
-            <DialogDescription className="text-base pt-2 space-y-2">
+            <DialogDescription className="text-base pt-2 space-y-3">
               <p>Te enviamos un email a <span className="font-semibold text-primary">{registeredEmail}</span> con un enlace para activar tu cuenta.</p>
-              <p>Revisa bandeja de entrada y spam.</p>
+              <p className="text-muted-foreground">
+                <span className="font-medium text-foreground">¿No lo encuentras?</span> Revisa tu carpeta de spam o correo no deseado. A veces los correos de verificación llegan ahí.
+              </p>
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-3 pt-4">
