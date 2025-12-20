@@ -1,7 +1,7 @@
 import { MessageCircle, Mic, Receipt, TrendingUp, Check, ArrowRight, Sparkles, Users, FileSpreadsheet, Globe, Target, PieChart, BarChart3, Wallet, Phone, UserCheck, Smartphone, Building2, Link2, UserPlus } from "lucide-react";
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useCountryTerms } from "@/hooks/useCountryTerms";
 import { AnimatedChatDemo } from "@/components/landing/AnimatedChatDemo";
 import { ScrollReveal } from "@/components/landing/ScrollReveal";
 
@@ -17,6 +17,7 @@ import featureEvolucion from "@/assets/landing/feature-evolucion.jpg";
 
 const Landing = () => {
   const navigate = useNavigate();
+  const { terms } = useCountryTerms();
 
   const handleCreateAccount = () => {
     navigate("/auth");
@@ -87,7 +88,7 @@ const Landing = () => {
           </h1>
           
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed px-2">
-            Registra gastos e ingresos por WhatsApp. Texto, audio o fotos de boletas.
+            Registra gastos e ingresos por WhatsApp. Texto, audio o fotos de {terms.boletas}.
             <br className="hidden md:block" />
             <span className="text-foreground font-medium">Sin planillas. Sin complicaciones.</span> En cualquier país hispano.
           </p>
@@ -455,7 +456,7 @@ const Landing = () => {
                   <span className="text-primary font-bold text-xs sm:text-sm">Paso 1</span>
                   <h3 className="text-lg sm:text-xl font-bold mt-2 mb-2 sm:mb-3">Envía un mensaje</h3>
                   <p className="text-muted-foreground text-sm sm:text-base">
-                    Texto, audio o foto de boleta por WhatsApp. Como si le escribieras a un amigo.
+                    Texto, audio o foto de {terms.boleta} por WhatsApp. Como si le escribieras a un amigo.
                   </p>
                 </div>
               </div>
@@ -550,7 +551,7 @@ const Landing = () => {
                 <ul className="space-y-2 sm:space-y-3">
                   <li className="flex items-center gap-2 sm:gap-3 text-muted-foreground text-sm sm:text-base">
                     <Check className="w-4 h-4 sm:w-5 sm:h-5 text-success flex-shrink-0" />
-                    <span>Texto, audio o fotos de boletas</span>
+                    <span>Texto, audio o fotos de {terms.boletas}</span>
                   </li>
                   <li className="flex items-center gap-2 sm:gap-3 text-muted-foreground text-sm sm:text-base">
                     <Check className="w-4 h-4 sm:w-5 sm:h-5 text-success flex-shrink-0" />
