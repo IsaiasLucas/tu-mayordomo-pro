@@ -48,25 +48,45 @@ serve(async (req) => {
     });
     logStep("Stripe client initialized");
 
+    // Get price details to check currency
+    const price = await stripe.prices.retrieve(priceId);
+    const priceCurrency = price.currency.toLowerCase();
+    logStep("Price currency", { priceCurrency });
+
     // Check if customer exists
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    let customerId: string;
+    let customerId: string | undefined;
+    let useCustomerEmail = false;
     
     if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-      logStep("Existing customer found", { customerId });
-    } else {
-      const customer = await stripe.customers.create({
-        email: user.email,
-        metadata: { supabase_user_id: user.id }
+      const existingCustomer = customers.data[0];
+      logStep("Existing customer found", { customerId: existingCustomer.id });
+      
+      // Check if customer has subscriptions in a different currency
+      const subscriptions = await stripe.subscriptions.list({
+        customer: existingCustomer.id,
+        limit: 10,
       });
-      customerId = customer.id;
-      logStep("New customer created", { customerId });
+      
+      const hasDifferentCurrency = subscriptions.data.some((sub: { currency?: string }) => {
+        return sub.currency && sub.currency.toLowerCase() !== priceCurrency;
+      });
+      
+      if (hasDifferentCurrency) {
+        logStep("Customer has subscriptions in different currency, will create new customer during checkout");
+        useCustomerEmail = true;
+      } else {
+        customerId = existingCustomer.id;
+      }
+    } else {
+      logStep("No existing customer, will create during checkout");
+      useCustomerEmail = true;
     }
 
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
+      customer_email: useCustomerEmail ? user.email : undefined,
       line_items: [
         {
           price: priceId,
