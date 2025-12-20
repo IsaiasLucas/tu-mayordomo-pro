@@ -1,4 +1,4 @@
-import { MessageCircle, Mic, Receipt, TrendingUp, Check, ArrowRight, Sparkles, Users, FileSpreadsheet, Globe, Target, PieChart, BarChart3, Wallet, Phone, UserCheck, Smartphone } from "lucide-react";
+import { MessageCircle, Mic, Receipt, TrendingUp, Check, ArrowRight, Sparkles, Users, FileSpreadsheet, Globe, Target, PieChart, BarChart3, Wallet, Phone, UserCheck, Smartphone, Building2, Link2, UserPlus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -695,6 +695,138 @@ const Landing = () => {
               </ul>
             </div>
           </div>
+
+          {/* Feature 5 - Cuentas Empresa con Colaboradores */}
+          <ScrollReveal direction="up" delay={100}>
+            <div className="max-w-6xl mx-auto mt-20 md:mt-32">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-lilac/20 rounded-3xl blur-2xl opacity-50" />
+                <div className="relative bg-card/50 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-border/50">
+                  <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+                    <div>
+                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary text-sm font-medium mb-4">
+                        <Building2 className="w-4 h-4" />
+                        Cuentas Empresa
+                      </div>
+                      <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                        Gestiona las finanzas de tu empresa en equipo
+                      </h3>
+                      <p className="text-muted-foreground text-lg mb-6">
+                        Al crear una cuenta de tipo <strong className="text-foreground">Empresa</strong>, obtienes acceso a 
+                        funcionalidades de colaboración únicas para equipos de trabajo.
+                      </p>
+                      
+                      <div className="space-y-4">
+                        <div className="flex gap-4 items-start p-4 rounded-2xl bg-background/50 border border-border/30">
+                          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                            <Link2 className="w-5 h-5 text-primary" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold mb-1">Genera un enlace de invitación</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Crea un código único desde tu panel para invitar colaboradores a tu empresa.
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-4 items-start p-4 rounded-2xl bg-background/50 border border-border/30">
+                          <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center flex-shrink-0">
+                            <UserPlus className="w-5 h-5 text-accent" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold mb-1">Tus colaboradores se unen fácilmente</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Solo necesitan el código y su número de WhatsApp registrado en Tu Mayordomo.
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-4 items-start p-4 rounded-2xl bg-background/50 border border-border/30">
+                          <div className="w-10 h-10 rounded-xl bg-success/20 flex items-center justify-center flex-shrink-0">
+                            <MessageCircle className="w-5 h-5 text-success" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold mb-1">Cada uno registra desde su WhatsApp</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Los gastos e ingresos que registran se agregan automáticamente al dashboard de la empresa.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Visual Mockup */}
+                    <div className="relative">
+                      <div className="bg-background/80 rounded-3xl p-6 border border-primary/30 shadow-elegant">
+                        {/* Header */}
+                        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border/30">
+                          <div className="w-12 h-12 rounded-xl bg-gradient-header flex items-center justify-center">
+                            <Building2 className="w-6 h-6 text-white" />
+                          </div>
+                          <div>
+                            <p className="font-bold">Mi Empresa S.A.</p>
+                            <p className="text-sm text-muted-foreground">Cuenta Empresa</p>
+                          </div>
+                        </div>
+                        
+                        {/* Collaborators */}
+                        <div className="mb-6">
+                          <p className="text-sm font-medium mb-3 flex items-center gap-2">
+                            <Users className="w-4 h-4 text-primary" />
+                            Colaboradores activos
+                          </p>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
+                              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold">JC</div>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium">Juan Carlos</p>
+                                <p className="text-xs text-muted-foreground">+54 11 ****-1234</p>
+                              </div>
+                              <Check className="w-4 h-4 text-success" />
+                            </div>
+                            <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
+                              <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-xs font-bold">ML</div>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium">María López</p>
+                                <p className="text-xs text-muted-foreground">+56 9 ****-5678</p>
+                              </div>
+                              <Check className="w-4 h-4 text-success" />
+                            </div>
+                            <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
+                              <div className="w-8 h-8 rounded-full bg-lilac/20 flex items-center justify-center text-xs font-bold">PR</div>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium">Pedro Ramírez</p>
+                                <p className="text-xs text-muted-foreground">+52 55 ****-9012</p>
+                              </div>
+                              <Check className="w-4 h-4 text-success" />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Invite Link */}
+                        <div className="p-4 rounded-xl bg-primary/10 border border-primary/30">
+                          <p className="text-xs text-muted-foreground mb-2">Código de invitación:</p>
+                          <div className="flex items-center gap-2">
+                            <code className="flex-1 bg-background px-3 py-2 rounded-lg text-sm font-mono">
+                              EMP-A8X2-K9M3
+                            </code>
+                            <button className="px-3 py-2 bg-primary text-white text-sm rounded-lg">
+                              Copiar
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Floating Badge */}
+                      <div className="absolute -bottom-4 -right-4 bg-success text-white px-4 py-2 rounded-full text-sm font-medium shadow-elegant animate-pulse">
+                        ✨ Colaboración en tiempo real
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
