@@ -141,8 +141,8 @@ const PerfilView = ({ onViewChange }: PerfilViewProps = {}) => {
     try {
       setLoading(true);
       await signOut();
-      // Use window.location for reliable redirect
-      window.location.href = "/auth";
+      // Redirect to landing page
+      window.location.href = "/";
     } catch (error) {
       console.error("Error signing out:", error);
       toast({
