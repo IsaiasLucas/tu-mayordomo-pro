@@ -1,6 +1,13 @@
-import { MessageCircle, Mic, Receipt, TrendingUp, Check, ArrowRight, Sparkles, Users, FileSpreadsheet, Globe } from "lucide-react";
+import { MessageCircle, Mic, Receipt, TrendingUp, Check, ArrowRight, Sparkles, Users, FileSpreadsheet, Globe, Target, PieChart, BarChart3, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+
+// Feature screenshots
+import featureWhatsapp from "@/assets/landing/feature-whatsapp.jpg";
+import featureGastos from "@/assets/landing/feature-gastos.jpg";
+import featureAhorro from "@/assets/landing/feature-ahorro.jpg";
+import featureReportes from "@/assets/landing/feature-reportes.jpg";
+import featureEvolucion from "@/assets/landing/feature-evolucion.jpg";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -264,6 +271,186 @@ const Landing = () => {
               Comenzar ahora
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Showcase Section */}
+      <section id="funciones" className="relative z-10 py-20 md:py-32">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <span className="text-accent text-sm font-semibold tracking-wider uppercase">
+              Todo lo que puedes hacer
+            </span>
+            <h2 className="text-2xl md:text-4xl font-bold mt-2 mb-4">
+              Más que solo registrar gastos
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+              Un dashboard completo para controlar tus finanzas personales o de tu negocio.
+            </p>
+          </div>
+
+          {/* Feature 1 - WhatsApp Real */}
+          <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center max-w-6xl mx-auto mb-20 md:mb-32">
+            <div className="order-2 md:order-1">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/20 text-success text-sm font-medium mb-4">
+                <MessageCircle className="w-4 h-4" />
+                WhatsApp
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                Registra gastos como si chatearas con un amigo
+              </h3>
+              <p className="text-muted-foreground text-lg mb-6">
+                Escribe naturalmente: "Me compré unos audífonos de 5 mil pesos hoy" y Tu Mayordomo 
+                entiende el monto, la categoría y la fecha automáticamente.
+              </p>
+              <ul className="space-y-3">
+                <li className="flex items-center gap-3 text-muted-foreground">
+                  <Check className="w-5 h-5 text-success flex-shrink-0" />
+                  <span>Texto, audio o fotos de boletas</span>
+                </li>
+                <li className="flex items-center gap-3 text-muted-foreground">
+                  <Check className="w-5 h-5 text-success flex-shrink-0" />
+                  <span>Categorización automática con IA</span>
+                </li>
+                <li className="flex items-center gap-3 text-muted-foreground">
+                  <Check className="w-5 h-5 text-success flex-shrink-0" />
+                  <span>Respuesta inmediata de confirmación</span>
+                </li>
+              </ul>
+            </div>
+            <div className="order-1 md:order-2 relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-success/30 to-primary/30 rounded-3xl blur-2xl opacity-50 group-hover:opacity-70 transition-opacity" />
+              <img 
+                src={featureWhatsapp} 
+                alt="WhatsApp chat con Tu Mayordomo" 
+                className="relative rounded-3xl shadow-elegant border border-border/50 w-full max-w-sm mx-auto"
+              />
+            </div>
+          </div>
+
+          {/* Feature 2 - Gastos y Presupuesto */}
+          <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center max-w-6xl mx-auto mb-20 md:mb-32">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/30 rounded-3xl blur-2xl opacity-50 group-hover:opacity-70 transition-opacity" />
+              <img 
+                src={featureGastos} 
+                alt="Panel de gastos y presupuesto" 
+                className="relative rounded-3xl shadow-elegant border border-border/50 w-full max-w-sm mx-auto"
+              />
+            </div>
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary text-sm font-medium mb-4">
+                <Wallet className="w-4 h-4" />
+                Presupuesto
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                Controla tu presupuesto mensual
+              </h3>
+              <p className="text-muted-foreground text-lg mb-6">
+                Define cuánto quieres gastar al mes y ve en tiempo real cuánto llevas gastado. 
+                Nunca más te sorprenderá el fin de mes.
+              </p>
+              <ul className="space-y-3">
+                <li className="flex items-center gap-3 text-muted-foreground">
+                  <Check className="w-5 h-5 text-success flex-shrink-0" />
+                  <span>Presupuesto mensual personalizable</span>
+                </li>
+                <li className="flex items-center gap-3 text-muted-foreground">
+                  <Check className="w-5 h-5 text-success flex-shrink-0" />
+                  <span>Ingresos vs gastos en un vistazo</span>
+                </li>
+                <li className="flex items-center gap-3 text-muted-foreground">
+                  <Check className="w-5 h-5 text-success flex-shrink-0" />
+                  <span>Descarga PDFs de tus movimientos</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Feature 3 - Metas de Ahorro */}
+          <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center max-w-6xl mx-auto mb-20 md:mb-32">
+            <div className="order-2 md:order-1">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 text-accent text-sm font-medium mb-4">
+                <Target className="w-4 h-4" />
+                Metas
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                Crea metas de ahorro y alcánzalas
+              </h3>
+              <p className="text-muted-foreground text-lg mb-6">
+                ¿Quieres un iPhone 15? ¿Ropa nueva? Crea una meta, agrega ahorros cuando puedas 
+                y visualiza tu progreso hasta lograrlo.
+              </p>
+              <ul className="space-y-3">
+                <li className="flex items-center gap-3 text-muted-foreground">
+                  <Check className="w-5 h-5 text-success flex-shrink-0" />
+                  <span>Metas ilimitadas</span>
+                </li>
+                <li className="flex items-center gap-3 text-muted-foreground">
+                  <Check className="w-5 h-5 text-success flex-shrink-0" />
+                  <span>Barra de progreso visual</span>
+                </li>
+                <li className="flex items-center gap-3 text-muted-foreground">
+                  <Check className="w-5 h-5 text-success flex-shrink-0" />
+                  <span>Fecha límite opcional</span>
+                </li>
+              </ul>
+            </div>
+            <div className="order-1 md:order-2 relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-accent/30 to-lilac/30 rounded-3xl blur-2xl opacity-50 group-hover:opacity-70 transition-opacity" />
+              <img 
+                src={featureAhorro} 
+                alt="Metas de ahorro" 
+                className="relative rounded-3xl shadow-elegant border border-border/50 w-full max-w-sm mx-auto"
+              />
+            </div>
+          </div>
+
+          {/* Feature 4 - Reportes */}
+          <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center max-w-6xl mx-auto">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-lilac/30 to-primary/30 rounded-3xl blur-2xl opacity-50 group-hover:opacity-70 transition-opacity" />
+              <div className="relative flex gap-4 justify-center">
+                <img 
+                  src={featureReportes} 
+                  alt="Reportes por categoría" 
+                  className="rounded-3xl shadow-elegant border border-border/50 w-full max-w-[45%]"
+                />
+                <img 
+                  src={featureEvolucion} 
+                  alt="Evolución temporal" 
+                  className="rounded-3xl shadow-elegant border border-border/50 w-full max-w-[45%]"
+                />
+              </div>
+            </div>
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-lilac/20 text-lilac text-sm font-medium mb-4">
+                <PieChart className="w-4 h-4" />
+                Reportes
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                Reportes detallados y gráficos
+              </h3>
+              <p className="text-muted-foreground text-lg mb-6">
+                Entiende exactamente en qué se va tu dinero con gráficos de categorías, 
+                evolución temporal y reportes descargables en PDF.
+              </p>
+              <ul className="space-y-3">
+                <li className="flex items-center gap-3 text-muted-foreground">
+                  <Check className="w-5 h-5 text-success flex-shrink-0" />
+                  <span>Gráfico de gastos por categoría</span>
+                </li>
+                <li className="flex items-center gap-3 text-muted-foreground">
+                  <Check className="w-5 h-5 text-success flex-shrink-0" />
+                  <span>Evolución de ingresos y egresos</span>
+                </li>
+                <li className="flex items-center gap-3 text-muted-foreground">
+                  <Check className="w-5 h-5 text-success flex-shrink-0" />
+                  <span>Descarga reportes PDF semanales y mensuales</span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
