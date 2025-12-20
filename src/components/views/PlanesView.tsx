@@ -72,7 +72,7 @@ export default function PlanesView() {
     description: "Mismo valor para uso personal o empresarial",
     price: 3,
     period: "mes",
-    priceId: "price_1SAb6WCGNOUldBA37lsDjBgB",
+    priceId: "price_1SgDnxCGNOUldBA3J8Uunn0L",
     iconName: "zap",
     popular: true,
     gradient: "from-purple-100 to-purple-200",
@@ -101,7 +101,7 @@ export default function PlanesView() {
     description: "Ahorra $11 • Mismo valor para uso personal o empresarial",
     price: 25,
     period: "año",
-    priceId: "price_1SBRZJCGNOUldBA3dPc3DIqU",
+    priceId: "price_1SgDphCGNOUldBA3Z8XeyyLF",
     iconName: "sparkles",
     gradient: "from-blue-100 to-blue-200",
     features: [{
