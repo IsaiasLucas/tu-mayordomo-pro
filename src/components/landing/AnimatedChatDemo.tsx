@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Check, CheckCheck, Mic, Camera, Send } from "lucide-react";
+import { useCountryTerms } from "@/hooks/useCountryTerms";
+import { formatCurrency, getCountryByCode } from "@/lib/countries";
 
 interface ChatMessage {
   id: number;
@@ -11,68 +13,235 @@ interface ChatMessage {
   isImage?: boolean;
 }
 
-const chatMessages: ChatMessage[] = [
-  {
-    id: 1,
-    type: "user",
-    content: "Gasté 15.000 en el supermercado",
-    time: "10:30",
-  },
-  {
-    id: 2,
-    type: "bot",
-    content: "✅ Gasto registrado: $15.000",
-    subtext: "Categoría: Alimentación 🛒",
-    time: "10:30",
-  },
-  {
-    id: 3,
-    type: "user",
-    content: "🎤 Audio: \"Recibí 200 mil de un cliente hoy\"",
-    time: "10:31",
-    isAudio: true,
-  },
-  {
-    id: 4,
-    type: "bot",
-    content: "✅ Ingreso registrado: $200.000",
-    subtext: "Categoría: Cliente 💼",
-    time: "10:31",
-  },
-  {
-    id: 5,
-    type: "user",
-    content: "📷 Foto de boleta",
-    time: "10:32",
-    isImage: true,
-  },
-  {
-    id: 6,
-    type: "bot",
-    content: "✅ Gasto registrado: $8.500",
-    subtext: "Tienda: Farmacia Cruz Verde 💊",
-    time: "10:32",
-  },
-  {
-    id: 7,
-    type: "user",
-    content: "¿Cuánto llevo gastado este mes?",
-    time: "10:33",
-  },
-  {
-    id: 8,
-    type: "bot",
-    content: "📊 Resumen del mes:",
-    subtext: "Gastos: $523.500 | Ingresos: $850.000\nBalance: +$326.500 💰",
-    time: "10:33",
-  },
-];
+// Currency-specific examples for the chat demo
+interface CountryExamples {
+  supermarketAmount: number;
+  clientAmount: number;
+  pharmacyAmount: number;
+  monthExpenses: number;
+  monthIncome: number;
+  pharmacyName: string;
+  // Natural language amount format
+  supermarketText: string;
+  clientText: string;
+}
+
+const getCountryExamples = (countryCode: string): CountryExamples => {
+  switch (countryCode) {
+    case 'CL': // Chile - Pesos chilenos
+      return {
+        supermarketAmount: 15000,
+        clientAmount: 200000,
+        pharmacyAmount: 8500,
+        monthExpenses: 523500,
+        monthIncome: 850000,
+        pharmacyName: 'Farmacia Cruz Verde',
+        supermarketText: '15 mil',
+        clientText: '200 mil',
+      };
+    case 'AR': // Argentina - Pesos argentinos
+      return {
+        supermarketAmount: 25000,
+        clientAmount: 350000,
+        pharmacyAmount: 12000,
+        monthExpenses: 890000,
+        monthIncome: 1500000,
+        pharmacyName: 'Farmacity',
+        supermarketText: '25 mil',
+        clientText: '350 mil',
+      };
+    case 'MX': // Mexico - Pesos mexicanos
+      return {
+        supermarketAmount: 1500,
+        clientAmount: 15000,
+        pharmacyAmount: 850,
+        monthExpenses: 45000,
+        monthIncome: 75000,
+        pharmacyName: 'Farmacias del Ahorro',
+        supermarketText: 'mil quinientos',
+        clientText: '15 mil',
+      };
+    case 'CO': // Colombia - Pesos colombianos
+      return {
+        supermarketAmount: 150000,
+        clientAmount: 2000000,
+        pharmacyAmount: 85000,
+        monthExpenses: 5200000,
+        monthIncome: 8500000,
+        pharmacyName: 'Drogas La Rebaja',
+        supermarketText: '150 mil',
+        clientText: '2 millones',
+      };
+    case 'PE': // Peru - Soles
+      return {
+        supermarketAmount: 150,
+        clientAmount: 2000,
+        pharmacyAmount: 85,
+        monthExpenses: 5200,
+        monthIncome: 8500,
+        pharmacyName: 'Inkafarma',
+        supermarketText: '150 soles',
+        clientText: '2 mil soles',
+      };
+    case 'BR': // Brazil - Reais
+      return {
+        supermarketAmount: 250,
+        clientAmount: 3500,
+        pharmacyAmount: 120,
+        monthExpenses: 8500,
+        monthIncome: 15000,
+        pharmacyName: 'Drogasil',
+        supermarketText: '250 reais',
+        clientText: '3500 reais',
+      };
+    case 'UY': // Uruguay - Pesos uruguayos
+      return {
+        supermarketAmount: 2500,
+        clientAmount: 35000,
+        pharmacyAmount: 1200,
+        monthExpenses: 85000,
+        monthIncome: 150000,
+        pharmacyName: 'Farmashop',
+        supermarketText: '2500 pesos',
+        clientText: '35 mil',
+      };
+    case 'EC': // Ecuador - Dólares
+      return {
+        supermarketAmount: 75,
+        clientAmount: 500,
+        pharmacyAmount: 35,
+        monthExpenses: 1800,
+        monthIncome: 3000,
+        pharmacyName: 'Fybeca',
+        supermarketText: '75 dólares',
+        clientText: '500 dólares',
+      };
+    case 'ES': // Spain - Euros
+      return {
+        supermarketAmount: 85,
+        clientAmount: 1200,
+        pharmacyAmount: 45,
+        monthExpenses: 2500,
+        monthIncome: 4000,
+        pharmacyName: 'Farmacia',
+        supermarketText: '85 euros',
+        clientText: '1200 euros',
+      };
+    case 'US': // USA - Dólares
+      return {
+        supermarketAmount: 120,
+        clientAmount: 1500,
+        pharmacyAmount: 65,
+        monthExpenses: 3500,
+        monthIncome: 6000,
+        pharmacyName: 'CVS Pharmacy',
+        supermarketText: '120 dólares',
+        clientText: '1500 dólares',
+      };
+    default: // Default - Dólares genéricos
+      return {
+        supermarketAmount: 100,
+        clientAmount: 1000,
+        pharmacyAmount: 50,
+        monthExpenses: 3000,
+        monthIncome: 5000,
+        pharmacyName: 'Farmacia',
+        supermarketText: '100',
+        clientText: 'mil',
+      };
+  }
+};
+
+const getChatMessages = (
+  countryCode: string,
+  currencyCode: string,
+  boletaTerm: string
+): ChatMessage[] => {
+  const examples = getCountryExamples(countryCode);
+  const locale = getCountryByCode(countryCode)?.locale || 'es-CL';
+  
+  const fmt = (amount: number) => formatCurrency(amount, currencyCode as any, locale);
+  
+  return [
+    {
+      id: 1,
+      type: "user",
+      content: `Gasté ${examples.supermarketText} en el supermercado`,
+      time: "10:30",
+    },
+    {
+      id: 2,
+      type: "bot",
+      content: `✅ Gasto registrado: ${fmt(examples.supermarketAmount)}`,
+      subtext: "Categoría: Alimentación 🛒",
+      time: "10:30",
+    },
+    {
+      id: 3,
+      type: "user",
+      content: `🎤 Audio: "Recibí ${examples.clientText} de un cliente hoy"`,
+      time: "10:31",
+      isAudio: true,
+    },
+    {
+      id: 4,
+      type: "bot",
+      content: `✅ Ingreso registrado: ${fmt(examples.clientAmount)}`,
+      subtext: "Categoría: Cliente 💼",
+      time: "10:31",
+    },
+    {
+      id: 5,
+      type: "user",
+      content: `📷 Foto de ${boletaTerm}`,
+      time: "10:32",
+      isImage: true,
+    },
+    {
+      id: 6,
+      type: "bot",
+      content: `✅ Gasto registrado: ${fmt(examples.pharmacyAmount)}`,
+      subtext: `Tienda: ${examples.pharmacyName} 💊`,
+      time: "10:32",
+    },
+    {
+      id: 7,
+      type: "user",
+      content: "¿Cuánto llevo gastado este mes?",
+      time: "10:33",
+    },
+    {
+      id: 8,
+      type: "bot",
+      content: "📊 Resumen del mes:",
+      subtext: `Gastos: ${fmt(examples.monthExpenses)} | Ingresos: ${fmt(examples.monthIncome)}\nBalance: +${fmt(examples.monthIncome - examples.monthExpenses)} 💰`,
+      time: "10:33",
+    },
+  ];
+};
 
 export const AnimatedChatDemo = () => {
+  const { terms, countryCode } = useCountryTerms();
+  const country = getCountryByCode(countryCode);
+  const currencyCode = country?.currency || 'USD';
+  
+  // Memoize chat messages based on country
+  const chatMessages = useMemo(
+    () => getChatMessages(countryCode, currencyCode, terms.boleta),
+    [countryCode, currencyCode, terms.boleta]
+  );
+  
   const [visibleMessages, setVisibleMessages] = useState<number[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
+
+  // Reset animation when country changes
+  useEffect(() => {
+    setVisibleMessages([]);
+    setCurrentMessageIndex(0);
+    setIsPlaying(true);
+  }, [countryCode]);
 
   useEffect(() => {
     if (!isPlaying || currentMessageIndex >= chatMessages.length) {
@@ -106,7 +275,7 @@ export const AnimatedChatDemo = () => {
       }, 1500);
       return () => clearTimeout(messageTimeout);
     }
-  }, [currentMessageIndex, isPlaying]);
+  }, [currentMessageIndex, isPlaying, chatMessages]);
 
   const handleReplay = () => {
     setVisibleMessages([]);
