@@ -80,14 +80,14 @@ const Landing = () => {
       {/* Hero Section */}
       <section className="relative z-10 container mx-auto px-4 pt-8 pb-16 sm:pt-12 sm:pb-20 md:pt-20 md:pb-32">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 sm:mb-6 px-2">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 sm:mb-6 px-2">
             ¿Sabes en qué se va tu dinero…{" "}
             <span className="bg-gradient-to-r from-primary via-accent to-lilac bg-clip-text text-transparent">
               de verdad?
             </span>
           </h1>
           
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed px-2">
+          <p className="text-lg sm:text-xl md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed px-2">
             Registra gastos e ingresos por WhatsApp. Texto, audio o fotos de {terms.boletas}.
             <br className="hidden md:block" />
             <span className="text-foreground font-medium">Sin planillas. Sin complicaciones.</span> En cualquier país hispano.
@@ -183,7 +183,7 @@ const Landing = () => {
           </div>
 
           {/* Trust Microtext */}
-          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-2 sm:gap-4 md:gap-8 text-xs sm:text-sm text-muted-foreground px-2">
+          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 md:gap-8 text-sm sm:text-base text-muted-foreground px-2">
             <div className="flex items-center justify-center gap-2">
               <Check className="w-4 h-4 text-success flex-shrink-0" />
               <span>30 mensajes gratis cada mes</span>
@@ -205,13 +205,13 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <ScrollReveal>
             <div className="text-center mb-10 sm:mb-16">
-              <span className="text-success text-xs sm:text-sm font-semibold tracking-wider uppercase">
+              <span className="text-success text-sm sm:text-base font-semibold tracking-wider uppercase">
                 Comienza en minutos
               </span>
-              <h2 className="text-xl sm:text-2xl md:text-4xl font-bold mt-2 mb-3 sm:mb-4 px-2">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mt-2 mb-3 sm:mb-4 px-2">
                 ¿Cómo empezar a usar Tu Mayordomo?
               </h2>
-              <p className="text-muted-foreground text-sm sm:text-lg max-w-xl mx-auto px-2">
+              <p className="text-muted-foreground text-base sm:text-lg max-w-xl mx-auto px-2">
                 Solo 3 pasos simples para comenzar a controlar tus finanzas
               </p>
             </div>
@@ -238,12 +238,12 @@ const Landing = () => {
                     </div>
                   </div>
                   
-                  <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
+                  <h3 className="text-xl sm:text-2xl font-bold mb-3 flex items-center gap-2">
                     <UserCheck className="w-5 h-5 text-primary" />
                     Crea tu cuenta y configura WhatsApp
                   </h3>
                   
-                  <p className="text-muted-foreground mb-6">
+                  <p className="text-muted-foreground text-base sm:text-lg mb-6">
                     Regístrate gratis y completa tu perfil con tu número de WhatsApp. 
                     <strong className="text-foreground"> Esto es esencial</strong> – Tu Mayordomo solo responde a números verificados.
                   </p>
@@ -453,9 +453,9 @@ const Landing = () => {
                   <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-header flex items-center justify-center mb-4 sm:mb-6 shadow-glow-sm">
                     <MessageCircle className="w-6 h-6 sm:w-8 sm:h-8 text-primary-foreground" />
                   </div>
-                  <span className="text-primary font-bold text-xs sm:text-sm">Paso 1</span>
-                  <h3 className="text-lg sm:text-xl font-bold mt-2 mb-2 sm:mb-3">Envía un mensaje</h3>
-                  <p className="text-muted-foreground text-sm sm:text-base">
+                  <span className="text-primary font-bold text-sm sm:text-base">Paso 1</span>
+                  <h3 className="text-xl sm:text-2xl font-bold mt-2 mb-2 sm:mb-3">Envía un mensaje</h3>
+                  <p className="text-muted-foreground text-base sm:text-lg">
                     Texto, audio o foto de {terms.boleta} por WhatsApp. Como si le escribieras a un amigo.
                   </p>
                 </div>
@@ -470,9 +470,9 @@ const Landing = () => {
                   <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-r from-accent to-lilac flex items-center justify-center mb-4 sm:mb-6 shadow-glow-sm">
                     <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                   </div>
-                  <span className="text-accent font-bold text-xs sm:text-sm">Paso 2</span>
-                  <h3 className="text-lg sm:text-xl font-bold mt-2 mb-2 sm:mb-3">Procesamiento inteligente</h3>
-                  <p className="text-muted-foreground text-sm sm:text-base">
+                  <span className="text-accent font-bold text-sm sm:text-base">Paso 2</span>
+                  <h3 className="text-xl sm:text-2xl font-bold mt-2 mb-2 sm:mb-3">Procesamiento inteligente</h3>
+                  <p className="text-muted-foreground text-base sm:text-lg">
                     Tu Mayordomo identifica el monto, la categoría y la fecha automáticamente.
                   </p>
                 </div>
@@ -487,9 +487,9 @@ const Landing = () => {
                   <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-success flex items-center justify-center mb-4 sm:mb-6 shadow-glow-sm">
                     <Check className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                   </div>
-                  <span className="text-success font-bold text-xs sm:text-sm">Paso 3</span>
-                  <h3 className="text-lg sm:text-xl font-bold mt-2 mb-2 sm:mb-3">Registro automático</h3>
-                  <p className="text-muted-foreground text-sm sm:text-base">
+                  <span className="text-success font-bold text-sm sm:text-base">Paso 3</span>
+                  <h3 className="text-xl sm:text-2xl font-bold mt-2 mb-2 sm:mb-3">Registro automático</h3>
+                  <p className="text-muted-foreground text-base sm:text-lg">
                     Todo aparece al instante en tu panel. Organizado y listo para consultar.
                   </p>
                 </div>
@@ -500,7 +500,7 @@ const Landing = () => {
           {/* Highlight */}
           <ScrollReveal>
             <div className="text-center mt-10 sm:mt-16 px-2">
-              <p className="text-lg sm:text-xl md:text-2xl font-medium text-foreground mb-6 sm:mb-8">
+              <p className="text-xl sm:text-2xl md:text-2xl font-medium text-foreground mb-6 sm:mb-8">
                 Olvídate de Excel y de apps complicadas.
               </p>
               <Button 
@@ -521,13 +521,13 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <ScrollReveal>
             <div className="text-center mb-10 sm:mb-16">
-              <span className="text-accent text-xs sm:text-sm font-semibold tracking-wider uppercase">
+              <span className="text-accent text-sm sm:text-base font-semibold tracking-wider uppercase">
                 Todo lo que puedes hacer
               </span>
-              <h2 className="text-xl sm:text-2xl md:text-4xl font-bold mt-2 mb-3 sm:mb-4 px-2">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mt-2 mb-3 sm:mb-4 px-2">
                 Más que solo registrar gastos
               </h2>
-              <p className="text-muted-foreground text-sm sm:text-lg max-w-xl mx-auto px-2">
+              <p className="text-muted-foreground text-base sm:text-lg max-w-xl mx-auto px-2">
                 Un dashboard completo para controlar tus finanzas personales o de tu negocio.
               </p>
             </div>
@@ -541,23 +541,23 @@ const Landing = () => {
                   <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                   WhatsApp
                 </div>
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">
+                <h3 className="text-2xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">
                   Registra gastos como si chatearas con un amigo
                 </h3>
-                <p className="text-muted-foreground text-sm sm:text-lg mb-4 sm:mb-6">
+                <p className="text-muted-foreground text-base sm:text-lg mb-4 sm:mb-6">
                   Escribe naturalmente: "Me compré unos audífonos de 5 mil pesos hoy" y Tu Mayordomo 
                   entiende el monto, la categoría y la fecha automáticamente.
                 </p>
                 <ul className="space-y-2 sm:space-y-3">
-                  <li className="flex items-center gap-2 sm:gap-3 text-muted-foreground text-sm sm:text-base">
-                    <Check className="w-4 h-4 sm:w-5 sm:h-5 text-success flex-shrink-0" />
+                  <li className="flex items-center gap-2 sm:gap-3 text-muted-foreground text-base sm:text-lg">
+                    <Check className="w-5 h-5 sm:w-5 sm:h-5 text-success flex-shrink-0" />
                     <span>Texto, audio o fotos de {terms.boletas}</span>
                   </li>
-                  <li className="flex items-center gap-2 sm:gap-3 text-muted-foreground text-sm sm:text-base">
-                    <Check className="w-4 h-4 sm:w-5 sm:h-5 text-success flex-shrink-0" />
+                  <li className="flex items-center gap-2 sm:gap-3 text-muted-foreground text-base sm:text-lg">
+                    <Check className="w-5 h-5 sm:w-5 sm:h-5 text-success flex-shrink-0" />
                     <span>Categorización automática con IA</span>
                   </li>
-                  <li className="flex items-center gap-2 sm:gap-3 text-muted-foreground text-sm sm:text-base">
+                  <li className="flex items-center gap-2 sm:gap-3 text-muted-foreground text-base sm:text-lg">
                     <Check className="w-4 h-4 sm:w-5 sm:h-5 text-success flex-shrink-0" />
                     <span>Respuesta inmediata de confirmación</span>
                   </li>
@@ -585,28 +585,28 @@ const Landing = () => {
               />
             </div>
             <div>
-              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/20 text-primary text-xs sm:text-sm font-medium mb-3 sm:mb-4">
-                <Wallet className="w-3 h-3 sm:w-4 sm:h-4" />
+              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/20 text-primary text-sm sm:text-base font-medium mb-3 sm:mb-4">
+                <Wallet className="w-4 h-4 sm:w-4 sm:h-4" />
                 Presupuesto
               </div>
-              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">
+              <h3 className="text-2xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">
                 Controla tu presupuesto mensual
               </h3>
-              <p className="text-muted-foreground text-sm sm:text-lg mb-4 sm:mb-6">
+              <p className="text-muted-foreground text-base sm:text-lg mb-4 sm:mb-6">
                 Define cuánto quieres gastar al mes y ve en tiempo real cuánto llevas gastado. 
                 Nunca más te sorprenderá el fin de mes.
               </p>
               <ul className="space-y-2 sm:space-y-3">
-                <li className="flex items-center gap-2 sm:gap-3 text-muted-foreground text-sm sm:text-base">
-                  <Check className="w-4 h-4 sm:w-5 sm:h-5 text-success flex-shrink-0" />
+                <li className="flex items-center gap-2 sm:gap-3 text-muted-foreground text-base sm:text-lg">
+                  <Check className="w-5 h-5 sm:w-5 sm:h-5 text-success flex-shrink-0" />
                   <span>Presupuesto mensual personalizable</span>
                 </li>
-                <li className="flex items-center gap-2 sm:gap-3 text-muted-foreground text-sm sm:text-base">
-                  <Check className="w-4 h-4 sm:w-5 sm:h-5 text-success flex-shrink-0" />
+                <li className="flex items-center gap-2 sm:gap-3 text-muted-foreground text-base sm:text-lg">
+                  <Check className="w-5 h-5 sm:w-5 sm:h-5 text-success flex-shrink-0" />
                   <span>Ingresos vs gastos en un vistazo</span>
                 </li>
-                <li className="flex items-center gap-2 sm:gap-3 text-muted-foreground text-sm sm:text-base">
-                  <Check className="w-4 h-4 sm:w-5 sm:h-5 text-success flex-shrink-0" />
+                <li className="flex items-center gap-2 sm:gap-3 text-muted-foreground text-base sm:text-lg">
+                  <Check className="w-5 h-5 sm:w-5 sm:h-5 text-success flex-shrink-0" />
                   <span>Descarga PDFs de tus movimientos</span>
                 </li>
               </ul>
@@ -837,7 +837,7 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <ScrollReveal>
             <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-xl sm:text-2xl md:text-4xl font-bold mb-3 sm:mb-4 px-2">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 px-2">
                 Planes simples, sin letra chica
               </h2>
             </div>
@@ -847,23 +847,23 @@ const Landing = () => {
             {/* Free Plan */}
             <ScrollReveal delay={0} direction="left">
               <div className="relative bg-card/30 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-border/50 h-full">
-                <h3 className="text-lg sm:text-xl font-bold mb-2">Gratis</h3>
+                <h3 className="text-xl sm:text-2xl font-bold mb-2">Gratis</h3>
                 <div className="mb-4 sm:mb-6">
-                  <span className="text-3xl sm:text-4xl font-bold">$0</span>
-                  <span className="text-muted-foreground ml-2 text-sm sm:text-base">/ mes</span>
+                  <span className="text-4xl sm:text-5xl font-bold">$0</span>
+                  <span className="text-muted-foreground ml-2 text-base sm:text-lg">/ mes</span>
                 </div>
                 
                 <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-                  <li className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base">
-                    <Check className="w-4 h-4 sm:w-5 sm:h-5 text-success flex-shrink-0" />
+                  <li className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg">
+                    <Check className="w-5 h-5 sm:w-5 sm:h-5 text-success flex-shrink-0" />
                     <span>30 mensajes por mes</span>
                   </li>
-                  <li className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base">
-                    <Check className="w-4 h-4 sm:w-5 sm:h-5 text-success flex-shrink-0" />
+                  <li className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg">
+                    <Check className="w-5 h-5 sm:w-5 sm:h-5 text-success flex-shrink-0" />
                     <span>Registro automático</span>
                   </li>
-                  <li className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base">
-                    <Check className="w-4 h-4 sm:w-5 sm:h-5 text-success flex-shrink-0" />
+                  <li className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg">
+                    <Check className="w-5 h-5 sm:w-5 sm:h-5 text-success flex-shrink-0" />
                     <span>Dashboard básico</span>
                   </li>
                 </ul>
@@ -887,28 +887,28 @@ const Landing = () => {
                   RECOMENDADO
                 </div>
                 
-                <h3 className="text-lg sm:text-xl font-bold mb-2 mt-2">Premium</h3>
+                <h3 className="text-xl sm:text-2xl font-bold mb-2 mt-2">Premium</h3>
                 <div className="mb-2">
-                  <span className="text-3xl sm:text-4xl font-bold">$3</span>
-                  <span className="text-muted-foreground ml-2 text-sm sm:text-base">/ mes</span>
+                  <span className="text-4xl sm:text-5xl font-bold">$3</span>
+                  <span className="text-muted-foreground ml-2 text-base sm:text-lg">/ mes</span>
                 </div>
-                <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6">o $25 / año (ahorra 30%)</p>
+                <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">o $25 / año (ahorra 30%)</p>
                 
                 <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-                  <li className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base">
-                    <Check className="w-4 h-4 sm:w-5 sm:h-5 text-success flex-shrink-0" />
+                  <li className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg">
+                    <Check className="w-5 h-5 sm:w-5 sm:h-5 text-success flex-shrink-0" />
                     <span className="font-medium">Mensajes ilimitados</span>
                   </li>
-                  <li className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base">
-                    <Check className="w-4 h-4 sm:w-5 sm:h-5 text-success flex-shrink-0" />
+                  <li className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg">
+                    <Check className="w-5 h-5 sm:w-5 sm:h-5 text-success flex-shrink-0" />
                     <span>Dashboard completo</span>
                   </li>
-                  <li className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base">
-                    <Check className="w-4 h-4 sm:w-5 sm:h-5 text-success flex-shrink-0" />
+                  <li className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg">
+                    <Check className="w-5 h-5 sm:w-5 sm:h-5 text-success flex-shrink-0" />
                     <span>Presupuestos y metas</span>
                   </li>
-                  <li className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base">
-                    <Check className="w-4 h-4 sm:w-5 sm:h-5 text-success flex-shrink-0" />
+                  <li className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg">
+                    <Check className="w-5 h-5 sm:w-5 sm:h-5 text-success flex-shrink-0" />
                     <span>Historial sin límites</span>
                   </li>
                 </ul>
