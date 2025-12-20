@@ -2,6 +2,7 @@ import { MessageCircle, Mic, Receipt, TrendingUp, Check, ArrowRight, Sparkles, U
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { AnimatedChatDemo } from "@/components/landing/AnimatedChatDemo";
 
 // Feature screenshots
 import featureWhatsapp from "@/assets/landing/feature-whatsapp.jpg";
@@ -413,14 +414,19 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <span className="text-primary text-sm font-semibold tracking-wider uppercase">
-              Prueba Tu Mayordomo
+              Mira Tu Mayordomo en acción
             </span>
             <h2 className="text-2xl md:text-4xl font-bold mt-2 mb-4">
-              Mira lo fácil que es registrar tus gastos por WhatsApp
+              Así de fácil es registrar tus gastos
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Envía un mensaje y tu gasto o ingreso queda registrado automáticamente.
+              Texto, audio o foto – Tu Mayordomo entiende todo y registra automáticamente.
             </p>
+          </div>
+
+          {/* Animated Chat Demo */}
+          <div className="max-w-lg mx-auto mb-20">
+            <AnimatedChatDemo />
           </div>
 
           {/* 3 Steps */}
