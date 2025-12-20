@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { AnimatedChatDemo } from "@/components/landing/AnimatedChatDemo";
+import { ScrollReveal } from "@/components/landing/ScrollReveal";
 
 // Feature screenshots
 import featureWhatsapp from "@/assets/landing/feature-whatsapp.jpg";
@@ -200,17 +201,19 @@ const Landing = () => {
       {/* Primeros Pasos - Animated Onboarding Section */}
       <section className="relative z-10 py-20 md:py-32 overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <span className="text-success text-sm font-semibold tracking-wider uppercase">
-              Comienza en minutos
-            </span>
-            <h2 className="text-2xl md:text-4xl font-bold mt-2 mb-4">
-              ¿Cómo empezar a usar Tu Mayordomo?
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Solo 3 pasos simples para comenzar a controlar tus finanzas
-            </p>
-          </div>
+          <ScrollReveal>
+            <div className="text-center mb-16">
+              <span className="text-success text-sm font-semibold tracking-wider uppercase">
+                Comienza en minutos
+              </span>
+              <h2 className="text-2xl md:text-4xl font-bold mt-2 mb-4">
+                ¿Cómo empezar a usar Tu Mayordomo?
+              </h2>
+              <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+                Solo 3 pasos simples para comenzar a controlar tus finanzas
+              </p>
+            </div>
+          </ScrollReveal>
 
           {/* Animated Steps Timeline */}
           <div className="relative max-w-5xl mx-auto">
@@ -219,7 +222,8 @@ const Landing = () => {
             
             <div className="grid md:grid-cols-3 gap-8 md:gap-4">
               {/* Step 1 - Crear cuenta y configurar WhatsApp */}
-              <div className="relative group">
+              <ScrollReveal delay={0} direction="up">
+                <div className="relative group h-full">
                 {/* Animated Glow */}
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/30 rounded-3xl blur-2xl opacity-0 group-hover:opacity-60 transition-all duration-700" />
                 
@@ -269,11 +273,13 @@ const Landing = () => {
                   </div>
                 </div>
               </div>
+              </ScrollReveal>
 
               {/* Step 2 - Completa el formulario */}
-              <div className="relative group" style={{ animationDelay: "0.2s" }}>
-                {/* Animated Glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-accent/30 to-lilac/30 rounded-3xl blur-2xl opacity-0 group-hover:opacity-60 transition-all duration-700" />
+              <ScrollReveal delay={150} direction="up">
+                <div className="relative group h-full">
+                  {/* Animated Glow */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-accent/30 to-lilac/30 rounded-3xl blur-2xl opacity-0 group-hover:opacity-60 transition-all duration-700" />
                 
                 <div className="relative bg-card/50 backdrop-blur-lg rounded-3xl p-6 border border-border/50 h-full">
                   {/* Step Number with Pulse Animation */}
@@ -332,11 +338,13 @@ const Landing = () => {
                   </div>
                 </div>
               </div>
+              </ScrollReveal>
 
               {/* Step 3 - Usar el botón de WhatsApp */}
-              <div className="relative group" style={{ animationDelay: "0.4s" }}>
-                {/* Animated Glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-success/30 to-primary/30 rounded-3xl blur-2xl opacity-0 group-hover:opacity-60 transition-all duration-700" />
+              <ScrollReveal delay={300} direction="up">
+                <div className="relative group h-full">
+                  {/* Animated Glow */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-success/30 to-primary/30 rounded-3xl blur-2xl opacity-0 group-hover:opacity-60 transition-all duration-700" />
                 
                 <div className="relative bg-card/50 backdrop-blur-lg rounded-3xl p-6 border border-border/50 h-full">
                   {/* Step Number with Pulse Animation */}
@@ -388,6 +396,7 @@ const Landing = () => {
                   </div>
                 </div>
               </div>
+              </ScrollReveal>
             </div>
 
             {/* Bottom CTA */}
@@ -412,141 +421,156 @@ const Landing = () => {
       {/* How It Works - Demo Section */}
       <section id="como-funciona" className="relative z-10 py-20 md:py-32">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <span className="text-primary text-sm font-semibold tracking-wider uppercase">
-              Mira Tu Mayordomo en acción
-            </span>
-            <h2 className="text-2xl md:text-4xl font-bold mt-2 mb-4">
-              Así de fácil es registrar tus gastos
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Texto, audio o foto – Tu Mayordomo entiende todo y registra automáticamente.
-            </p>
-          </div>
+          <ScrollReveal>
+            <div className="text-center mb-12">
+              <span className="text-primary text-sm font-semibold tracking-wider uppercase">
+                Mira Tu Mayordomo en acción
+              </span>
+              <h2 className="text-2xl md:text-4xl font-bold mt-2 mb-4">
+                Así de fácil es registrar tus gastos
+              </h2>
+              <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+                Texto, audio o foto – Tu Mayordomo entiende todo y registra automáticamente.
+              </p>
+            </div>
+          </ScrollReveal>
 
           {/* Animated Chat Demo */}
-          <div className="max-w-lg mx-auto mb-20">
-            <AnimatedChatDemo />
-          </div>
+          <ScrollReveal delay={100}>
+            <div className="max-w-lg mx-auto mb-20">
+              <AnimatedChatDemo />
+            </div>
+          </ScrollReveal>
 
-          {/* 3 Steps */}
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mt-16">
             {/* Step 1 */}
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative bg-card/50 backdrop-blur-lg rounded-3xl p-8 border border-border/50 h-full">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-header flex items-center justify-center mb-6 shadow-glow-sm">
-                  <MessageCircle className="w-8 h-8 text-primary-foreground" />
+            <ScrollReveal delay={0}>
+              <div className="relative group h-full">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative bg-card/50 backdrop-blur-lg rounded-3xl p-8 border border-border/50 h-full">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-header flex items-center justify-center mb-6 shadow-glow-sm">
+                    <MessageCircle className="w-8 h-8 text-primary-foreground" />
+                  </div>
+                  <span className="text-primary font-bold text-sm">Paso 1</span>
+                  <h3 className="text-xl font-bold mt-2 mb-3">Envía un mensaje</h3>
+                  <p className="text-muted-foreground">
+                    Texto, audio o foto de boleta por WhatsApp. Como si le escribieras a un amigo.
+                  </p>
                 </div>
-                <span className="text-primary font-bold text-sm">Paso 1</span>
-                <h3 className="text-xl font-bold mt-2 mb-3">Envía un mensaje</h3>
-                <p className="text-muted-foreground">
-                  Texto, audio o foto de boleta por WhatsApp. Como si le escribieras a un amigo.
-                </p>
               </div>
-            </div>
+            </ScrollReveal>
 
             {/* Step 2 */}
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-accent/20 to-lilac/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative bg-card/50 backdrop-blur-lg rounded-3xl p-8 border border-border/50 h-full">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-accent to-lilac flex items-center justify-center mb-6 shadow-glow-sm">
-                  <Sparkles className="w-8 h-8 text-white" />
+            <ScrollReveal delay={100}>
+              <div className="relative group h-full">
+                <div className="absolute inset-0 bg-gradient-to-r from-accent/20 to-lilac/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative bg-card/50 backdrop-blur-lg rounded-3xl p-8 border border-border/50 h-full">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-accent to-lilac flex items-center justify-center mb-6 shadow-glow-sm">
+                    <Sparkles className="w-8 h-8 text-white" />
+                  </div>
+                  <span className="text-accent font-bold text-sm">Paso 2</span>
+                  <h3 className="text-xl font-bold mt-2 mb-3">Procesamiento inteligente</h3>
+                  <p className="text-muted-foreground">
+                    Tu Mayordomo identifica el monto, la categoría y la fecha automáticamente.
+                  </p>
                 </div>
-                <span className="text-accent font-bold text-sm">Paso 2</span>
-                <h3 className="text-xl font-bold mt-2 mb-3">Procesamiento inteligente</h3>
-                <p className="text-muted-foreground">
-                  Tu Mayordomo identifica el monto, la categoría y la fecha automáticamente.
-                </p>
               </div>
-            </div>
+            </ScrollReveal>
 
             {/* Step 3 */}
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-success/20 to-primary/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative bg-card/50 backdrop-blur-lg rounded-3xl p-8 border border-border/50 h-full">
-                <div className="w-16 h-16 rounded-2xl bg-success flex items-center justify-center mb-6 shadow-glow-sm">
-                  <Check className="w-8 h-8 text-white" />
+            <ScrollReveal delay={200}>
+              <div className="relative group h-full">
+                <div className="absolute inset-0 bg-gradient-to-r from-success/20 to-primary/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative bg-card/50 backdrop-blur-lg rounded-3xl p-8 border border-border/50 h-full">
+                  <div className="w-16 h-16 rounded-2xl bg-success flex items-center justify-center mb-6 shadow-glow-sm">
+                    <Check className="w-8 h-8 text-white" />
+                  </div>
+                  <span className="text-success font-bold text-sm">Paso 3</span>
+                  <h3 className="text-xl font-bold mt-2 mb-3">Registro automático</h3>
+                  <p className="text-muted-foreground">
+                    Todo aparece al instante en tu panel. Organizado y listo para consultar.
+                  </p>
                 </div>
-                <span className="text-success font-bold text-sm">Paso 3</span>
-                <h3 className="text-xl font-bold mt-2 mb-3">Registro automático</h3>
-                <p className="text-muted-foreground">
-                  Todo aparece al instante en tu panel. Organizado y listo para consultar.
-                </p>
               </div>
-            </div>
+            </ScrollReveal>
           </div>
 
           {/* Highlight */}
-          <div className="text-center mt-16">
-            <p className="text-xl md:text-2xl font-medium text-foreground mb-8">
-              Olvídate de Excel y de apps complicadas.
-            </p>
-            <Button 
-              onClick={handleCreateAccount}
-              size="lg"
-              className="bg-gradient-header hover:opacity-90 text-primary-foreground shadow-elegant px-8 py-6 text-lg font-semibold"
-            >
-              Comenzar ahora
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </div>
+          <ScrollReveal>
+            <div className="text-center mt-16">
+              <p className="text-xl md:text-2xl font-medium text-foreground mb-8">
+                Olvídate de Excel y de apps complicadas.
+              </p>
+              <Button 
+                onClick={handleCreateAccount}
+                size="lg"
+                className="bg-gradient-header hover:opacity-90 text-primary-foreground shadow-elegant px-8 py-6 text-lg font-semibold"
+              >
+                Comenzar ahora
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* Features Showcase Section */}
       <section id="funciones" className="relative z-10 py-20 md:py-32">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <span className="text-accent text-sm font-semibold tracking-wider uppercase">
-              Todo lo que puedes hacer
-            </span>
-            <h2 className="text-2xl md:text-4xl font-bold mt-2 mb-4">
-              Más que solo registrar gastos
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Un dashboard completo para controlar tus finanzas personales o de tu negocio.
-            </p>
-          </div>
+          <ScrollReveal>
+            <div className="text-center mb-16">
+              <span className="text-accent text-sm font-semibold tracking-wider uppercase">
+                Todo lo que puedes hacer
+              </span>
+              <h2 className="text-2xl md:text-4xl font-bold mt-2 mb-4">
+                Más que solo registrar gastos
+              </h2>
+              <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+                Un dashboard completo para controlar tus finanzas personales o de tu negocio.
+              </p>
+            </div>
+          </ScrollReveal>
 
           {/* Feature 1 - WhatsApp Real */}
-          <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center max-w-6xl mx-auto mb-20 md:mb-32">
-            <div className="order-2 md:order-1">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/20 text-success text-sm font-medium mb-4">
-                <MessageCircle className="w-4 h-4" />
-                WhatsApp
+          <ScrollReveal direction="left">
+            <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center max-w-6xl mx-auto mb-20 md:mb-32">
+              <div className="order-2 md:order-1">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/20 text-success text-sm font-medium mb-4">
+                  <MessageCircle className="w-4 h-4" />
+                  WhatsApp
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                  Registra gastos como si chatearas con un amigo
+                </h3>
+                <p className="text-muted-foreground text-lg mb-6">
+                  Escribe naturalmente: "Me compré unos audífonos de 5 mil pesos hoy" y Tu Mayordomo 
+                  entiende el monto, la categoría y la fecha automáticamente.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-3 text-muted-foreground">
+                    <Check className="w-5 h-5 text-success flex-shrink-0" />
+                    <span>Texto, audio o fotos de boletas</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-muted-foreground">
+                    <Check className="w-5 h-5 text-success flex-shrink-0" />
+                    <span>Categorización automática con IA</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-muted-foreground">
+                    <Check className="w-5 h-5 text-success flex-shrink-0" />
+                    <span>Respuesta inmediata de confirmación</span>
+                  </li>
+                </ul>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                Registra gastos como si chatearas con un amigo
-              </h3>
-              <p className="text-muted-foreground text-lg mb-6">
-                Escribe naturalmente: "Me compré unos audífonos de 5 mil pesos hoy" y Tu Mayordomo 
-                entiende el monto, la categoría y la fecha automáticamente.
-              </p>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-3 text-muted-foreground">
-                  <Check className="w-5 h-5 text-success flex-shrink-0" />
-                  <span>Texto, audio o fotos de boletas</span>
-                </li>
-                <li className="flex items-center gap-3 text-muted-foreground">
-                  <Check className="w-5 h-5 text-success flex-shrink-0" />
-                  <span>Categorización automática con IA</span>
-                </li>
-                <li className="flex items-center gap-3 text-muted-foreground">
-                  <Check className="w-5 h-5 text-success flex-shrink-0" />
-                  <span>Respuesta inmediata de confirmación</span>
-                </li>
-              </ul>
+              <div className="order-1 md:order-2 relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-success/30 to-primary/30 rounded-3xl blur-2xl opacity-50 group-hover:opacity-70 transition-opacity" />
+                <img 
+                  src={featureWhatsapp} 
+                  alt="WhatsApp chat con Tu Mayordomo" 
+                  className="relative rounded-3xl shadow-elegant border border-border/50 w-full max-w-sm mx-auto"
+                />
+              </div>
             </div>
-            <div className="order-1 md:order-2 relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-success/30 to-primary/30 rounded-3xl blur-2xl opacity-50 group-hover:opacity-70 transition-opacity" />
-              <img 
-                src={featureWhatsapp} 
-                alt="WhatsApp chat con Tu Mayordomo" 
-                className="relative rounded-3xl shadow-elegant border border-border/50 w-full max-w-sm mx-auto"
-              />
-            </div>
-          </div>
+          </ScrollReveal>
 
           {/* Feature 2 - Gastos y Presupuesto */}
           <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center max-w-6xl mx-auto mb-20 md:mb-32">
@@ -677,48 +701,52 @@ const Landing = () => {
       {/* Pricing Section */}
       <section id="precios" className="relative z-10 py-20 md:py-32">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-4xl font-bold mb-4">
-              Planes simples, sin letra chica
-            </h2>
-          </div>
+          <ScrollReveal>
+            <div className="text-center mb-12">
+              <h2 className="text-2xl md:text-4xl font-bold mb-4">
+                Planes simples, sin letra chica
+              </h2>
+            </div>
+          </ScrollReveal>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Free Plan */}
-            <div className="relative bg-card/30 backdrop-blur-lg rounded-3xl p-8 border border-border/50">
-              <h3 className="text-xl font-bold mb-2">Gratis</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold">$0</span>
-                <span className="text-muted-foreground ml-2">/ mes</span>
-              </div>
-              
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-success flex-shrink-0" />
-                  <span>30 mensajes por mes</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-success flex-shrink-0" />
-                  <span>Registro automático</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-success flex-shrink-0" />
-                  <span>Dashboard básico</span>
-                </li>
-              </ul>
+            <ScrollReveal delay={0} direction="left">
+              <div className="relative bg-card/30 backdrop-blur-lg rounded-3xl p-8 border border-border/50 h-full">
+                <h3 className="text-xl font-bold mb-2">Gratis</h3>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold">$0</span>
+                  <span className="text-muted-foreground ml-2">/ mes</span>
+                </div>
+                
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-success flex-shrink-0" />
+                    <span>30 mensajes por mes</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-success flex-shrink-0" />
+                    <span>Registro automático</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-success flex-shrink-0" />
+                    <span>Dashboard básico</span>
+                  </li>
+                </ul>
 
-              <Button 
-                onClick={handleCreateAccount}
-                variant="outline" 
-                className="w-full border-primary text-primary hover:bg-primary/10"
-                size="lg"
-              >
-                Crear cuenta gratis
-              </Button>
-            </div>
+                <Button 
+                  onClick={handleCreateAccount}
+                  variant="outline" 
+                  className="w-full border-primary text-primary hover:bg-primary/10"
+                  size="lg"
+                >
+                  Crear cuenta gratis
+                </Button>
+              </div>
+            </ScrollReveal>
 
             {/* Premium Plan */}
-            <div className="relative group">
+            <ScrollReveal delay={100} direction="right">
               <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-lilac rounded-3xl blur-xl opacity-30" />
               <div className="relative bg-card/50 backdrop-blur-lg rounded-3xl p-8 border-2 border-primary/50 shadow-elegant">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-header text-white text-xs font-bold px-4 py-1 rounded-full">
@@ -759,7 +787,7 @@ const Landing = () => {
                   Pasar a Premium
                 </Button>
               </div>
-            </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -767,11 +795,13 @@ const Landing = () => {
       {/* Who Is It For Section */}
       <section className="relative z-10 py-20 md:py-32">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-4xl font-bold mb-4">
-              ¿Para quién es Tu Mayordomo?
-            </h2>
-          </div>
+          <ScrollReveal>
+            <div className="text-center mb-12">
+              <h2 className="text-2xl md:text-4xl font-bold mb-4">
+                ¿Para quién es Tu Mayordomo?
+              </h2>
+            </div>
+          </ScrollReveal>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
             <div className="bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-border/50 text-center group hover:border-primary/50 transition-colors">
@@ -808,25 +838,27 @@ const Landing = () => {
       {/* Final CTA Section */}
       <section className="relative z-10 py-20 md:py-32">
         <div className="container mx-auto px-4">
-          <div className="relative max-w-3xl mx-auto">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-lilac rounded-3xl blur-2xl opacity-20" />
-            <div className="relative bg-card/50 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-border/50 text-center shadow-elegant">
-              <h2 className="text-2xl md:text-4xl font-bold mb-4">
-                Empieza a controlar tu dinero hoy
-              </h2>
-              <p className="text-lg text-muted-foreground mb-8">
-                Solo necesitas WhatsApp
-              </p>
-              <Button 
-                onClick={handleCreateAccount}
-                size="lg"
-                className="bg-gradient-header hover:opacity-90 text-primary-foreground shadow-elegant px-10 py-6 text-lg font-semibold"
-              >
-                Crear cuenta gratis
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
+          <ScrollReveal>
+            <div className="relative max-w-3xl mx-auto">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-lilac rounded-3xl blur-2xl opacity-20" />
+              <div className="relative bg-card/50 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-border/50 text-center shadow-elegant">
+                <h2 className="text-2xl md:text-4xl font-bold mb-4">
+                  Empieza a controlar tu dinero hoy
+                </h2>
+                <p className="text-lg text-muted-foreground mb-8">
+                  Solo necesitas WhatsApp
+                </p>
+                <Button 
+                  onClick={handleCreateAccount}
+                  size="lg"
+                  className="bg-gradient-header hover:opacity-90 text-primary-foreground shadow-elegant px-10 py-6 text-lg font-semibold"
+                >
+                  Crear cuenta gratis
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
