@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { AnimatedChatDemo } from "@/components/landing/AnimatedChatDemo";
 import { ScrollReveal } from "@/components/landing/ScrollReveal";
 
+// Logo
+import apoyadorLogo from "@/assets/apoyador-logo.png";
+
 // Feature screenshots
 import featureWhatsapp from "@/assets/landing/feature-whatsapp.jpg";
 import featureGastos from "@/assets/landing/feature-gastos.jpg";
@@ -46,9 +49,7 @@ const Landing = () => {
       <header className="relative z-50 w-full">
         <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-header flex items-center justify-center shadow-glow-sm">
-              <span className="text-xl font-bold text-primary-foreground">TM</span>
-            </div>
+            <img src={apoyadorLogo} alt="Tu Mayordomo" className="w-10 h-10 rounded-xl object-contain" />
             <span className="text-xl font-bold text-foreground">Tu Mayordomo</span>
           </div>
           
