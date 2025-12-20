@@ -6,7 +6,7 @@ import { AnimatedChatDemo } from "@/components/landing/AnimatedChatDemo";
 import { ScrollReveal } from "@/components/landing/ScrollReveal";
 
 // Logo
-import apoyadorLogo from "@/assets/apoyador-logo.png";
+import tuMayordomoLogo from "@/assets/tu-mayordomo-logo.png";
 
 // Feature screenshots
 import featureWhatsapp from "@/assets/landing/feature-whatsapp.jpg";
@@ -49,7 +49,7 @@ const Landing = () => {
       <header className="relative z-50 w-full">
         <nav className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <img src={apoyadorLogo} alt="Tu Mayordomo" className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl object-contain flex-shrink-0" />
+            <img src={tuMayordomoLogo} alt="Tu Mayordomo" className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl object-contain flex-shrink-0" />
             <span className="text-base sm:text-xl font-bold text-foreground truncate">Tu Mayordomo</span>
           </div>
           
@@ -999,7 +999,7 @@ const Landing = () => {
       <footer className="relative z-10 py-6 sm:py-8 border-t border-border/30">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <img src={apoyadorLogo} alt="Tu Mayordomo" className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg object-contain" />
+            <img src={tuMayordomoLogo} alt="Tu Mayordomo" className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg object-contain" />
             <span className="font-semibold text-sm sm:text-base">Tu Mayordomo</span>
           </div>
           <p className="text-muted-foreground text-xs sm:text-sm">
