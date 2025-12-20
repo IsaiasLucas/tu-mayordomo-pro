@@ -1,4 +1,5 @@
-import { MessageCircle, Mic, Receipt, TrendingUp, Check, ArrowRight, Sparkles, Users, FileSpreadsheet, Globe, Target, PieChart, BarChart3, Wallet } from "lucide-react";
+import { MessageCircle, Mic, Receipt, TrendingUp, Check, ArrowRight, Sparkles, Users, FileSpreadsheet, Globe, Target, PieChart, BarChart3, Wallet, Phone, UserCheck, Smartphone } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -190,6 +191,218 @@ const Landing = () => {
             <div className="flex items-center gap-2">
               <Check className="w-4 h-4 text-success" />
               <span>Solo necesitas WhatsApp</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Primeros Pasos - Animated Onboarding Section */}
+      <section className="relative z-10 py-20 md:py-32 overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <span className="text-success text-sm font-semibold tracking-wider uppercase">
+              Comienza en minutos
+            </span>
+            <h2 className="text-2xl md:text-4xl font-bold mt-2 mb-4">
+              ¿Cómo empezar a usar Tu Mayordomo?
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+              Solo 3 pasos simples para comenzar a controlar tus finanzas
+            </p>
+          </div>
+
+          {/* Animated Steps Timeline */}
+          <div className="relative max-w-5xl mx-auto">
+            {/* Connection Line */}
+            <div className="hidden md:block absolute top-32 left-1/6 right-1/6 h-1 bg-gradient-to-r from-primary via-accent to-success rounded-full opacity-30" />
+            
+            <div className="grid md:grid-cols-3 gap-8 md:gap-4">
+              {/* Step 1 - Crear cuenta y configurar WhatsApp */}
+              <div className="relative group">
+                {/* Animated Glow */}
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/30 rounded-3xl blur-2xl opacity-0 group-hover:opacity-60 transition-all duration-700" />
+                
+                <div className="relative bg-card/50 backdrop-blur-lg rounded-3xl p-6 border border-border/50 h-full">
+                  {/* Step Number with Pulse Animation */}
+                  <div className="relative mb-6">
+                    <div className="absolute inset-0 w-16 h-16 rounded-2xl bg-primary/40 blur-lg animate-pulse" />
+                    <div className="relative w-16 h-16 rounded-2xl bg-gradient-header flex items-center justify-center shadow-glow-sm">
+                      <span className="text-2xl font-bold text-primary-foreground">1</span>
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
+                    <UserCheck className="w-5 h-5 text-primary" />
+                    Crea tu cuenta y configura WhatsApp
+                  </h3>
+                  
+                  <p className="text-muted-foreground mb-6">
+                    Regístrate gratis y completa tu perfil con tu número de WhatsApp. 
+                    <strong className="text-foreground"> Esto es esencial</strong> – Tu Mayordomo solo responde a números verificados.
+                  </p>
+                  
+                  {/* Animated Phone Card Mockup */}
+                  <div className="relative mt-4">
+                    <div className="bg-background/80 rounded-2xl p-4 border border-primary/30 shadow-elegant transform group-hover:scale-[1.02] transition-transform duration-500">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                          <Phone className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-sm">Configura tu WhatsApp</p>
+                          <p className="text-xs text-muted-foreground">Paso requerido</p>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="h-3 bg-muted rounded-full w-3/4" />
+                        <div className="h-3 bg-muted rounded-full w-1/2" />
+                      </div>
+                      <div className="mt-4 h-10 bg-gradient-header rounded-xl flex items-center justify-center">
+                        <span className="text-white text-sm font-medium">Completar Perfil</span>
+                      </div>
+                    </div>
+                    {/* Floating Arrow */}
+                    <div className="hidden md:flex absolute -right-8 top-1/2 -translate-y-1/2 w-8 h-8 items-center justify-center animate-pulse">
+                      <ArrowRight className="w-6 h-6 text-primary/50" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 2 - Completa el formulario */}
+              <div className="relative group" style={{ animationDelay: "0.2s" }}>
+                {/* Animated Glow */}
+                <div className="absolute inset-0 bg-gradient-to-r from-accent/30 to-lilac/30 rounded-3xl blur-2xl opacity-0 group-hover:opacity-60 transition-all duration-700" />
+                
+                <div className="relative bg-card/50 backdrop-blur-lg rounded-3xl p-6 border border-border/50 h-full">
+                  {/* Step Number with Pulse Animation */}
+                  <div className="relative mb-6">
+                    <div className="absolute inset-0 w-16 h-16 rounded-2xl bg-accent/40 blur-lg animate-pulse" style={{ animationDelay: "0.5s" }} />
+                    <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-r from-accent to-lilac flex items-center justify-center shadow-glow-sm">
+                      <span className="text-2xl font-bold text-white">2</span>
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
+                    <Smartphone className="w-5 h-5 text-accent" />
+                    Completa tu perfil
+                  </h3>
+                  
+                  <p className="text-muted-foreground mb-6">
+                    Ingresa tu nombre, número de WhatsApp, país y moneda. 
+                    <strong className="text-foreground"> Tu país se detecta automáticamente</strong> para facilitar el proceso.
+                  </p>
+                  
+                  {/* Animated Form Mockup */}
+                  <div className="relative mt-4">
+                    <div className="bg-background/80 rounded-2xl p-4 border border-accent/30 shadow-elegant transform group-hover:scale-[1.02] transition-transform duration-500">
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Nombre</p>
+                          <div className="h-8 bg-muted rounded-lg" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">WhatsApp</p>
+                          <div className="h-8 bg-muted rounded-lg flex items-center px-3">
+                            <span className="text-xs text-foreground/70">+54 11 1234-5678</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <div className="flex-1">
+                            <p className="text-xs text-muted-foreground mb-1">País</p>
+                            <div className="h-8 bg-muted rounded-lg flex items-center px-2 gap-1">
+                              <span className="text-sm">🇦🇷</span>
+                              <span className="text-xs">Argentina</span>
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-xs text-muted-foreground mb-1">Moneda</p>
+                            <div className="h-8 bg-muted rounded-lg flex items-center px-2">
+                              <span className="text-xs">$ ARS</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Floating Arrow */}
+                    <div className="hidden md:flex absolute -right-8 top-1/2 -translate-y-1/2 w-8 h-8 items-center justify-center animate-pulse">
+                      <ArrowRight className="w-6 h-6 text-accent/50" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 3 - Usar el botón de WhatsApp */}
+              <div className="relative group" style={{ animationDelay: "0.4s" }}>
+                {/* Animated Glow */}
+                <div className="absolute inset-0 bg-gradient-to-r from-success/30 to-primary/30 rounded-3xl blur-2xl opacity-0 group-hover:opacity-60 transition-all duration-700" />
+                
+                <div className="relative bg-card/50 backdrop-blur-lg rounded-3xl p-6 border border-border/50 h-full">
+                  {/* Step Number with Pulse Animation */}
+                  <div className="relative mb-6">
+                    <div className="absolute inset-0 w-16 h-16 rounded-2xl bg-success/40 blur-lg animate-pulse" style={{ animationDelay: "1s" }} />
+                    <div className="relative w-16 h-16 rounded-2xl bg-success flex items-center justify-center shadow-glow-sm">
+                      <span className="text-2xl font-bold text-white">3</span>
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
+                    <MessageCircle className="w-5 h-5 text-success" />
+                    ¡Comienza a usar Tu Mayordomo!
+                  </h3>
+                  
+                  <p className="text-muted-foreground mb-6">
+                    Toca el <strong className="text-foreground">botón de WhatsApp</strong> flotante en la app y empieza a registrar 
+                    tus gastos e ingresos. ¡Así de fácil!
+                  </p>
+                  
+                  {/* Animated App Interface Mockup */}
+                  <div className="relative mt-4">
+                    <div className="bg-background/80 rounded-2xl p-4 border border-success/30 shadow-elegant transform group-hover:scale-[1.02] transition-transform duration-500">
+                      {/* Mini Nav Bar */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                            <span className="text-xs">🏠</span>
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+                            <span className="text-xs">💰</span>
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+                            <span className="text-xs">📊</span>
+                          </div>
+                        </div>
+                        {/* Floating WhatsApp Button with Animation */}
+                        <div className="relative">
+                          <div className="absolute inset-0 w-12 h-12 rounded-full bg-success/50 blur-lg animate-ping" />
+                          <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-success to-primary flex items-center justify-center shadow-glow-sm">
+                            <MessageCircle className="w-6 h-6 text-white" />
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-center text-xs text-muted-foreground">
+                        Toca aquí para abrir WhatsApp
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom CTA */}
+            <div className="text-center mt-12">
+              <p className="text-muted-foreground mb-4">
+                <Check className="w-4 h-4 text-success inline mr-2" />
+                Solo toma <span className="text-foreground font-semibold">2 minutos</span> configurar todo
+              </p>
+              <Button 
+                onClick={handleCreateAccount}
+                size="lg"
+                className="bg-gradient-header hover:opacity-90 text-primary-foreground shadow-elegant px-8 py-6 text-lg font-semibold"
+              >
+                Crear mi cuenta gratis
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
             </div>
           </div>
         </div>
