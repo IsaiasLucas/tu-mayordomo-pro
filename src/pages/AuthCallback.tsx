@@ -35,7 +35,7 @@ export default function AuthCallback() {
         await syncUserProfile();
         
         // Redirect to home - the useAuth hook will handle profile fetching
-        window.location.replace('/inicio');
+        window.location.replace('/app');
       } catch (error) {
         console.error('Error en callback:', error);
         // If error, redirect to auth
