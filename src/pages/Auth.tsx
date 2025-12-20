@@ -42,13 +42,13 @@ export default function Auth() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/inicio");
+        navigate("/app");
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        navigate("/inicio");
+        navigate("/app");
       }
     });
 
@@ -184,7 +184,7 @@ export default function Auth() {
             title: "¡Cuenta creada!",
             description: "Bienvenido a Géminis",
           });
-          window.location.replace('/inicio');
+          window.location.replace('/app');
           return;
         }
 
@@ -268,7 +268,7 @@ export default function Auth() {
         });
 
         // Redirigir a inicio para cargar gastos/plan/perfil por user_id
-        window.location.replace('/inicio');
+        window.location.replace('/app');
       }
     } catch (error: any) {
       const msg = (error?.message || '').toLowerCase();

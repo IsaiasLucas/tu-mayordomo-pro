@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import EmailConfirm from "./pages/EmailConfirm";
@@ -9,12 +10,14 @@ import EmailChange from "./pages/EmailChange";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "./components/ui/toaster";
 import { ActiveTabProvider } from "./store/appState";
+
 function App() {
   return (
     <Router>
       <ActiveTabProvider>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/app" element={<Index />} />
           <Route path="/inicio" element={<Index />} />
           <Route path="/gastos" element={<Index />} />
           <Route path="/reportes" element={<Index />} />
